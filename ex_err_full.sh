@@ -1,0 +1,1 @@
+bin/recal-debug -F -C 100 -R "../bams/recal_bams/refpreprocesada.fa" -I "../bams/recal_bams/ERR089819.bam" -c "../bams/recal_output/erroutputgatk.bam" -o "../bams/recal_output/erroutputrecal.bam" -d "errdata.data" -i "errdata.info"
