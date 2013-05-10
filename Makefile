@@ -1,8 +1,12 @@
 CC = gcc
-compiler = gcc
+#compiler = gcc
+compiler = mpicc
+#linker = tau_cc.sh
+linker = mpicc
+#linker = gcc
 
-CFLAGS = -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500 -msse2
-CFLAGS_DEBUG = -ggdb -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500 -msse2
+CFLAGS = -O3 -ansi -Wall -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500 -msse2
+CFLAGS_DEBUG = -O0 -ansi -Wall -ggdb -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500 -msse2
 
 # Main folders
 SRC_DIR = $(PWD)/src
@@ -26,7 +30,7 @@ BWT_DIR = $(BIOINFO_LIBS_DIR)/aligners/bwt
 
 # Include and lib folders
 INCLUDES = -I . -I ./include -I $(LIB_DIR) -I $(COMPBIO_LIB_DIR) -I $(BIOINFO_LIBS_DIR) -I $(COMMON_LIBS_DIR) -I $(INC_DIR) -I $(SAMTOOLS_DIR) -I $(CPROPS_DIR) -I $(LIBXML_DIR) -I $(BWT_DIR) -I /usr/include/libxml2 -I /usr/local/include
-LIBS = -L$(LIB_DIR) -L$(COMPBIO_LIB_DIR) -L$(SAMTOOLS_DIR) -L$(CPROPS_LIB_DIR) -L$(LIBXML_LIB_DIR) -L/usr/lib/x86_64-linux-gnu -Wl,-Bsymbolic-functions -lbam -lcurl -lm -lz -lxml2 -lpthread -lcprops -fopenmp -largtable2
+LIBS = -L$(LIB_DIR) -L$(COMPBIO_LIB_DIR) -L$(SAMTOOLS_DIR) -L$(CPROPS_LIB_DIR) -L$(LIBXML_LIB_DIR) -lm -lbam -lcurl -lxml2 -lpthread -lcprops -fopenmp -largtable2 
 
 # Object file dependencies
 MISC_OBJS = $(COMMONS_DIR)/*.o $(CONTAINERS_DIR)/*.o $(BIOFORMATS_DIR)/bam-sam/*.o $(BWT_DIR)/*.o 
@@ -44,24 +48,23 @@ all: compile-dependencies recal recal-debug
 
 recal: compile-dependencies
 	cd $(SRC_DIR) &&                                                         \
-	$(CC) $(CFLAGS) -c recalibrate.c $(HPG_BAM_FILES) $(INCLUDES) $(LIBS) &&    \
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ recalibrate.o $(ALL_OBJS) $(INCLUDES) $(LIBS)
+	$(compiler) $(CFLAGS) -c recalibrate.c $(HPG_BAM_FILES) $(INCLUDES) $(LIBS) &&    \
+	$(linker) $(CFLAGS) -o $(BIN_DIR)/$@ recalibrate.o $(ALL_OBJS) $(INCLUDES) $(LIBS)
 	
 recal-debug: compile-dependencies
 	cd $(SRC_DIR) &&                                                         \
-	$(CC) $(CFLAGS_DEBUG) -c recalibrate.c $(HPG_BAM_FILES) $(INCLUDES) $(LIBS) -DDEBUG &&    \
-	$(CC) $(CFLAGS_DEBUG) -o $(BIN_DIR)/$@ recalibrate.o $(ALL_OBJS) $(INCLUDES) $(LIBS)
+	$(compiler) $(CFLAGS_DEBUG) -c recalibrate.c $(HPG_BAM_FILES) $(INCLUDES) $(LIBS) -DDEBUG &&    \
+	$(linker) $(CFLAGS_DEBUG) -o $(BIN_DIR)/$@ recalibrate.o $(ALL_OBJS) $(INCLUDES) $(LIBS)
 
 compile-dependencies: bam-dependencies
 	cd $(COMMONS_DIR) && make compiler=$(compiler) &&           \
-	cd $(CONTAINERS_DIR) && make compiler=$(compiler) && \
-	cd $(BIOFORMATS_DIR)/fastq && make compiler=$(compiler)
+	cd $(CONTAINERS_DIR) && make compiler=$(compiler) 
 
 bam-dependencies:
 	cd $(BIOFORMATS_DIR)/bam-sam &&  \
-        $(CC) $(CFLAGS) -c -o $(BIOFORMATS_DIR)/bam-sam/alignment.o $(BIOFORMATS_DIR)/bam-sam/alignment.c $(INCLUDES) $(LIBS) && \
-		$(CC) $(CFLAGS) -c -o $(BIOFORMATS_DIR)/bam-sam/bam_file.o $(BIOFORMATS_DIR)/bam-sam/bam_file.c $(INCLUDES) $(LIBS) && \
-		$(CC) $(CFLAGS) -c -o $(BWT_DIR)/genome.o $(BWT_DIR)/genome.c $(INCLUDES) $(LIBS)
+        $(compiler) $(CFLAGS) -c -o $(BIOFORMATS_DIR)/bam-sam/alignment.o $(BIOFORMATS_DIR)/bam-sam/alignment.c $(INCLUDES) $(LIBS) && \
+		$(compiler) $(CFLAGS) -c -o $(BIOFORMATS_DIR)/bam-sam/bam_file.o $(BIOFORMATS_DIR)/bam-sam/bam_file.c $(INCLUDES) $(LIBS) && \
+		$(compiler) $(CFLAGS) -c -o $(BWT_DIR)/genome.o $(BWT_DIR)/genome.c $(INCLUDES) $(LIBS)
 
 clean:
 	-rm -f $(SRC_DIR)/*~ $(SRC_DIR)/\#*\# $(SRC_DIR)/*.o 
