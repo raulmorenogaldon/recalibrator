@@ -46,9 +46,9 @@ int mymain(	int full,
 	}
 	
 	//Default case: No phase selected
-    if (!full && !p1 && !p2)
+    if (!full && !p1 && !p2 && !compcount)
     {
-		printf("No recalibration phase specified, executing full recalibration.\n");
+		printf("No recalibration phase specified or comparation, executing full recalibration.\n");
 		full = 1;
 	}
 	
