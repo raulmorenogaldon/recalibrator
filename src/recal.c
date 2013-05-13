@@ -84,6 +84,9 @@ void recal_add_base(recal_info_t *data, int qual, int cycle, int dinuc, int miss
 	int qual_cycle_index = qual_index * data->num_cycles + cycle;
 	int qual_dinuc_index = qual_index * data->num_dinuc + dinuc;
 	
+	if(qual < MIN_QUALITY_TO_STAT)
+		return;
+	
 	//Error check
 	if(qual_index >= MAX_QUALITY - MIN_QUALITY || qual_index < 0)
 	{
@@ -137,19 +140,15 @@ void recal_add_base_v(recal_info_t *data, char *seq, char *quals, int init_cycle
 	int qual_cycle_index;
 	int qual_dinuc_index;
 	
-	if(end_cycle >= data->num_cycles)
-	{
-		printf("ERROR: Adding base with cycle greater than data maximum num_cycles\n");
-		exit(1);
-	}
-	
 	//Iterates cycles
 	for(i = init_cycle; i <= end_cycle; i++)
 	{
 		#ifdef NOT_COUNT_NUCLEOTIDE_N
-		if(seq[i] != 'N')
+		if(seq[i] != 'N' && quals[i] >= MIN_QUALITY_TO_STAT)
 		#endif
 		{
+			if(seq[i] != 'A' && seq[i] != 'C' && seq[i] != 'G' && seq[i] != 'T')
+				printf("NUCLEOTIDO: %s : %d\n", seq, i);
 			//Indices
 			qual_index = quals[i] - data->min_qual;
 			qual_cycle_index = qual_index * data->num_cycles + i;
@@ -373,10 +372,10 @@ inline void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal
 	convert_to_quality_string_length(quals, bam1_qual(alig), alig->core.l_qseq, 1);
 
 	//Sequence fields
-	ref_seq = malloc(output_data->num_cycles * sizeof(char));
+	ref_seq = malloc(alig->core.l_qseq * sizeof(char));
 	flag = (uint32_t) alig->core.flag;
 	init_pos = alig->core.pos + 1;
-	end_pos = init_pos + (output_data->num_cycles - 1);
+	end_pos = init_pos + (alig->core.l_qseq - 1);
 	
 	//Obtain reference for this 100 nucleotides
 	genome_read_sequence_by_chr_index(ref_seq, (flag & BAM_FREVERSE) ? 1 : 0, alig->core.tid, &init_pos, &end_pos, ref);
@@ -389,7 +388,7 @@ inline void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal
 		fprintf(fp, "--------------------------\n");
 		fprintf(fp, "Chrom:%d\nPos ref:%lu\nPos bam:%d\nL_qseq:%d\nSEQ:%s\nBAM:%s\n", alig->core.tid, init_pos, alig->core.pos, alig->core.l_qseq, ref_seq, bam_seq);
 		fprintf(fp, "Mis:");
-		for(i = 0; i < output_data->num_cycles; i++)
+		for(i = 0; i < alig->core.l_qseq; i++)
 		{
 			fprintf(fp, "%d",  ref_seq[i] != bam_seq[i]);
 		}
@@ -400,12 +399,12 @@ inline void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal
 	
 	//Iterates nucleotides in this read
 	dinuc = 0;
-	comp_res = malloc(output_data->num_cycles * sizeof(char));
-	dinucs = malloc(output_data->num_cycles * sizeof(int));
-	for(i = 0; i < output_data->num_cycles; i++)
+	comp_res = malloc(alig->core.l_qseq * sizeof(char));
+	dinucs = malloc(alig->core.l_qseq * sizeof(int));
+	for(i = 0; i < alig->core.l_qseq; i++)
 	{	
 		#ifdef USE_SSE /*SSE Block*/
-		if( (i + 16) < output_data->num_cycles)
+		if( (i + 16) < alig->core.l_qseq)
 		{
 			//Use SSE
 			//_mm_prefetch(&ref_seq[i + 16], _MM_HINT_T0);
@@ -490,7 +489,7 @@ inline void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal
 	}
 	
 	//Dinucs
-	for(i = 0; i < output_data->num_cycles; i++)
+	for(i = 0; i < alig->core.l_qseq; i++)
 	{
 		if(i > 0) 
 		{
@@ -507,7 +506,7 @@ inline void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal
 	}
 	
 	//Add data
-	recal_add_base_v(output_data, bam_seq, quals, 0, output_data->num_cycles - 1, dinucs, comp_res);
+	recal_add_base_v(output_data, bam_seq, quals, 0, alig->core.l_qseq - 1, dinucs, comp_res);
 	
 	free(comp_res);
 	free(dinucs);
@@ -736,7 +735,7 @@ void recal_recalibrate_alignment(bam1_t* alig, recal_info_t *bam_info, bam_file_
 
 	//Iterates nucleotides in this read
 	dinuc = 0;
-	for(i = 0; i < bam_info->num_cycles; i++)
+	for(i = 0; i < alig->core.l_qseq; i++)
 	{			
 		//Compare only if the nucleotide is not "N"
 		#ifdef NOT_COUNT_NUCLEOTIDE_N
@@ -938,7 +937,7 @@ void recal_fprint_info(recal_info_t *data, const char *path)
 	fprintf(fp, "==============================\nQUAL VECTOR:\n");
 	for(i = 0; i < n_quals; i++)
 	{
-		fprintf(fp, "%d \t%u \t%u \t%.2f \n", i + MIN_QUALITY, data->qual_miss[i], data->qual_bases[i], data->qual_delta[i]);
+		fprintf(fp, "%d \t%u \t%u \t%.2f \n", i + MIN_QUALITY, data->qual_miss[i] - SMOOTH_CONSTANT_MISS, data->qual_bases[i] - SMOOTH_CONSTANT_BASES, data->qual_delta[i] - SMOOTH_CONSTANT_MISS);
 	}
 	
 	//Print cycle infos
@@ -948,7 +947,7 @@ void recal_fprint_info(recal_info_t *data, const char *path)
 		fprintf(fp, "%d \t", i + MIN_QUALITY);
 		for(j = 0; j < n_cycles; j++)
 		{
-			fprintf(fp, "%u \t", data->qual_cycle_miss[i * n_cycles + j]);
+			fprintf(fp, "%u \t", data->qual_cycle_miss[i * n_cycles + j] - SMOOTH_CONSTANT_MISS);
 		}
 		fprintf(fp, "\n");
 	}
@@ -959,7 +958,7 @@ void recal_fprint_info(recal_info_t *data, const char *path)
 		fprintf(fp, "%d \t", i + MIN_QUALITY);
 		for(j = 0; j < n_cycles; j++)
 		{
-			fprintf(fp, "%u \t", data->qual_cycle_bases[i * n_cycles + j]);
+			fprintf(fp, "%u \t", data->qual_cycle_bases[i * n_cycles + j] - SMOOTH_CONSTANT_BASES);
 		}
 		fprintf(fp, "\n");
 	}
@@ -982,7 +981,7 @@ void recal_fprint_info(recal_info_t *data, const char *path)
 		fprintf(fp, "%d \t", i + MIN_QUALITY);
 		for(j = 0; j < n_dinuc; j++)
 		{
-			fprintf(fp, "%u \t", data->qual_dinuc_miss[i * n_dinuc + j]);
+			fprintf(fp, "%u \t", data->qual_dinuc_miss[i * n_dinuc + j] - SMOOTH_CONSTANT_MISS);
 		}
 		fprintf(fp, "\n");
 	}
@@ -993,7 +992,7 @@ void recal_fprint_info(recal_info_t *data, const char *path)
 		fprintf(fp, "%d \t", i + MIN_QUALITY);
 		for(j = 0; j < n_dinuc; j++)
 		{
-			fprintf(fp, "%u \t", data->qual_dinuc_bases[i * n_dinuc + j]);
+			fprintf(fp, "%u \t", data->qual_dinuc_bases[i * n_dinuc + j] - SMOOTH_CONSTANT_BASES);
 		}
 		fprintf(fp, "\n");
 	}
