@@ -80,11 +80,11 @@ double *new_vector_d(int size, double value)
 //Manage functions
 void recal_add_base(recal_info_t *data, int qual, int cycle, int dinuc, int miss)
 {
-	int qual_index = qual - data->min_qual;
+	int qual_index = qual - data->min_qual - 1;
 	int qual_cycle_index = qual_index * data->num_cycles + cycle;
 	int qual_dinuc_index = qual_index * data->num_dinuc + dinuc;
 	
-	if(qual < MIN_QUALITY_TO_STAT)
+	if(qual - 1 < MIN_QUALITY_TO_STAT)
 		return;
 	
 	//Error check
@@ -144,13 +144,11 @@ void recal_add_base_v(recal_info_t *data, char *seq, char *quals, int init_cycle
 	for(i = init_cycle; i <= end_cycle; i++)
 	{
 		#ifdef NOT_COUNT_NUCLEOTIDE_N
-		if(seq[i] != 'N' && quals[i] >= MIN_QUALITY_TO_STAT)
+		if(seq[i] != 'N' && quals[i] - 1 >= MIN_QUALITY_TO_STAT)
 		#endif
 		{
-			if(seq[i] != 'A' && seq[i] != 'C' && seq[i] != 'G' && seq[i] != 'T')
-				printf("NUCLEOTIDO: %s : %d\n", seq, i);
 			//Indices
-			qual_index = quals[i] - data->min_qual;
+			qual_index = quals[i] - data->min_qual - 1;
 			qual_cycle_index = qual_index * data->num_cycles + i;
 			qual_dinuc_index = qual_index * data->num_dinuc + dinuc[i];
 			
@@ -329,6 +327,10 @@ void recal_get_data_from_bam_batch(bam_batch_t* batch, genome_t* ref, recal_info
 	for(i = 0; i < batch->num_alignments; i++)
 	{
 		//Process every alignment
+		#ifdef NOT_MAPPING_QUAL_ZERO
+		if(batch->alignments_p[i]->core.qual != 0)
+		#endif
+		{
 		#ifdef D_TIME_DEBUG
 			time_init_slot(D_SLOT_GET_DATA_ALIG, clock(), time_global_stats);
 		#endif
@@ -336,6 +338,7 @@ void recal_get_data_from_bam_batch(bam_batch_t* batch, genome_t* ref, recal_info
 		#ifdef D_TIME_DEBUG
 			time_set_slot(D_SLOT_GET_DATA_ALIG, clock(), time_global_stats);
 		#endif
+		}
 	}
 }
 

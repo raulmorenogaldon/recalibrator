@@ -17,14 +17,16 @@
 
 #define NUM_DINUC	17
 
-#define SMOOTH_CONSTANT_MISS 1 //5
-#define SMOOTH_CONSTANT_BASES 2 //16
+#define SMOOTH_CONSTANT_MISS 0 //5
+#define SMOOTH_CONSTANT_BASES 0 //16
 
 #define NOT_COUNT_NUCLEOTIDE_N
 
 #define STAT_FIRST_DINUC
 
-#define MIN_QUALITY_TO_STAT 7
+#define MIN_QUALITY_TO_STAT 6
+
+#define NOT_MAPPING_QUAL_ZERO //Reads with map score of 0 wont be stated
 
 //#define MAX_BATCH_SIZE 100000000
 #define MAX_BATCH_SIZE 10000000
