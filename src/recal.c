@@ -706,8 +706,14 @@ void recal_recalibrate_batch(bam_batch_t* batch, recal_info_t *bam_info, bam_fil
 	//Process all alignments of the batchs
 	for(i = 0; i < batch->num_alignments; i++)
 	{
+		#ifdef D_TIME_DEBUG
+		time_init_slot(D_SLOT_RECAL_ALIG, clock(), time_global_stats);
+		#endif
 		//Process every alignment
 		recal_recalibrate_alignment(batch->alignments_p[i], bam_info, recal_bam_f); 
+		#ifdef D_TIME_DEBUG
+		time_set_slot(D_SLOT_RECAL_ALIG, clock(), time_global_stats);
+		#endif
 	}
 }
 

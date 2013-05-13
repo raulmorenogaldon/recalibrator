@@ -41,6 +41,7 @@
 	#define D_SLOT_CALC_DELTAS 4
 	#define D_SLOT_RECALIBRATE 5
 	#define D_SLOT_MEMCOPY_BATCH 6
+	#define D_SLOT_RECAL_ALIG 7
 #endif
 	
 	
