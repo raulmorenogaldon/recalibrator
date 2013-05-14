@@ -510,7 +510,7 @@ inline void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal
 	
 	//Add data
 	recal_add_base_v(output_data, bam_seq, quals, 0, alig->core.l_qseq - 1, dinucs, comp_res);
-	
+
 	free(comp_res);
 	free(dinucs);
 	free(quals);
