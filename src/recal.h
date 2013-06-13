@@ -26,7 +26,6 @@
 //#define MAX_BATCH_SIZE 10000000
 
 //#define USE_BATCH_POOL
-#define USE_SSE
 
 //QUALITY MEASURE METHOD
 //#define P_SOLEXA	//Comment to use sanger method instead solexa

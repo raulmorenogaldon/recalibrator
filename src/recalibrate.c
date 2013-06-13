@@ -67,6 +67,9 @@ int mymain(	int full,
 	
 	//Printf proc caps
 	printf_proc_features();
+	#ifdef __SSE2__
+	printf("Using SSE2 features\n");
+	#endif
 	
 	//Execute phase 1
 	if (p1)

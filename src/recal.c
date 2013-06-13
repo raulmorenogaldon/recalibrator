@@ -350,7 +350,9 @@ inline void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal
 	char aux_comp[16];
 	char *comp_res, *dinucs;
 	int i, miss, j;
+	#ifdef __SSE2__
 	__m128i v_ref, v_seq, v_comp;
+	#endif
 	enum DINUC dinuc;
 	unsigned long int init_pos, end_pos;
 	uint32_t flag; 
@@ -404,7 +406,7 @@ inline void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal
 	dinucs = malloc(output_data->num_cycles * sizeof(int));
 	for(i = 0; i < output_data->num_cycles; i++)
 	{	
-		#ifdef USE_SSE /*SSE Block*/
+		#ifdef __SSE2__ /*SSE Block*/
 		if( (i + 16) < output_data->num_cycles)
 		{
 			//Use SSE
