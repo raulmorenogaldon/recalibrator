@@ -1,12 +1,12 @@
 CC = gcc
-#compiler = gcc
-compiler = mpicc
+compiler = gcc
+#compiler = mpicc
 #linker = tau_cc.sh
-linker = mpicc
-#linker = gcc
+#linker = mpicc
+linker = gcc
 
-CFLAGS = -O3 -ansi -Wall -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500 -msse2
-CFLAGS_DEBUG = -O0 -ansi -Wall -ggdb -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500 -msse2
+CFLAGS = -O3 -ansi -Wall -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500 
+CFLAGS_DEBUG = -O0 -ansi -Wall -ggdb -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500
 
 # Main folders
 SRC_DIR = $(PWD)/src
