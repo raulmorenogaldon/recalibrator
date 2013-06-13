@@ -1,5 +1,8 @@
+#ifndef TIMESTATS_H
+#define TIMESTATS_H
+
 #include <stdio.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <pthread.h>
 #include <time.h>
 
@@ -28,3 +31,5 @@ double time_get_min_slot(int slot, time_stats_t *stats);
 double time_get_max_slot(int slot, time_stats_t *stats);
 
 void time_destroy_stats(time_stats_t *stats);
+
+#endif

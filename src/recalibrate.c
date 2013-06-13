@@ -67,8 +67,17 @@ int mymain(	int full,
 	
 	//Printf proc caps
 	printf_proc_features();
+	#ifdef __MMX__
+	printf("Using MMX features\n");
+	#endif
+	#ifdef __SSE__
+	printf("Using SSE features\n");
+	#endif
 	#ifdef __SSE2__
 	printf("Using SSE2 features\n");
+	#endif
+	#ifdef __SSE3__
+	printf("Using SSE3 features\n");
 	#endif
 	
 	//Execute phase 1

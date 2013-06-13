@@ -9,6 +9,7 @@
 #include "bioformats/bam-sam/alignment.h"
 #include "bioformats/bam-sam/bam_file.h"
 #include "bamaux.h"
+
 #include "timestats.h"
 #include "bampool.h"
 
@@ -28,8 +29,8 @@
 
 #define NOT_MAPPING_QUAL_ZERO //Reads with map score of 0 wont be stated
 
-//#define MAX_BATCH_SIZE 100000000
-#define MAX_BATCH_SIZE 10000000
+#define MAX_BATCH_SIZE 1000000000
+//#define MAX_BATCH_SIZE 10000000
 
 //#define USE_BATCH_POOL
 

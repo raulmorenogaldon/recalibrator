@@ -218,7 +218,11 @@ void recal_get_data_from_bam(bam_file_t *bam, genome_t* ref, recal_info_t* outpu
 {
 	bam_batch_t* batch;
 	int count = 0;
+	
+	#ifdef USE_BATCH_POOL
 	bam_pool_t* pool;
+	#endif
+	
 	int zero = 0;
 	
 	unmapped = 0;
@@ -638,7 +642,10 @@ void recal_recalibrate_bam(bam_file_t *orig_bam_f, recal_info_t *bam_info, bam_f
 {
 	bam_batch_t* batch;
 	int count = 0;
+	
+	#ifdef USE_BATCH_POOL
 	bam_pool_t* pool;
+	#endif
 	
 	//Allocate memory for batchs
 	batch = bam_batch_new(MAX_BATCH_SIZE, MULTIPLE_CHROM_BATCH);

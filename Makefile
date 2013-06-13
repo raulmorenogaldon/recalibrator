@@ -5,7 +5,9 @@ compiler = gcc
 #linker = mpicc
 linker = gcc
 
-CFLAGS = -O3 -ansi -Wall -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500 
+CFLAGS = -O3 -ansi -Wall -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500
+CFLAGS_NOSSE2 = -O3 -ansi -Wall -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500 -mfpmath=387 -mno-sse2
+CFLAGS_SSE2 = -O3 -ansi -Wall -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500 -mfpmath=387 -msse2
 CFLAGS_DEBUG = -O0 -ansi -Wall -ggdb -std=c99 -D_REENTRANT -D_XOPEN_SOURCE=500
 
 # Main folders
@@ -36,15 +38,17 @@ LIBS = -L$(LIB_DIR) -L$(COMPBIO_LIB_DIR) -L$(SAMTOOLS_DIR) -L$(CPROPS_LIB_DIR) -
 MISC_OBJS = $(COMMONS_DIR)/*.o $(CONTAINERS_DIR)/*.o $(BIOFORMATS_DIR)/bam-sam/*.o $(BWT_DIR)/*.o 
 
 # Project source files
-HPG_BAM_FILES = bamaux.c recal.c timestats.c bampool.c
+#HPG_BAM_FILES = bamaux.c recal.c timestats.c bampool.c
+HPG_BAM_FILES = bamaux.c recal.c timestats.c
 
 # Project object files
-HPG_BAM_OBJS = bamaux.o recal.o timestats.o bampool.o
+#HPG_BAM_OBJS = bamaux.o recal.o timestats.o bampool.o
+HPG_BAM_OBJS = bamaux.o recal.o timestats.o
 
 ALL_OBJS = $(HPG_BAM_OBJS) $(MISC_OBJS)
 
 # Targets
-all: compile-dependencies recal recal-debug
+all: compile-dependencies recal recal-debug 
 
 recal: compile-dependencies
 	cd $(SRC_DIR) &&                                                         \
@@ -65,11 +69,30 @@ bam-dependencies:
         $(compiler) $(CFLAGS) -c -o $(BIOFORMATS_DIR)/bam-sam/alignment.o $(BIOFORMATS_DIR)/bam-sam/alignment.c $(INCLUDES) $(LIBS) && \
 		$(compiler) $(CFLAGS) -c -o $(BIOFORMATS_DIR)/bam-sam/bam_file.o $(BIOFORMATS_DIR)/bam-sam/bam_file.c $(INCLUDES) $(LIBS) && \
 		$(compiler) $(CFLAGS) -c -o $(BWT_DIR)/genome.o $(BWT_DIR)/genome.c $(INCLUDES) $(LIBS)
+		
+		
+		
+		
+		
+		
+recal-sse2: bam-dependencies compile-dependencies
+	cd $(SRC_DIR) &&                                                         \
+	$(compiler) $(CFLAGS_SSE2) -c recalibrate.c $(HPG_BAM_FILES) $(INCLUDES) $(LIBS) &&    \
+	$(linker) $(CFLAGS_SSE2) -o $(BIN_DIR)/$@ recalibrate.o $(ALL_OBJS) $(INCLUDES) $(LIBS)
+		
+		
+		
+recal-nosse2: bam-dependencies compile-dependencies
+	cd $(SRC_DIR) &&                                                         \
+	$(compiler) $(CFLAGS_NOSSE2) -c recalibrate.c $(HPG_BAM_FILES) $(INCLUDES) $(LIBS) &&    \
+	$(linker) $(CFLAGS_NOSSE2) -o $(BIN_DIR)/$@ recalibrate.o $(ALL_OBJS) $(INCLUDES) $(LIBS)
+
+
 
 clean:
 	-rm -f $(SRC_DIR)/*~ $(SRC_DIR)/\#*\# $(SRC_DIR)/*.o 
 	-rm -f $(COMMONS_DIR)/*.o
 	-rm -f $(CONTAINERS_DIR)/*.o
 	-rm -f $(BIOFORMATS_DIR)/bam-sam/*.o
-	-rm -f $(BIN_DIR)/recal
-	-rm -f $(BIN_DIR)/recal-debug
+	-rm -f $(BIN_DIR)/*
+	-rm -f $(BIN_DIR)/*
