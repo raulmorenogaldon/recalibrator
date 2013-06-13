@@ -32,7 +32,6 @@
 #define MAX_BATCH_SIZE 10000000
 
 //#define USE_BATCH_POOL
-#define USE_SSE
 
 //QUALITY MEASURE METHOD
 //#define P_SOLEXA	//Comment to use sanger method instead solexa
@@ -47,6 +46,7 @@
 	#define D_SLOT_CALC_DELTAS 4
 	#define D_SLOT_RECALIBRATE 5
 	#define D_SLOT_MEMCOPY_BATCH 6
+	#define D_SLOT_RECAL_ALIG 7
 #endif
 	
 	

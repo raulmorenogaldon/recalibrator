@@ -67,6 +67,9 @@ int mymain(	int full,
 	
 	//Printf proc caps
 	printf_proc_features();
+	#ifdef __SSE2__
+	printf("Using SSE2 features\n");
+	#endif
 	
 	//Execute phase 1
 	if (p1)
@@ -131,19 +134,6 @@ int mymain(	int full,
 		free(outputc);
 	}
 	
-	//Compare
-	if(compcount)
-	{
-		if(p1 || p2)
-		{
-			compare_bams_qual(output, compfile, 76);
-		}
-		else
-		{
-			compare_bams_qual(input, compfile, 76);
-		}
-	}
-	
 	
 	//Print times
 	#ifdef D_TIME_DEBUG
@@ -178,12 +168,29 @@ int mymain(	int full,
 		if (p2)
 		{
 			//Print recalibrate stats
-			printf("Time used to recalibrate -> %.2f s\n", time_global_stats->slots[D_SLOT_RECALIBRATE]->min);
+			printf("Time used recalibrate one alignment (Mean) -> %.2f micros - min/max = %.2f/%.2f\n", 
+				time_get_mean_slot(D_SLOT_RECAL_ALIG, time_global_stats)*1000000.0, 
+				time_get_min_slot(D_SLOT_RECAL_ALIG, time_global_stats)*1000000.0,
+				time_get_max_slot(D_SLOT_RECAL_ALIG, time_global_stats)*1000000.0);
+			printf("Time used to recalibrate -> %.2f s\n", time_global_stats->slots[D_SLOT_RECALIBRATE]->min);		
 		}
 			
 		//Free memory from stats
 		time_destroy_stats(time_global_stats);
 	#endif
+	
+	//Compare
+	if(compcount)
+	{
+		if(p1 || p2)
+		{
+			compare_bams_qual(output, compfile, 76);
+		}
+		else
+		{
+			compare_bams_qual(input, compfile, 76);
+		}
+	}
 	
 	//Free data memory	
 	recal_destroy_info(data);

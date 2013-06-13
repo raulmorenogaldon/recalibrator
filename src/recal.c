@@ -352,7 +352,9 @@ inline void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal
 	char aux_comp[16];
 	char *comp_res, *dinucs;
 	int i, miss, j;
+	#ifdef __SSE2__
 	__m128i v_ref, v_seq, v_comp;
+	#endif
 	enum DINUC dinuc;
 	unsigned long int init_pos, end_pos;
 	uint32_t flag; 
@@ -406,7 +408,7 @@ inline void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal
 	dinucs = malloc(alig->core.l_qseq * sizeof(int));
 	for(i = 0; i < alig->core.l_qseq; i++)
 	{	
-		#ifdef USE_SSE /*SSE Block*/
+		#ifdef __SSE2__ /*SSE Block*/
 		if( (i + 16) < alig->core.l_qseq)
 		{
 			//Use SSE
@@ -708,8 +710,14 @@ void recal_recalibrate_batch(bam_batch_t* batch, recal_info_t *bam_info, bam_fil
 	//Process all alignments of the batchs
 	for(i = 0; i < batch->num_alignments; i++)
 	{
+		#ifdef D_TIME_DEBUG
+		time_init_slot(D_SLOT_RECAL_ALIG, clock(), time_global_stats);
+		#endif
 		//Process every alignment
 		recal_recalibrate_alignment(batch->alignments_p[i], bam_info, recal_bam_f); 
+		#ifdef D_TIME_DEBUG
+		time_set_slot(D_SLOT_RECAL_ALIG, clock(), time_global_stats);
+		#endif
 	}
 }
 
