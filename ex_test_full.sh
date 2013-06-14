@@ -1,1 +1,0 @@
-bin/recal-debug -F -C 100 -R "../bams/recal_bams/refpreprocesada.fa" -I "../bams/recal_bams/testbam.bam" -c "../bams/recal_output/testoutputgatk.bam" -o "../bams/recal_output/testoutputrecal.bam" -d "testdata.data" -i "testdata.info"
