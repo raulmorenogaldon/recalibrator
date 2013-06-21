@@ -1,7 +1,9 @@
 #include <argtable2.h>
 #include <string.h>
 #include <libgen.h>
-#include "recal.h"
+#include "recal_structs.h"
+#include "bam_recal.h"
+#include "data_collector.h"
 #include "bamaux.h"
 
 int mymain(	int full,
