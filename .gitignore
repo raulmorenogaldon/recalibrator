@@ -6,11 +6,14 @@
 *.log
 *.o
 .*
+*.lo
+*.la
 Makefile
 Makefile.in
 m4/*
 config/*
 config.h
+config.h.in
 *~
 autom4te*
 autoscan*
