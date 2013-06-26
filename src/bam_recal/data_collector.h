@@ -1,14 +1,19 @@
 #ifndef DATA_COLLECTOR_H_
 #define DATA_COLLECTOR_H_
 
+#include "common.h"
+#include "recal_config.h"
+#include "recal_structs.h"
+
 #include "genome.h"
 #include "alignment.h"
 #include "bam_file.h"
-#include "config.h"
 
 #ifdef D_TIME_DEBUG
 	#include "timestats.h"
 #endif
+
+unsigned long int unmapped;
 
 /**
  * Get recalibration data from BAM path.

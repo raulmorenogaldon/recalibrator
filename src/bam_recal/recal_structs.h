@@ -1,7 +1,14 @@
 #ifndef RECAL_STRUCTS_H_
 #define RECAL_STRUCTS_H_
 
-#include "config.h"
+#include "common.h"
+#include "recal_config.h"
+#include "aux_math.h"
+#include "timestats.h"
+
+#include "genome.h"
+#include "alignment.h"
+#include "bam_file.h"
 
 /**
  * Dinucleotide enumeration.

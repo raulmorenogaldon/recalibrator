@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "common.h"
+
 /**
  * Initializes vector with initial values.
  */

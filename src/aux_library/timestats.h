@@ -6,6 +6,8 @@
 #include <pthread.h>
 #include <time.h>
 
+#include "common.h"
+
 typedef struct time_slot {
 	clock_t aux_time;	//Internal use
 	double min;	//Min time

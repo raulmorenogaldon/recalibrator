@@ -17,14 +17,19 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_LIBTOOL
+AC_SUBST(LIBTOOL_DEPS)
 
 # Checks for libraries.
+AC_CHECK_LIB([z], [gzread])
 AC_CHECK_LIB([m],[cos])
 AC_CHECK_LIB([xml2],[xmlStrPrintf])
 AC_CHECK_LIB([pthread],[pthread_mutex_init])
 AC_CHECK_LIB([cprops],[cp_mempool_alloc])
 AC_CHECK_LIB([openmp],[omp_num_threads])
 AC_CHECK_LIB([argtable2],[arg_lit0])
+
+AC_LIB_SAMTOOLS
+AC_LIB_COMPBIO
 
 
 # Checks for header files.
@@ -46,6 +51,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([\
 				Makefile	\
 				src/Makefile	\
+				src/common/Makefile	\
 				src/aux_library/Makefile	\
 				src/bam_recal/Makefile	\
 				])

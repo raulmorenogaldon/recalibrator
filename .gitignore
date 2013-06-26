@@ -9,17 +9,10 @@
 *.lo
 *.la
 Makefile
-Makefile.in
-m4/*
-config/*
-config.h
 config.h.in
 *~
-autom4te*
 autoscan*
-aclocal.m4
 config.status
-configure
 configure.scan
 libtool
 stamp*

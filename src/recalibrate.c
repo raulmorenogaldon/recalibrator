@@ -4,7 +4,8 @@
 #include "recal_structs.h"
 #include "bam_recal.h"
 #include "data_collector.h"
-#include "bamaux.h"
+#include "aux_misc.h"
+#include "aux_bam.h"
 
 int mymain(	int full,
 			int p1,
