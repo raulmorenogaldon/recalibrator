@@ -11,8 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void printf_proc_features();
-
-void print_binary(unsigned int num);
+#include "common.h"
+#include "aux_library.h"
 
 #endif /* AUX_MISC_H_ */
