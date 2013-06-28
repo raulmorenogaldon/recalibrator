@@ -2,7 +2,20 @@
 
 pthread_mutex_t time_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-time_stats_t *time_new_stats(int num_slots)
+typedef struct time_slot {
+	clock_t aux_time;	//Internal use
+	double min;	//Min time
+	double max;	//Max time
+	double sum;	//Total time
+	unsigned int number;	//Number of times counted (for mean sum/number)
+} time_slot_t;
+
+typedef struct time_stats {
+	unsigned int num_slots;
+	time_slot_t **slots;
+} time_stats_t;
+
+void *time_new_stats(int num_slots)
 {
 	time_stats_t *stats;
 	time_slot_t *slot;
@@ -26,83 +39,90 @@ time_stats_t *time_new_stats(int num_slots)
 		stats->slots[i] = slot;
 	}
 	
-	time_global_stats = stats;
+	TIME_GLOBAL_STATS = stats;
 	
-	return stats;
+	return (void *)stats;
 }
 
-void time_init_slot(int slot, clock_t initial_time, time_stats_t *stats)
+void time_init_slot(int slot, clock_t initial_time, void *stats)
 {
-	if(stats == NULL)
+	time_stats_t *s = (time_stats_t *)stats;
+
+	if(s == PNULL)
 	{
 		return;
 	}
-	if(slot > stats->num_slots)
+	if(slot > s->num_slots)
 	{
-		printf("Time: illegal slot, maximum = %d\n", stats->num_slots);
+		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
 		return;
 	}
 	
 	pthread_mutex_lock(&time_mutex);	
-	stats->slots[slot]->aux_time = initial_time;
+	s->slots[slot]->aux_time = initial_time;
 	pthread_mutex_unlock(&time_mutex);
 }
 
 
-void time_set_slot(int slot, clock_t end_time, time_stats_t *stats)
+void time_set_slot(int slot, clock_t end_time, void *stats)
 {
 	double time;
+	time_stats_t *s = (time_stats_t *)stats;
 	
-	if(stats == NULL)
+	if(s == PNULL)
 	{
 		return;
 	}
-	if(slot > stats->num_slots)
+	if(slot > s->num_slots)
 	{
-		printf("Time: illegal slot, maximum = %d\n", stats->num_slots);
+		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
 		return;
 	}
 		
 	pthread_mutex_lock(&time_mutex);
 		
-	time = ((double) (end_time - stats->slots[slot]->aux_time)) / CLOCKS_PER_SEC;
+	time = ((double) (end_time - s->slots[slot]->aux_time)) / CLOCKS_PER_SEC;
 	
-	if(stats->slots[slot]->max < time)
-		stats->slots[slot]->max = time;
+	if(s->slots[slot]->max < time)
+		s->slots[slot]->max = time;
 		
-	if(stats->slots[slot]->min > time)
-		stats->slots[slot]->min = time;
+	if(s->slots[slot]->min > time)
+		s->slots[slot]->min = time;
 		
-	stats->slots[slot]->sum += time;
-	stats->slots[slot]->number++;
+	s->slots[slot]->sum += time;
+	s->slots[slot]->number++;
 	
 	pthread_mutex_unlock(&time_mutex);
 }
 
-double time_get_mean_slot(int slot, time_stats_t *stats)
+double time_get_mean_slot(int slot, void *stats)
 {
-	return (double) (stats->slots[slot]->sum / stats->slots[slot]->number);
+	time_stats_t *s = (time_stats_t *)s;
+	return (double) (s->slots[slot]->sum / s->slots[slot]->number);
 }
 
-double time_get_min_slot(int slot, time_stats_t *stats)
+double time_get_min_slot(int slot, void *stats)
 {
-	return stats->slots[slot]->min;
+	time_stats_t *s = (time_stats_t *)stats;
+	return s->slots[slot]->min;
 }
 
-double time_get_max_slot(int slot, time_stats_t *stats)
+double time_get_max_slot(int slot, void *stats)
 {
-	return stats->slots[slot]->max;
+	time_stats_t *s = (time_stats_t *)stats;
+	return s->slots[slot]->max;
 }
 
-void time_destroy_stats(time_stats_t *stats)
+void time_destroy_stats(void *stats)
 {
 	int i;
+	time_stats_t *s = (time_stats_t *)stats;
 	
 	//Destroy slots
-	for(i = 0; i < stats->num_slots; i++)
+	for(i = 0; i < s->num_slots; i++)
 	{	
-		free(stats->slots[i]);
+		free(s->slots[i]);
 	}
 	
-	free(stats);
+	free(s);
 }
