@@ -22,11 +22,11 @@ void recal_recalibrate_bam_file(char *orig_bam_path, recal_info_t *bam_info, cha
 
 	//Recalibrate bams
 	#ifdef D_TIME_DEBUG
-		time_init_slot(D_SLOT_RECALIBRATE, clock(), time_global_stats);
+		time_init_slot(D_SLOT_RECALIBRATE, clock(), TIME_GLOBAL_STATS);
 	#endif
 	recal_recalibrate_bam(orig_bam_f, bam_info, recal_bam_f);
 	#ifdef D_TIME_DEBUG
-		time_set_slot(D_SLOT_RECALIBRATE, clock(), time_global_stats);
+		time_set_slot(D_SLOT_RECALIBRATE, clock(), TIME_GLOBAL_STATS);
 	#endif
 
 	//Memory free
@@ -124,12 +124,12 @@ void recal_recalibrate_batch(bam_batch_t* batch, recal_info_t *bam_info, bam_fil
 	for(i = 0; i < batch->num_alignments; i++)
 	{
 		#ifdef D_TIME_DEBUG
-		time_init_slot(D_SLOT_RECAL_ALIG, clock(), time_global_stats);
+		time_init_slot(D_SLOT_RECAL_ALIG, clock(), TIME_GLOBAL_STATS);
 		#endif
 		//Process every alignment
 		recal_recalibrate_alignment(batch->alignments_p[i], bam_info, recal_bam_f);
 		#ifdef D_TIME_DEBUG
-		time_set_slot(D_SLOT_RECAL_ALIG, clock(), time_global_stats);
+		time_set_slot(D_SLOT_RECAL_ALIG, clock(), TIME_GLOBAL_STATS);
 		#endif
 	}
 }

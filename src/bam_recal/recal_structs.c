@@ -185,7 +185,7 @@ void recal_calc_deltas(recal_info_t* data)
 
 	//Time measures
 	#ifdef D_TIME_DEBUG
-		time_init_slot(D_SLOT_CALC_DELTAS, clock(), time_global_stats);
+		time_init_slot(D_SLOT_CALC_DELTAS, clock(), TIME_GLOBAL_STATS);
 	#endif
 
 	printf("Processing deltas...\n");
@@ -248,7 +248,7 @@ void recal_calc_deltas(recal_info_t* data)
 	printf("Deltas processed.\n");
 
 	#ifdef D_TIME_DEBUG
-		time_set_slot(D_SLOT_CALC_DELTAS, clock(), time_global_stats);
+		time_set_slot(D_SLOT_CALC_DELTAS, clock(), TIME_GLOBAL_STATS);
 	#endif
 }
 

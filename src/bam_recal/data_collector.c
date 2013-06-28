@@ -20,11 +20,11 @@ void recal_get_data_from_file(char *bam_path, char *ref_name, char *ref_path, re
 
 	//Fill data
 	#ifdef D_TIME_DEBUG
-		time_init_slot(D_SLOT_GET_DATA_BAM, clock(), time_global_stats);
+		time_init_slot(D_SLOT_GET_DATA_BAM, clock(), TIME_GLOBAL_STATS);
 	#endif
 	recal_get_data_from_bam(bam_f, ref, out_info);
 	#ifdef D_TIME_DEBUG
-		time_set_slot(D_SLOT_GET_DATA_BAM, clock(), time_global_stats);
+		time_set_slot(D_SLOT_GET_DATA_BAM, clock(), TIME_GLOBAL_STATS);
 	#endif
 
 	//Memory free
@@ -65,11 +65,11 @@ void recal_get_data_from_bam(bam_file_t *bam, genome_t* ref, recal_info_t* outpu
 
 	//Read batch
 	#ifdef D_TIME_DEBUG
-		time_init_slot(D_SLOT_READ_BATCH, clock(), time_global_stats);
+		time_init_slot(D_SLOT_READ_BATCH, clock(), TIME_GLOBAL_STATS);
 	#endif
 	bam_fread_max_size(batch, MAX_BATCH_SIZE, 1, bam);
 	#ifdef D_TIME_DEBUG
-		time_set_slot(D_SLOT_READ_BATCH, clock(), time_global_stats);
+		time_set_slot(D_SLOT_READ_BATCH, clock(), TIME_GLOBAL_STATS);
 	#endif
 
 	printf("\nNum alignments in batchs: %d\n----------------\n", batch->num_alignments);
@@ -105,11 +105,11 @@ void recal_get_data_from_bam(bam_file_t *bam, genome_t* ref, recal_info_t* outpu
 
 		//Process batch
 		#ifdef D_TIME_DEBUG
-			time_init_slot(D_SLOT_GET_DATA_BATCH, clock(), time_global_stats);
+			time_init_slot(D_SLOT_GET_DATA_BATCH, clock(), TIME_GLOBAL_STATS);
 		#endif
 		recal_get_data_from_bam_batch(batch, ref, output_data);
 		#ifdef D_TIME_DEBUG
-			time_set_slot(D_SLOT_GET_DATA_BATCH, clock(), time_global_stats);
+			time_set_slot(D_SLOT_GET_DATA_BATCH, clock(), TIME_GLOBAL_STATS);
 		#endif
 
 		//Update read counter
@@ -126,11 +126,11 @@ void recal_get_data_from_bam(bam_file_t *bam, genome_t* ref, recal_info_t* outpu
 
 		//Read batch
 		#ifdef D_TIME_DEBUG
-			time_init_slot(D_SLOT_READ_BATCH, clock(), time_global_stats);
+			time_init_slot(D_SLOT_READ_BATCH, clock(), TIME_GLOBAL_STATS);
 		#endif
 		bam_fread_max_size(batch, MAX_BATCH_SIZE, 1, bam);
 		#ifdef D_TIME_DEBUG
-			time_set_slot(D_SLOT_READ_BATCH, clock(), time_global_stats);
+			time_set_slot(D_SLOT_READ_BATCH, clock(), TIME_GLOBAL_STATS);
 		#endif
 	}
 
@@ -162,11 +162,11 @@ void recal_get_data_from_bam_batch(bam_batch_t* batch, genome_t* ref, recal_info
 		#endif
 		{
 		#ifdef D_TIME_DEBUG
-			time_init_slot(D_SLOT_GET_DATA_ALIG, clock(), time_global_stats);
+			time_init_slot(D_SLOT_GET_DATA_ALIG, clock(), TIME_GLOBAL_STATS);
 		#endif
 		recal_get_data_from_bam_alignment(batch->alignments_p[i], ref, output_data);
 		#ifdef D_TIME_DEBUG
-			time_set_slot(D_SLOT_GET_DATA_ALIG, clock(), time_global_stats);
+			time_set_slot(D_SLOT_GET_DATA_ALIG, clock(), TIME_GLOBAL_STATS);
 		#endif
 		}
 	}
