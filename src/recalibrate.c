@@ -1,11 +1,8 @@
 #include <argtable2.h>
 #include <string.h>
 #include <libgen.h>
-#include "recal_structs.h"
-#include "bam_recal.h"
-#include "data_collector.h"
-#include "aux_misc.h"
-#include "aux_bam.h"
+#include "bam_recal_library.h"
+#include "aux_library.h"
 
 int mymain(	int full,
 			int p1,
@@ -155,20 +152,20 @@ int mymain(	int full,
 		//Times from phase 1
 		if (p1)
 		{	
-			printf("Time used to process BAM -> %.2f s\n", time_global_stats->slots[D_SLOT_GET_DATA_BAM]->min);
+			printf("Time used to process BAM -> %.2f s\n", time_get_min_slot(D_SLOT_GET_DATA_BAM, TIME_GLOBAL_STATS));
 			printf("Time used to process one BATCH(mean) -> %.2f ms - min/max = %.2f/%.2f\n", 
-				time_get_mean_slot(D_SLOT_GET_DATA_BATCH, time_global_stats)*1000.0, 
-				time_get_min_slot(D_SLOT_GET_DATA_BATCH, time_global_stats)*1000.0,
-				time_get_max_slot(D_SLOT_GET_DATA_BATCH, time_global_stats)*1000.0);
+				time_get_mean_slot(D_SLOT_GET_DATA_BATCH, TIME_GLOBAL_STATS)*1000.0,
+				time_get_min_slot(D_SLOT_GET_DATA_BATCH, TIME_GLOBAL_STATS)*1000.0,
+				time_get_max_slot(D_SLOT_GET_DATA_BATCH, TIME_GLOBAL_STATS)*1000.0);
 			printf("Time used to process one ALIGNMENT(mean) -> %.2f micros - min/max = %.2f/%.2f\n", 
-				time_get_mean_slot(D_SLOT_GET_DATA_ALIG, time_global_stats)*1000000.0, 
-				time_get_min_slot(D_SLOT_GET_DATA_ALIG, time_global_stats)*1000000.0,
-				time_get_max_slot(D_SLOT_GET_DATA_ALIG, time_global_stats)*1000000.0);
+				time_get_mean_slot(D_SLOT_GET_DATA_ALIG, TIME_GLOBAL_STATS)*1000000.0,
+				time_get_min_slot(D_SLOT_GET_DATA_ALIG, TIME_GLOBAL_STATS)*1000000.0,
+				time_get_max_slot(D_SLOT_GET_DATA_ALIG, TIME_GLOBAL_STATS)*1000000.0);
 			printf("Time used to read one BATCH(mean) -> %.2f ms - min/max = %.2f/%.2f\n", 
-				time_get_mean_slot(D_SLOT_READ_BATCH, time_global_stats)*1000.0, 
-				time_get_min_slot(D_SLOT_READ_BATCH, time_global_stats)*1000.0,
-				time_get_max_slot(D_SLOT_READ_BATCH, time_global_stats)*1000.0);
-			printf("Time used to process deltas -> %.2f ns\n", time_global_stats->slots[D_SLOT_CALC_DELTAS]->min*1000000000.0);
+				time_get_mean_slot(D_SLOT_READ_BATCH, TIME_GLOBAL_STATS)*1000.0,
+				time_get_min_slot(D_SLOT_READ_BATCH, TIME_GLOBAL_STATS)*1000.0,
+				time_get_max_slot(D_SLOT_READ_BATCH, TIME_GLOBAL_STATS)*1000.0);
+			printf("Time used to process deltas -> %.2f ns\n", time_get_min_slot(D_SLOT_CALC_DELTAS, TIME_GLOBAL_STATS)*1000000000.0);
 			#ifdef USE_BATCH_POOL
 			printf("Time used in pool operations (Mean) -> %.2f ms - min/max = %.2f/%.2f\n", 
 				time_get_mean_slot(D_SLOT_MEMCOPY_BATCH, time_global_stats)*1000.0, 
@@ -181,14 +178,14 @@ int mymain(	int full,
 		{
 			//Print recalibrate stats
 			printf("Time used recalibrate one alignment (Mean) -> %.2f micros - min/max = %.2f/%.2f\n", 
-				time_get_mean_slot(D_SLOT_RECAL_ALIG, time_global_stats)*1000000.0, 
-				time_get_min_slot(D_SLOT_RECAL_ALIG, time_global_stats)*1000000.0,
-				time_get_max_slot(D_SLOT_RECAL_ALIG, time_global_stats)*1000000.0);
-			printf("Time used to recalibrate -> %.2f s\n", time_global_stats->slots[D_SLOT_RECALIBRATE]->min);		
+				time_get_mean_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS)*1000000.0,
+				time_get_min_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS)*1000000.0,
+				time_get_max_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS)*1000000.0);
+			printf("Time used to recalibrate -> %.2f s\n", time_get_min_slot(D_SLOT_RECALIBRATE, TIME_GLOBAL_STATS));
 		}
 			
 		//Free memory from stats
-		time_destroy_stats(time_global_stats);
+		time_destroy_stats(TIME_GLOBAL_STATS);
 	#endif
 	
 	//Compare
