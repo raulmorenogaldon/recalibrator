@@ -29,7 +29,14 @@ inline double Pvalue(double Q)
  */
 inline double Qsolexa(double p)
 {
-	return -10.0 * log10(p/(1-p));
+	double ret = -10.0 * log10(p/(1-p));
+
+	if(ret > P_SOLEXA_MAX)
+		ret = P_SOLEXA_MAX;
+	if(ret < P_SOLEXA_MIN)
+		ret = P_SOLEXA_MIN;
+
+	return ret;
 }
 
 /**
@@ -37,7 +44,14 @@ inline double Qsolexa(double p)
  */
 inline double Psolexa(double Q)
 {
-	return pow(10.0, -Q/10.0) / (pow(10.0, -Q/10.0) + 1);
+	double ret = pow(10.0, -Q/10.0) / (pow(10.0, -Q/10.0) + 1);
+
+	if(ret > 1.0)
+		ret = 1.0;
+	if(ret < 0.0)
+		ret = 0.0;
+
+	return ret;
 }
 
 /**
@@ -45,7 +59,14 @@ inline double Psolexa(double Q)
  */
 inline double Qsanger(double p)
 {
-	return -10.0 * log10(p);
+	double ret = -10.0 * log10(p);
+
+	if(ret > P_SANGER_MAX)
+		ret = P_SANGER_MAX;
+	if(ret < P_SANGER_MIN)
+		ret = P_SANGER_MIN;
+
+	return ret;
 }
 
 /**
@@ -53,5 +74,12 @@ inline double Qsanger(double p)
  */
 inline double Psanger(double Q)
 {
-	return pow(10.0, -Q/10.0);
+	double ret = pow(10.0, -Q/10.0);
+
+	if(ret > 1.0)
+		ret = 1.0;
+	if(ret < 0.0)
+		ret = 0.0;
+
+	return ret;
 }

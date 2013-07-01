@@ -33,6 +33,14 @@
 #define MAX_BATCH_SIZE 1000000000
 
 /**
+ * Probability math limits
+ */
+#define P_SOLEXA_MAX 62
+#define P_SOLEXA_MIN -5
+#define P_SANGER_MAX 93
+#define P_SANGER_MIN 0
+
+/**
  * Time measures
  */
 #define D_TIME_DEBUG
