@@ -13,6 +13,8 @@
 #include <emmintrin.h>
 #endif
 
-#define PNULL (void *)0
+#ifndef _cplusplus
+	#define NULL (void *)0
+#endif
 
 #endif /* COMMON_H_ */

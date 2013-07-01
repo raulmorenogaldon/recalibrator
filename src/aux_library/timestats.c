@@ -48,7 +48,7 @@ void time_init_slot(int slot, clock_t initial_time, void *stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
 
-	if(s == PNULL)
+	if(s == NULL)
 	{
 		return;
 	}
@@ -69,7 +69,7 @@ void time_set_slot(int slot, clock_t end_time, void *stats)
 	double time;
 	time_stats_t *s = (time_stats_t *)stats;
 	
-	if(s == PNULL)
+	if(s == NULL)
 	{
 		return;
 	}
