@@ -65,9 +65,12 @@ void compare_bams_qual(const char* bamPath0, const char* bamPath1, int cycles)
 	printf("BAM closed.\n");
 }
 
-bam_header_t* create_empty_bam_header(unsigned num_chroms) {
+bam_header_t* create_empty_bam_header(unsigned int num_chroms) {
 
 	int i;
+
+	if(num_chroms == 0)
+		return NULL;
 
 	//Memory allocation for struct
 	bam_header_t *bam_header = (bam_header_t *) calloc(1, sizeof(bam_header_t));
