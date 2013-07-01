@@ -6,8 +6,6 @@
 #include <pthread.h>
 #include <time.h>
 
-#include "common.h"
-
 /**
  * Global time statistics for use
  */
