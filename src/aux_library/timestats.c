@@ -50,6 +50,7 @@ void time_init_slot(int slot, clock_t initial_time, void *stats)
 
 	if(s == NULL)
 	{
+		printf("Time - WARNING: Attempting to initialize slot from NULL pointer time\n");
 		return;
 	}
 	if(slot > s->num_slots)
@@ -71,6 +72,7 @@ void time_set_slot(int slot, clock_t end_time, void *stats)
 	
 	if(s == NULL)
 	{
+		printf("Time - WARNING: Attempting to set slot from NULL pointer time\n");
 		return;
 	}
 	if(slot > s->num_slots)
@@ -98,18 +100,39 @@ void time_set_slot(int slot, clock_t end_time, void *stats)
 double time_get_mean_slot(int slot, void *stats)
 {
 	time_stats_t *s = (time_stats_t *)s;
+
+	if(s == NULL)
+	{
+		printf("Time - WARNING: Attempting to get slot mean from NULL pointer time\n");
+		return -1;
+	}
+
 	return (double) (s->slots[slot]->sum / s->slots[slot]->number);
 }
 
 double time_get_min_slot(int slot, void *stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
+
+	if(s == NULL)
+	{
+		printf("Time - WARNING: Attempting to get slot min from NULL pointer time\n");
+		return -1;
+	}
+
 	return s->slots[slot]->min;
 }
 
 double time_get_max_slot(int slot, void *stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
+
+	if(s == NULL)
+	{
+		printf("Time - WARNING: Attempting to get slot max from NULL pointer time\n");
+		return -1;
+	}
+
 	return s->slots[slot]->max;
 }
 
@@ -118,6 +141,12 @@ void time_destroy_stats(void *stats)
 	int i;
 	time_stats_t *s = (time_stats_t *)stats;
 	
+	if(s == NULL)
+	{
+		printf("Time - WARNING: Attempting to destroy NULL pointer time\n");
+		return -1;
+	}
+
 	//Destroy slots
 	for(i = 0; i < s->num_slots; i++)
 	{	
