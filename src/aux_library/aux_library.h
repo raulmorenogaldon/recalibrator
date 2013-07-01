@@ -50,7 +50,7 @@ extern inline double Psanger(double Q);
  * BAM OPERATIONS
  **************************/
 
-extern bam_header_t* create_empty_bam_header(int num_chroms);
+extern bam_header_t* create_empty_bam_header(unsigned int num_chroms);
 
 extern void compare_bams_qual(const char* bamPath0, const char* bamPath1, int cycles);
 

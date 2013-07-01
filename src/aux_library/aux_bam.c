@@ -65,7 +65,7 @@ void compare_bams_qual(const char* bamPath0, const char* bamPath1, int cycles)
 	printf("BAM closed.\n");
 }
 
-bam_header_t* create_empty_bam_header(int num_chroms) {
+bam_header_t* create_empty_bam_header(unsigned num_chroms) {
 
 	int i;
 
