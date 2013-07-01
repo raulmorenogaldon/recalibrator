@@ -147,6 +147,16 @@ END_TEST
 
 START_TEST (check_timestats)
 {
+	void *timestats;
+
+	/* Check timestats creation */
+	ck_assert(!TIME_GLOBAL_STATS);
+	timestats = time_new_stats(20);
+	ck_assert(timestats);
+	ck_assert(TIME_GLOBAL_STATS);
+
+	/* Check timestats destroy */
+	time_destroy_stats(timestats);
 
 }
 END_TEST
