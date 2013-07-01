@@ -145,6 +145,12 @@ START_TEST (check_aux_vector)
 }
 END_TEST
 
+START_TEST (check_timestats)
+{
+
+}
+END_TEST
+
 
 Suite *
 aux_library_suite(void)
@@ -156,6 +162,7 @@ aux_library_suite(void)
 	tcase_add_test(tc_core, check_aux_bam);
 	tcase_add_test(tc_core, check_aux_math);
 	tcase_add_test(tc_core, check_aux_vector);
+	tcase_add_test(tc_core, check_timestats);
 	suite_add_tcase(s, tc_core);
 
 	return s;
