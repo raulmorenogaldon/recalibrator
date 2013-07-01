@@ -101,6 +101,49 @@ START_TEST (check_aux_math)
 }
 END_TEST
 
+START_TEST (check_aux_vector)
+{
+	unsigned int *uret;
+	double *dret;
+	int i;
+
+	uret = new_vector(0, 0);
+	if(uret)
+		ck_abort_msg("new_vector must return NULL when size is vector is 0");
+
+	/* new_vector*/
+	uret = new_vector(1, 0);
+	ck_assert(uret && uret[0] == 0);
+	free(uret);
+
+	uret = new_vector(100, 4);
+	ck_assert(uret);
+	for(i = 0; i < 100; i++)
+		ck_assert(uret[i] == 4);
+
+	/* initialize_vector */
+	initialize_vector(uret, 100, -20);
+	for(i = 0; i < 100; i++)
+		ck_assert(uret[i] == -20);
+	free(uret);
+
+	/*new_vector_d */
+	dret = new_vector_d(0, 0);
+	if(dret)
+		ck_abort_msg("new_vector must return NULL when size is vector is 0");
+	free(dret);
+
+	dret = new_vector_d(1, 0);
+	ck_assert(dret && dret[0] == 0);
+	free(dret);
+
+	dret = new_vector_d(100, 4);
+	ck_assert(dret);
+	for(i = 0; i < 100; i++)
+		ck_assert(dret[i] == 4);
+	free(dret);
+}
+END_TEST
 
 
 Suite *
@@ -112,6 +155,7 @@ aux_library_suite(void)
 	TCase *tc_core = tcase_create("core");
 	tcase_add_test(tc_core, check_aux_bam);
 	tcase_add_test(tc_core, check_aux_math);
+	tcase_add_test(tc_core, check_aux_vector);
 	suite_add_tcase(s, tc_core);
 
 	return s;
