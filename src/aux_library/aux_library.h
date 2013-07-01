@@ -62,17 +62,17 @@ extern void compare_bams_qual(const char* bamPath0, const char* bamPath1, int cy
 /**
  * Initializes vector with initial values.
  */
-extern void initialize_vector(unsigned int *vector, int size, int value);
+extern void initialize_vector(unsigned int *vector, unsigned int size, int value);
 
 /**
  * Return vector of integers with initial values.
  */
-extern unsigned int *new_vector(int size, int value);
+extern unsigned int *new_vector(unsigned int size, int value);
 
 /**
  * Return vector of double with initial values.
  */
-extern double *new_vector_d(int size, double value);
+extern double *new_vector_d(unsigned int size, double value);
 
 
 /***************************
