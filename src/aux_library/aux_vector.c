@@ -7,6 +7,9 @@ void initialize_vector(unsigned int *vector, unsigned int size, int value)
 {
 	int i;
 
+	if(size == 0)
+		return;
+
 	for(i = 0; i < size; i++)
 	{
 		vector[i] = value;
@@ -20,6 +23,9 @@ unsigned int *new_vector(unsigned int size, int value)
 {
 	unsigned int *vector;
 	int i;
+
+	if(size == 0)
+		return NULL;
 
 	vector = (unsigned int *)malloc(size * sizeof(unsigned int));
 
@@ -38,6 +44,9 @@ double *new_vector_d(unsigned int size, double value)
 {
 	double *vector;
 	int i;
+
+	if(size == 0)
+		return NULL;
 
 	vector = (double *)malloc(size * sizeof(double));
 
