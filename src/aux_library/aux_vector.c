@@ -3,7 +3,7 @@
 /**
  * Initializes vector with initial values.
  */
-void initialize_vector(unsigned int *vector, int size, int value)
+void initialize_vector(unsigned int *vector, unsigned int size, int value)
 {
 	int i;
 
