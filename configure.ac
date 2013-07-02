@@ -19,6 +19,8 @@ AC_PROG_LN_S
 AC_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
 
+AM_PROG_CC_C_O
+
 # Checks for libraries.
 AC_CHECK_LIB([z], [gzread])
 AC_CHECK_LIB([m],[cos])
@@ -54,5 +56,7 @@ AC_CONFIG_FILES([\
 				src/common/Makefile	\
 				src/aux_library/Makefile	\
 				src/bam_recal/Makefile	\
+				tests/Makefile	\
+				tests/aux_library/Makefile	\
 				])
 AC_OUTPUT
