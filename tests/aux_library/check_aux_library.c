@@ -148,15 +148,25 @@ END_TEST
 START_TEST (check_timestats)
 {
 	void *timestats;
+	clock_t time, t_arg;
 
 	/* Check timestats creation */
 	ck_assert(!TIME_GLOBAL_STATS);
+	//TIME_GLOBAL_STATS = time_new_stats(20);
+	ck_assert(!timestats);
 	timestats = time_new_stats(20);
 	ck_assert(timestats);
-	ck_assert(TIME_GLOBAL_STATS);
+	//ck_assert(TIME_GLOBAL_STATS);
+
+	/* Check timing */
+
 
 	/* Check timestats destroy */
-	time_destroy_stats(timestats);
+	time_destroy_stats(TIME_GLOBAL_STATS);
+	ck_assert(!TIME_GLOBAL_STATS);
+
+	/* Try to destroy null pointer */
+	time_destroy_stats(NULL);
 
 }
 END_TEST
