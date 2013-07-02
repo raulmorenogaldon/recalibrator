@@ -8,10 +8,10 @@
 #ifndef BAM_RECAL_LIBRARY_H_
 #define BAM_RECAL_LIBRARY_H_
 
-#include "bam.h"
-#include "bam_file.h"
-#include "alignment.h"
-#include "genome.h"
+#include <bam.h>
+#include <bam_file.h>
+#include <alignment.h>
+#include <genome.h>
 
 /**
  * Recalibration data storage

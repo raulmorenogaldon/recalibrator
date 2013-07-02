@@ -2,9 +2,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = common aux_library bam_recal
 
-INCLUDES = 		-I$(top_builddir)/src/common \
-				-I$(top_builddir)/src/aux_library \
-				-I$(top_builddir)/src/bam_recal 
+INCLUDES = 		-I$(top_builddir)/include
 
 lib_LTLIBRARIES = librecal.la
 librecal_la_SOURCES = dummy.c

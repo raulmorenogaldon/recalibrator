@@ -10,8 +10,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <recal_common.h>
 
-#include "common.h"
-#include "aux_library.h"
+extern void printf_proc_features();
+
+extern void print_binary(unsigned int num);
 
 #endif /* AUX_MISC_H_ */
