@@ -216,8 +216,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = librecal_aux.la
-librecal_aux_la_SOURCES = aux_misc.c aux_bam.c aux_math.c aux_vector.c timestats.c
+librecal_aux_la_SOURCES = aux_misc.c aux_bam.c aux_math.c aux_vector.c timestats.c aux_bam.h aux_math.h aux_misc.h aux_vector.h
 include_HEADERS = $(top_builddir)/include/aux_library.h $(top_builddir)/include/timestats.h
+
+#EXTRA_DIST = 
 INCLUDES = -I$(top_builddir)/include
 all: all-am
 

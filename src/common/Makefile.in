@@ -212,7 +212,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libcommon.la
-libcommon_la_SOURCES = recal_common.h recal_config.h
+libcommon_la_SOURCES = 
 include_HEADERS = $(top_builddir)/include/recal_common.h $(top_builddir)/include/recal_config.h 
 all: all-am
 
