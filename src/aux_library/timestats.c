@@ -55,7 +55,7 @@ void time_init_slot(unsigned int slot, clock_t initial_time, p_timestats stats)
 		printf("Time - WARNING: Attempting to initialize slot from NULL pointer time\n");
 		return;
 	}
-	if(slot > s->num_slots)
+	if(slot >= s->num_slots)
 	{
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
 		return;
@@ -77,7 +77,7 @@ void time_set_slot(unsigned int slot, clock_t end_time, p_timestats stats)
 		printf("Time - WARNING: Attempting to set slot from NULL pointer time\n");
 		return;
 	}
-	if(slot > s->num_slots)
+	if(slot >= s->num_slots)
 	{
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
 		return;
@@ -109,7 +109,7 @@ double time_get_mean_slot(unsigned int slot, p_timestats stats)
 		return -1;
 	}
 
-	if(slot > s->num_slots)
+	if(slot >= s->num_slots)
 	{
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
 		return -1.0;
@@ -128,7 +128,7 @@ double time_get_min_slot(unsigned int slot, p_timestats stats)
 		return -1;
 	}
 
-	if(slot > s->num_slots)
+	if(slot >= s->num_slots)
 	{
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
 		return -1.0;
@@ -147,7 +147,7 @@ double time_get_max_slot(unsigned int slot, p_timestats stats)
 		return -1;
 	}
 
-	if(slot > s->num_slots)
+	if(slot >= s->num_slots)
 	{
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
 		return -1.0;
