@@ -136,9 +136,6 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PKG_CONFIG = @PKG_CONFIG@
-PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
-PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -200,6 +197,7 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 check_aux_library_SOURCES = check_aux_library.c
 check_aux_library_CFLAGS = $(CHECK_CFLAGS)
+check_aux_library_CPPFLAGS = -I$(top_builddir)/include
 check_aux_library_LDADD = $(top_builddir)/src/librecal.la $(CHECK_LIBS)
 CLEANFILES = *~
 all: all-am
@@ -279,18 +277,18 @@ distclean-compile:
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
 check_aux_library-check_aux_library.o: check_aux_library.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_aux_library_CFLAGS) $(CFLAGS) -MT check_aux_library-check_aux_library.o -MD -MP -MF $(DEPDIR)/check_aux_library-check_aux_library.Tpo -c -o check_aux_library-check_aux_library.o `test -f 'check_aux_library.c' || echo '$(srcdir)/'`check_aux_library.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(check_aux_library_CPPFLAGS) $(CPPFLAGS) $(check_aux_library_CFLAGS) $(CFLAGS) -MT check_aux_library-check_aux_library.o -MD -MP -MF $(DEPDIR)/check_aux_library-check_aux_library.Tpo -c -o check_aux_library-check_aux_library.o `test -f 'check_aux_library.c' || echo '$(srcdir)/'`check_aux_library.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/check_aux_library-check_aux_library.Tpo $(DEPDIR)/check_aux_library-check_aux_library.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='check_aux_library.c' object='check_aux_library-check_aux_library.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_aux_library_CFLAGS) $(CFLAGS) -c -o check_aux_library-check_aux_library.o `test -f 'check_aux_library.c' || echo '$(srcdir)/'`check_aux_library.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(check_aux_library_CPPFLAGS) $(CPPFLAGS) $(check_aux_library_CFLAGS) $(CFLAGS) -c -o check_aux_library-check_aux_library.o `test -f 'check_aux_library.c' || echo '$(srcdir)/'`check_aux_library.c
 
 check_aux_library-check_aux_library.obj: check_aux_library.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_aux_library_CFLAGS) $(CFLAGS) -MT check_aux_library-check_aux_library.obj -MD -MP -MF $(DEPDIR)/check_aux_library-check_aux_library.Tpo -c -o check_aux_library-check_aux_library.obj `if test -f 'check_aux_library.c'; then $(CYGPATH_W) 'check_aux_library.c'; else $(CYGPATH_W) '$(srcdir)/check_aux_library.c'; fi`
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(check_aux_library_CPPFLAGS) $(CPPFLAGS) $(check_aux_library_CFLAGS) $(CFLAGS) -MT check_aux_library-check_aux_library.obj -MD -MP -MF $(DEPDIR)/check_aux_library-check_aux_library.Tpo -c -o check_aux_library-check_aux_library.obj `if test -f 'check_aux_library.c'; then $(CYGPATH_W) 'check_aux_library.c'; else $(CYGPATH_W) '$(srcdir)/check_aux_library.c'; fi`
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/check_aux_library-check_aux_library.Tpo $(DEPDIR)/check_aux_library-check_aux_library.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='check_aux_library.c' object='check_aux_library-check_aux_library.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(check_aux_library_CFLAGS) $(CFLAGS) -c -o check_aux_library-check_aux_library.obj `if test -f 'check_aux_library.c'; then $(CYGPATH_W) 'check_aux_library.c'; else $(CYGPATH_W) '$(srcdir)/check_aux_library.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(check_aux_library_CPPFLAGS) $(CPPFLAGS) $(check_aux_library_CFLAGS) $(CFLAGS) -c -o check_aux_library-check_aux_library.obj `if test -f 'check_aux_library.c'; then $(CYGPATH_W) 'check_aux_library.c'; else $(CYGPATH_W) '$(srcdir)/check_aux_library.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
