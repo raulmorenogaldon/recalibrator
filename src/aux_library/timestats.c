@@ -17,7 +17,7 @@ typedef struct time_stats {
 	time_slot_t **slots;
 } time_stats_t;
 
-p_timestats time_new_stats(int num_slots)
+p_timestats time_new_stats(unsigned int num_slots)
 {
 	time_stats_t *stats;
 	time_slot_t *slot;
@@ -46,7 +46,7 @@ p_timestats time_new_stats(int num_slots)
 	return (p_timestats)stats;
 }
 
-void time_init_slot(int slot, clock_t initial_time, p_timestats stats)
+void time_init_slot(unsigned int slot, clock_t initial_time, p_timestats stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
 
@@ -67,7 +67,7 @@ void time_init_slot(int slot, clock_t initial_time, p_timestats stats)
 }
 
 
-void time_set_slot(int slot, clock_t end_time, p_timestats stats)
+void time_set_slot(unsigned int slot, clock_t end_time, p_timestats stats)
 {
 	double time;
 	time_stats_t *s = (time_stats_t *)stats;
@@ -99,7 +99,7 @@ void time_set_slot(int slot, clock_t end_time, p_timestats stats)
 	pthread_mutex_unlock(&time_mutex);
 }
 
-double time_get_mean_slot(int slot, p_timestats stats)
+double time_get_mean_slot(unsigned int slot, p_timestats stats)
 {
 	time_stats_t *s = (time_stats_t *)s;
 
@@ -109,10 +109,16 @@ double time_get_mean_slot(int slot, p_timestats stats)
 		return -1;
 	}
 
+	if(slot > s->num_slots)
+	{
+		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
+		return -1.0;
+	}
+
 	return (double) (s->slots[slot]->sum / s->slots[slot]->number);
 }
 
-double time_get_min_slot(int slot, p_timestats stats)
+double time_get_min_slot(unsigned int slot, p_timestats stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
 
@@ -122,10 +128,16 @@ double time_get_min_slot(int slot, p_timestats stats)
 		return -1;
 	}
 
+	if(slot > s->num_slots)
+	{
+		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
+		return -1.0;
+	}
+
 	return s->slots[slot]->min;
 }
 
-double time_get_max_slot(int slot, p_timestats stats)
+double time_get_max_slot(unsigned int slot, p_timestats stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
 
@@ -133,6 +145,12 @@ double time_get_max_slot(int slot, p_timestats stats)
 	{
 		printf("Time - WARNING: Attempting to get slot max from NULL pointer time\n");
 		return -1;
+	}
+
+	if(slot > s->num_slots)
+	{
+		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
+		return -1.0;
 	}
 
 	return s->slots[slot]->max;

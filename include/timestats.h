@@ -29,10 +29,10 @@ extern void time_destroy_stats(p_timestats stats);
 /**
  * TIME OPERATIONS
  */
-extern void time_init_slot(int slot, clock_t initial_time, p_timestats stats);
-extern void time_set_slot(int slot, clock_t end_time, p_timestats stats);
-extern double time_get_mean_slot(int slot, p_timestats stats);
-extern double time_get_min_slot(int slot, p_timestats stats);
-extern double time_get_max_slot(int slot, p_timestats stats);
+extern void time_init_slot(unsigned int slot, clock_t initial_time, p_timestats stats);
+extern void time_set_slot(unsigned int slot, clock_t end_time, p_timestats stats);
+extern double time_get_mean_slot(unsigned int slot, p_timestats stats);
+extern double time_get_min_slot(unsigned int slot, p_timestats stats);
+extern double time_get_max_slot(unsigned int slot, p_timestats stats);
 
 #endif
