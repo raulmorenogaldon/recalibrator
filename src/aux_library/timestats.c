@@ -1,4 +1,4 @@
-#include "timestats.h"
+#include <timestats.h>
 
 pthread_mutex_t time_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -40,7 +40,7 @@ void *time_new_stats(int num_slots)
 	}
 	
 	TIME_GLOBAL_STATS = stats;
-	
+
 	return (void *)stats;
 }
 
