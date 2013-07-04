@@ -20,6 +20,7 @@ AC_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
 
 AM_PROG_CC_C_O
+AM_PATH_CHECK
 
 # Checks for libraries.
 AC_CHECK_LIB([z], [gzread])
