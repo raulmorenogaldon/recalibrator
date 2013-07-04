@@ -15,7 +15,7 @@ typedef struct time_stats {
 	time_slot_t **slots;
 } time_stats_t;
 
-void *time_new_stats(int num_slots)
+p_timestats time_new_stats(int num_slots)
 {
 	time_stats_t *stats;
 	time_slot_t *slot;
@@ -41,14 +41,14 @@ void *time_new_stats(int num_slots)
 	
 	TIME_GLOBAL_STATS = stats;
 
-	return (void *)stats;
+	return (p_timestats)stats;
 }
 
-void time_init_slot(int slot, clock_t initial_time, void *stats)
+void time_init_slot(int slot, clock_t initial_time, p_timestats stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
 
-	if(s == NULL)
+	if(!s)
 	{
 		printf("Time - WARNING: Attempting to initialize slot from NULL pointer time\n");
 		return;
@@ -65,12 +65,12 @@ void time_init_slot(int slot, clock_t initial_time, void *stats)
 }
 
 
-void time_set_slot(int slot, clock_t end_time, void *stats)
+void time_set_slot(int slot, clock_t end_time, p_timestats stats)
 {
 	double time;
 	time_stats_t *s = (time_stats_t *)stats;
 	
-	if(s == NULL)
+	if(!s)
 	{
 		printf("Time - WARNING: Attempting to set slot from NULL pointer time\n");
 		return;
@@ -97,11 +97,11 @@ void time_set_slot(int slot, clock_t end_time, void *stats)
 	pthread_mutex_unlock(&time_mutex);
 }
 
-double time_get_mean_slot(int slot, void *stats)
+double time_get_mean_slot(int slot, p_timestats stats)
 {
 	time_stats_t *s = (time_stats_t *)s;
 
-	if(s == NULL)
+	if(!s)
 	{
 		printf("Time - WARNING: Attempting to get slot mean from NULL pointer time\n");
 		return -1;
@@ -110,11 +110,11 @@ double time_get_mean_slot(int slot, void *stats)
 	return (double) (s->slots[slot]->sum / s->slots[slot]->number);
 }
 
-double time_get_min_slot(int slot, void *stats)
+double time_get_min_slot(int slot, p_timestats stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
 
-	if(s == NULL)
+	if(!s)
 	{
 		printf("Time - WARNING: Attempting to get slot min from NULL pointer time\n");
 		return -1;
@@ -123,11 +123,11 @@ double time_get_min_slot(int slot, void *stats)
 	return s->slots[slot]->min;
 }
 
-double time_get_max_slot(int slot, void *stats)
+double time_get_max_slot(int slot, p_timestats stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
 
-	if(s == NULL)
+	if(!s)
 	{
 		printf("Time - WARNING: Attempting to get slot max from NULL pointer time\n");
 		return -1;
@@ -136,12 +136,12 @@ double time_get_max_slot(int slot, void *stats)
 	return s->slots[slot]->max;
 }
 
-void time_destroy_stats(void *stats)
+void time_destroy_stats(p_timestats stats)
 {
 	int i;
 	time_stats_t *s = (time_stats_t *)stats;
 	
-	if(s == NULL)
+	if(!s)
 	{
 		printf("Time - WARNING: Attempting to destroy NULL pointer time\n");
 		return -1;
