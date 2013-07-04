@@ -2,6 +2,8 @@
 
 pthread_mutex_t time_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+p_timestats TIME_GLOBAL_STATS;
+
 typedef struct time_slot {
 	clock_t aux_time;	//Internal use
 	double min;	//Min time
@@ -38,7 +40,7 @@ p_timestats time_new_stats(int num_slots)
 		
 		stats->slots[i] = slot;
 	}
-	
+
 	TIME_GLOBAL_STATS = stats;
 
 	return (p_timestats)stats;
@@ -144,7 +146,7 @@ void time_destroy_stats(p_timestats stats)
 	if(!s)
 	{
 		printf("Time - WARNING: Attempting to destroy NULL pointer time\n");
-		return -1;
+		return;
 	}
 
 	//Destroy slots

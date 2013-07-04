@@ -14,7 +14,7 @@ typedef void *p_timestats;
 /**
  * Global time statistics for use
  */
-static p_timestats TIME_GLOBAL_STATS;
+extern p_timestats TIME_GLOBAL_STATS;
 
 /**
  * Time statistics structure creation
