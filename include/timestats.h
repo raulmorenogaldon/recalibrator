@@ -19,7 +19,7 @@ extern p_timestats TIME_GLOBAL_STATS;
 /**
  * Time statistics structure creation
  */
-extern p_timestats time_new_stats(int num_slots);
+extern p_timestats time_new_stats(unsigned int num_slots);
 
 /**
  * Time statistics structure delete
