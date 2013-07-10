@@ -82,7 +82,7 @@ recal_destroy_info(recal_info_t **data)
  * Add recalibration data from one base.
  */
 ERROR_CODE
-recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCLEOTIDE dinuc, const BOOL miss)
+recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCLEOTIDE dinuc, const BOOL match)
 {
 	int qual_index = qual - data->min_qual - 1;
 	int qual_cycle_index = qual_index * data->num_cycles + cycle;
@@ -109,24 +109,24 @@ recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCL
 	}
 
 	//Increase total counters
-	if(miss)
+	if(!match)
 	data->total_miss++;
 	data->total_bases++;
 
 	//Increase quality vector
-	if(miss)
+	if(!match)
 	data->qual_miss[qual_index]++;
 	data->qual_bases[qual_index]++;
 
 	//Increase quality-cycle matrix
-	if(miss)
+	if(!match)
 	data->qual_cycle_miss[qual_cycle_index]++;
 	data->qual_cycle_bases[qual_cycle_index]++;
 
 	//Increase quality-dinuc matrix (if not dinuc != -1)
 	if(dinuc >= 0)
 	{
-		if(miss)
+		if(!match)
 		data->qual_dinuc_miss[qual_dinuc_index]++;
 		data->qual_dinuc_bases[qual_dinuc_index]++;
 	}
@@ -143,7 +143,7 @@ recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCL
  * Add recalibration data from vector of bases
  */
 ERROR_CODE
-recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const DINUCLEOTIDE *dinuc, const BOOL *misses)
+recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const unsigned char *dinuc, const char *matches)
 {
 	int i;
 	int qual_index;
@@ -172,7 +172,7 @@ recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const i
 			}
 
 			//Increase misses
-			if(!misses[i])
+			if(!matches[i])
 			{
 				data->total_miss++;
 				data->qual_miss[qual_index]++;

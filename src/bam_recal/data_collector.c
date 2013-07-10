@@ -194,11 +194,12 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	char *bam_seq, *bam_seq_aux;
 	char aux_comp[16];
 	char *comp_res, *dinucs;
-	int i, miss, j;
+	int i, j;
+	BOOL miss;
 	#ifdef __SSE2__
 	__m128i v_ref, v_seq, v_comp;
 	#endif
-	enum DINUC dinuc;
+	DINUCLEOTIDE dinuc;
 	unsigned long int init_pos, end_pos;
 	uint32_t flag;
 
@@ -248,7 +249,7 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	//Iterates nucleotides in this read
 	dinuc = 0;
 	comp_res = malloc(alig->core.l_qseq * sizeof(char));
-	dinucs = malloc(alig->core.l_qseq * sizeof(int));
+	dinucs = malloc(alig->core.l_qseq * sizeof(DINUCLEOTIDE));
 	for(i = 0; i < alig->core.l_qseq; i++)
 	{
 		#ifdef __SSE2__ /*SSE Block*/
@@ -327,11 +328,11 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 			}*/
 			if(ref_seq[i] != bam_seq[i])
 			{
-				comp_res[i] = 0;	/*Diff*/
+				comp_res[i] = FALSE;	/*Diff*/
 			}
 			else
 			{
-				comp_res[i] = -1;	/*Equals*/
+				comp_res[i] = TRUE;	/*Equals*/
 			}
 		}
 	}

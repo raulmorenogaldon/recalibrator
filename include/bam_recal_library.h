@@ -77,9 +77,9 @@ EXTERNC ERROR_CODE recal_destroy_info(recal_info_t **data);
  * \param qual Quality to add.
  * \param cycle Cycle to add.
  * \param dinuc Dinucleotide to add.
- * \param miss Indicate if miss(1) or not (0)
+ * \param miss Indicate if match(!=0) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCLEOTIDE dinuc, const BOOL miss);
+EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCLEOTIDE dinuc, const BOOL match);
 
 /**
  * \brief Add recalibration data from vector of bases.
@@ -88,9 +88,9 @@ EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const int qual, const int 
  * \param qual Vector of qualities to add.
  * \param cycle Vector of cycles to add.
  * \param dinuc Vector of dinucleotides to add.
- * \param miss Vector of miss(1) or not (0)
+ * \param miss Vector of match(!=0) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const DINUCLEOTIDE *dinuc, const BOOL *misses);
+EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const unsigned char *dinuc, const unsigned char *matches);
 
 /**
  * \brief Compute deltas from bases and misses.
