@@ -69,7 +69,7 @@ compare_bams_qual(const char* bamPath0, const char* bamPath1, const int cycles)
 }
 
 ERROR_CODE
-create_empty_bam_header(const unsigned int num_chroms, bam_header_t *header)
+init_empty_bam_header(const unsigned int num_chroms, bam_header_t *header)
 {
 	int i;
 

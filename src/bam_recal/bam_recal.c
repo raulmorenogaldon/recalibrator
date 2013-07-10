@@ -4,7 +4,7 @@
  * Recalibrate BAM file from path and store in file.
  */
 ERROR_CODE
-recal_recalibrate_bam_file(char *orig_bam_path, recal_info_t *bam_info, char *recal_bam_path)
+recal_recalibrate_bam_file(const char *orig_bam_path, const recal_info_t *bam_info, const char *recal_bam_path)
 {
 	bam_file_t *orig_bam_f, *recal_bam_f;
 	bam_header_t *recal_bam_header;
@@ -19,7 +19,7 @@ recal_recalibrate_bam_file(char *orig_bam_path, recal_info_t *bam_info, char *re
 
 	//Create new bam
 	printf("Creating new bam file in \"%s\"...\n", recal_bam_path);
-	create_empty_bam_header(orig_bam_f->bam_header_p->n_targets, recal_bam_header);
+	init_empty_bam_header(orig_bam_f->bam_header_p->n_targets, recal_bam_header);
 	recal_bam_f = bam_fopen_mode(recal_bam_path, recal_bam_header, "w");
 	bam_fwrite_header(recal_bam_header, recal_bam_f);
 	printf("New BAM initialized!...\n");
@@ -48,7 +48,7 @@ recal_recalibrate_bam_file(char *orig_bam_path, recal_info_t *bam_info, char *re
  * Recalibrate BAM file and store in file.
  */
 ERROR_CODE
-recal_recalibrate_bam(bam_file_t *orig_bam_f, recal_info_t *bam_info, bam_file_t *recal_bam_f)
+recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info, bam_file_t *recal_bam_f)
 {
 	bam_batch_t* batch;
 	int count = 0;
@@ -126,7 +126,7 @@ recal_recalibrate_bam(bam_file_t *orig_bam_f, recal_info_t *bam_info, bam_file_t
  * Recalibrate BAM batch of alignments and store in file.
  */
 ERROR_CODE
-recal_recalibrate_batch(bam_batch_t* batch, recal_info_t *bam_info, bam_file_t *recal_bam_f)
+recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info, bam_file_t *recal_bam_f)
 {
 	int i;
 
@@ -150,7 +150,7 @@ recal_recalibrate_batch(bam_batch_t* batch, recal_info_t *bam_info, bam_file_t *
  * Recalibrate alignment and store in file.
  */
 ERROR_CODE
-recal_recalibrate_alignment(bam1_t* alig, recal_info_t *bam_info, bam_file_t *recal_bam_f)
+recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, bam_file_t *recal_bam_f)
 {
 	int qual_index;
 	int matrix_index;

@@ -79,7 +79,7 @@ int mymain(	int full,
 	#ifdef __SSE3__
 	printf("Using SSE3 features\n");
 	#endif
-	
+
 	//Execute phase 1
 	if (p1)
 	{
@@ -87,7 +87,7 @@ int mymain(	int full,
 
 		//Create new data
 		printf("cycles: %d\n",cycles);
-		recal_new_info(cycles, &data);
+		recal_init_info(cycles, &data);
 		
 		//Obtain reference filename and dirpath from full path
 		dir = strdup(reference);
@@ -129,7 +129,7 @@ int mymain(	int full,
 		if (!p1)
 		{
 			//New data
-			recal_new_info(cycles, &data);
+			recal_init_info(cycles, &data);
 			
 			//Load data
 			recal_load_recal_info(datafile, data);

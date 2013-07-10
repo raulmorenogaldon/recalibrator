@@ -10,12 +10,12 @@
  * Allocate new recalibration data.
  */
 ERROR_CODE
-recal_new_info(const int cycles, recal_info_t **out_info)
+recal_init_info(const int cycles, recal_info_t **out_data)
 {
 	recal_info_t *data;
 	int vector_size = MAX_QUALITY - MIN_QUALITY;
 
-	data = malloc(sizeof(recal_info_t)); //Memory allocation
+	data = (recal_info_t *)malloc(sizeof(recal_info_t));
 
 	//Struct initialization
 	data->min_qual = MIN_QUALITY;
@@ -29,21 +29,21 @@ recal_new_info(const int cycles, recal_info_t **out_info)
 	data->total_delta = 0;
 
 	//Quality vectors
-	new_vector(vector_size, SMOOTH_CONSTANT_MISS, data->qual_miss);
-	new_vector(vector_size, SMOOTH_CONSTANT_BASES, data->qual_bases);
-	new_vector_d(vector_size, 0.0, data->qual_delta);
+	new_vector(vector_size, SMOOTH_CONSTANT_MISS, &(data->qual_miss));
+	new_vector(vector_size, SMOOTH_CONSTANT_BASES, &(data->qual_bases));
+	new_vector_d(vector_size, 0.0, &(data->qual_delta));
 
 	//Qual-Cycle matrix
-	new_vector(vector_size * cycles, SMOOTH_CONSTANT_MISS, data->qual_cycle_miss);
-	new_vector(vector_size * cycles, SMOOTH_CONSTANT_BASES, data->qual_cycle_bases);
-	new_vector_d(vector_size * cycles, 0.0, data->qual_cycle_delta);
+	new_vector(vector_size * cycles, SMOOTH_CONSTANT_MISS, &(data->qual_cycle_miss));
+	new_vector(vector_size * cycles, SMOOTH_CONSTANT_BASES, &(data->qual_cycle_bases));
+	new_vector_d(vector_size * cycles, 0.0, &(data->qual_cycle_delta));
 
 	//Qual-Dinuc matrix
-	new_vector(vector_size * cycles, SMOOTH_CONSTANT_MISS, data->qual_dinuc_miss);
-	new_vector(vector_size * cycles, SMOOTH_CONSTANT_BASES, data->qual_dinuc_bases);
-	new_vector_d(vector_size * cycles, 0.0, data->qual_dinuc_delta);
+	new_vector(vector_size * cycles, SMOOTH_CONSTANT_MISS, &(data->qual_dinuc_miss));
+	new_vector(vector_size * cycles, SMOOTH_CONSTANT_BASES, &(data->qual_dinuc_bases));
+	new_vector_d(vector_size * cycles, 0.0, &(data->qual_dinuc_delta));
 
-	*out_info = data;
+	*out_data = data;
 
 	return NO_ERROR;
 }
@@ -73,7 +73,7 @@ recal_destroy_info(recal_info_t **data)
 
 	//Free struct
 	free(d);
-	d = NULL;
+	*data = NULL;
 
 	return NO_ERROR;
 }
@@ -82,7 +82,7 @@ recal_destroy_info(recal_info_t **data)
  * Add recalibration data from one base.
  */
 ERROR_CODE
-recal_add_base(recal_info_t *data, const int qual, const int cycle, const int dinuc, const int miss)
+recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCLEOTIDE dinuc, const BOOL miss)
 {
 	int qual_index = qual - data->min_qual - 1;
 	int qual_cycle_index = qual_index * data->num_cycles + cycle;
@@ -143,7 +143,7 @@ recal_add_base(recal_info_t *data, const int qual, const int cycle, const int di
  * Add recalibration data from vector of bases
  */
 ERROR_CODE
-recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const char *dinuc, const char *misses)
+recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const DINUCLEOTIDE *dinuc, const BOOL *misses)
 {
 	int i;
 	int qual_index;

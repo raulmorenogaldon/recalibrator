@@ -4,7 +4,7 @@
  * Get recalibration data from BAM path.
  */
 ERROR_CODE
-recal_get_data_from_file(char *bam_path, char *ref_name, char *ref_path, recal_info_t *out_info)
+recal_get_data_from_file(const char *bam_path, const char *ref_name, const char *ref_path, recal_info_t *out_info)
 {
 	genome_t* ref;
 	bam_file_t *bam_f;
@@ -41,7 +41,7 @@ recal_get_data_from_file(char *bam_path, char *ref_name, char *ref_path, recal_i
  * Get recalibration data from BAM file.
  */
 ERROR_CODE
-recal_get_data_from_bam(bam_file_t *bam, genome_t* ref, recal_info_t* output_data)
+recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t* output_data)
 {
 	bam_batch_t* batch;
 	int count = 0;
@@ -156,7 +156,7 @@ recal_get_data_from_bam(bam_file_t *bam, genome_t* ref, recal_info_t* output_dat
  * Get recalibration data from BAM batch of alignments.
  */
 ERROR_CODE
-recal_get_data_from_bam_batch(bam_batch_t* batch, genome_t* ref, recal_info_t* output_data)
+recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, recal_info_t* output_data)
 {
 	int i;
 
@@ -185,7 +185,7 @@ recal_get_data_from_bam_batch(bam_batch_t* batch, genome_t* ref, recal_info_t* o
  * Get recalibration data from alignment.
  */
 ERROR_CODE
-recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal_info_t* output_data)
+recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal_info_t* output_data)
 {
 	//alignment_t* aux_alig;
 	FILE *fp;
@@ -209,7 +209,7 @@ recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal_info_t* out
 	if(alig->core.tid < 0)
 	{
 		unmapped++;
-		return;
+		return NO_ERROR;
 	}
 
 	//Bam seq fields

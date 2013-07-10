@@ -15,14 +15,16 @@
 #include <recal_common.h>
 
 /**
- * Recalibration data storage
- * This struct hold all data necessary to perform recalibrations
+ * \brief Recalibration data storage.
+ *
+ * This struct hold all data necessary to perform recalibrations.
  */
 struct recal_info;
 typedef struct recal_info recal_info_t;
 
 /**
- * Dinucleotide enumeration.
+ * \brief Dinucleotide enumeration.
+ *
  * Represents all possible dinucleotide cases.
  */
 typedef enum DINUC
@@ -43,7 +45,7 @@ typedef enum DINUC
 	dTG = 13,
 	dTC = 14,
 	dTT = 15,
-	d_X = 16	/**< Not a dinucleotide. For example "NT" or "NN".*/
+	d_X = 16	/* Not a dinucleotide. For example "NT" or "NN".*/
 } DINUCLEOTIDE;
 
 
@@ -52,27 +54,48 @@ typedef enum DINUC
  **********************************************/
 
 /**
- * Allocate new recalibration data.
+ * \brief Initialize empty recalibration data struct.
+ *
+ * \param cycles Number of maximum cycles to stat.
+ * \param out_info Previously allocated info struct to initialize.
  */
-EXTERNC ERROR_CODE recal_new_info(const int cycles, recal_info_t **out_info);
+EXTERNC ERROR_CODE recal_init_info(const int cycles, recal_info_t **out_data);
 
 /**
- * Free recalibration data.
+ * \brief Free all resources of recalibration.
+ *
+ * Free all data struct attributes including itself at the end.
+ *
+ * \param data Data struct to free
  */
 EXTERNC ERROR_CODE recal_destroy_info(recal_info_t **data);
 
 /**
- * Add recalibration data from one base.
+ * \brief Add recalibration data from one base.
+ *
+ * \param data Data struct to add stats.
+ * \param qual Quality to add.
+ * \param cycle Cycle to add.
+ * \param dinuc Dinucleotide to add.
+ * \param miss Indicate if miss(1) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const int qual, const int cycle, const int dinuc, const int miss);
+EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCLEOTIDE dinuc, const BOOL miss);
 
 /**
- * Add recalibration data from vector of bases
+ * \brief Add recalibration data from vector of bases.
+ *
+ * \param data Vector of data structs to add stats.
+ * \param qual Vector of qualities to add.
+ * \param cycle Vector of cycles to add.
+ * \param dinuc Vector of dinucleotides to add.
+ * \param miss Vector of miss(1) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const char *dinuc, const char *misses);
+EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const DINUCLEOTIDE *dinuc, const BOOL *misses);
 
 /**
- * Compute deltas from bases and misses.
+ * \brief Compute deltas from bases and misses.
+ *
+ * \param data Data to compute deltas.
  */
 EXTERNC ERROR_CODE recal_calc_deltas(recal_info_t* data);
 
@@ -82,7 +105,11 @@ EXTERNC ERROR_CODE recal_calc_deltas(recal_info_t* data);
  **********************************************/
 
 /**
- * Return dinucleotide enumeration from two bases.
+ * \brief Return dinucleotide enumeration from two bases.
+ *
+ * \param A First base.
+ * \param B Second base.
+ * \param out_dinuc Pointer to output dinucleotide.
  */
 EXTERNC ERROR_CODE recal_get_dinuc(const char A, const char B, DINUCLEOTIDE *out_dinuc);
 
@@ -92,24 +119,41 @@ EXTERNC ERROR_CODE recal_get_dinuc(const char A, const char B, DINUCLEOTIDE *out
  **********************************************/
 
 /**
- * Get recalibration data from BAM path.
+ * \brief Get recalibration data from BAM path.
+ *
+ * \param bam_path Path to BAM.
+ * \param ref_name String with the name of the reference genome.
+ * \param ref_path Path to reference.
+ * \param out_info Data struct to fill.
  */
-EXTERNC ERROR_CODE recal_get_data_from_file(char *bam_path, char *ref_name, char *ref_path, recal_info_t *out_info);
+EXTERNC ERROR_CODE recal_get_data_from_file(const char *bam_path, const char *ref_name, const char *ref_path, recal_info_t *out_info);
 
 /**
- * Get recalibration data from BAM file.
+ * \brief Get recalibration data from BAM file.
+ *
+ * \param bam BAM file struct to process.
+ * \param ref Reference genome struct.
+ * \param out_info Data struct to fill.
  */
-EXTERNC ERROR_CODE recal_get_data_from_bam(bam_file_t *bam, genome_t* ref, recal_info_t* output_data);
+EXTERNC ERROR_CODE recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t* output_data);
 
 /**
- * Get recalibration data from BAM batch of alignments.
+ * \brief Get recalibration data from BAM batch of alignments.
+ *
+ * \param batch BAM batch struct to process.
+ * \param ref Reference genome struct.
+ * \param out_info Data struct to fill.
  */
-EXTERNC ERROR_CODE recal_get_data_from_bam_batch(bam_batch_t* batch, genome_t* ref, recal_info_t* output_data);
+EXTERNC ERROR_CODE recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, recal_info_t* output_data);
 
 /**
- * Get recalibration data from alignment.
+ * \brief Get recalibration data from alignment.
+ *
+ * \param batch BAM alignment struct to process.
+ * \param ref Reference genome struct.
+ * \param out_info Data struct to fill.
  */
-EXTERNC ERROR_CODE recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal_info_t* output_data);
+EXTERNC ERROR_CODE recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal_info_t* output_data);
 
 
 /***********************************************
@@ -117,24 +161,40 @@ EXTERNC ERROR_CODE recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref
  **********************************************/
 
 /**
- * Recalibrate BAM file from path and store in file.
+ * \brief Recalibrate BAM file from path and store in file.
+ *
+ * \param orig_bam_path Path to BAM which will be recalibrated.
+ * \param bam_info Data struct with recalibration info.
+ * \param recal_bam_path Path to output BAM.
  */
-EXTERNC ERROR_CODE recal_recalibrate_bam_file(char *orig_bam_path, recal_info_t *bam_info, char *recal_bam_path);
+EXTERNC ERROR_CODE recal_recalibrate_bam_file(const char *orig_bam_path, const recal_info_t *bam_info, const char *recal_bam_path);
 
 /**
- * Recalibrate BAM file and store in file.
+ * \brief Recalibrate BAM file and store in file.
+ *
+ * \param orig_bam_f BAM file struct to recalibrate.
+ * \param bam_info Data struct with recalibration info.
+ * \param recal_bam_f Recalibrated BAM output file struct.
  */
-EXTERNC ERROR_CODE recal_recalibrate_bam(bam_file_t *orig_bam_f, recal_info_t *bam_info, bam_file_t *recal_bam_f);
+EXTERNC ERROR_CODE recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info, bam_file_t *recal_bam_f);
 
 /**
- * Recalibrate BAM batch of alignments and store in file.
+ * \brief Recalibrate BAM batch of alignments and store in file.
+ *
+ * \param batch Batch struct to recalibrate.
+ * \param bam_info Data struct with recalibration info.
+ * \param recal_bam_f Recalibrated BAM output file struct.
  */
-EXTERNC ERROR_CODE recal_recalibrate_batch(bam_batch_t* batch, recal_info_t *bam_info, bam_file_t *recal_bam_f);
+EXTERNC ERROR_CODE recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info, bam_file_t *recal_bam_f);
 
 /**
- * Recalibrate alignment and store in file.
+ * \brief Recalibrate alignment and store in file.
+ *
+ * \param alig BAM alignment struct to recalibrate.
+ * \param bam_info Data struct with recalibration info.
+ * \param recal_bam_f Recalibrated BAM output file struct.
  */
-EXTERNC ERROR_CODE recal_recalibrate_alignment(bam1_t* alig, recal_info_t *bam_info, bam_file_t *recal_bam_f);
+EXTERNC ERROR_CODE recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, bam_file_t *recal_bam_f);
 
 
 /***********************************************
@@ -142,17 +202,26 @@ EXTERNC ERROR_CODE recal_recalibrate_alignment(bam1_t* alig, recal_info_t *bam_i
  **********************************************/
 
 /**
- * Print to file data from recalibration.
+ * \brief Print to file data from recalibration.
+ *
+ * \param data Data struct with recalibration info.
+ * \param path File path to print the info.
  */
 EXTERNC ERROR_CODE recal_fprint_info(const recal_info_t *data, const char *path);
 
 /**
- * Save to file recalibration data.
+ * \brief Save to file recalibration data.
+ *
+ * \param data Data struct with recalibration info.
+ * \param path File path to save data.
  */
 EXTERNC ERROR_CODE recal_save_recal_info(const recal_info_t *data, const char *path);
 
 /**
- * Load from file recalibration data.
+ * \brief Load from file recalibration data.
+ *
+ * \param path File path to load data.
+ * \param data Data struct to store info.
  */
 EXTERNC ERROR_CODE recal_load_recal_info(const char *path, recal_info_t *data);
 

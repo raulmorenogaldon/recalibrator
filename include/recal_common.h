@@ -27,6 +27,10 @@
 	#define EXTERNC extern
 #endif
 
+#define BOOL unsigned char
+#define TRUE 1
+#define FALSE 0
+
 //#define ERROR_CODE unsigned char;
 enum ERROR_C {
 	NO_ERROR,
