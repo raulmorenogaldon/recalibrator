@@ -8,16 +8,16 @@
 /**
  * Initializes vector with initial values.
  */
-extern void initialize_vector(unsigned int *vector, unsigned int size, int value);
+ERROR_CODE initialize_vector(unsigned int *vector, const size_t size, const int value);
 
 /**
  * Return vector of integers with initial values.
  */
-extern unsigned int *new_vector(unsigned int size, int value);
+ERROR_CODE new_vector(const size_t size, const int value, unsigned int *out_vector);
 
 /**
  * Return vector of double with initial values.
  */
-extern double *new_vector_d(unsigned int size, double value);
+ERROR_CODE new_vector_d(const size_t size, const double value, double *out_vector);
 
 #endif /* AUX_VECTOR_H_ */

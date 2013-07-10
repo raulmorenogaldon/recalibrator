@@ -8,31 +8,31 @@
 /**
  * Returns quality from probability.
  */
-extern inline double Qvalue(double P);
+EXTERNC double Qvalue(double P);
 
 /**
  * Return probability from quality.
  */
-extern inline double Pvalue(double Q);
+EXTERNC double Pvalue(double Q);
 
 /**
  * Return Solexa quality from probability.
  */
-extern inline double Qsolexa(double p);
+EXTERNC double Qsolexa(double p);
 
 /**
  * Return probability from Solexa quality.
  */
-extern inline double Psolexa(double Q);
+EXTERNC double Psolexa(double Q);
 
 /**
  * Return Sanger quality from probability.
  */
-extern inline double Qsanger(double p);
+EXTERNC double Qsanger(double p);
 
 /**
  * Return probability from Solexa quality.
  */
-extern inline double Psanger(double Q);
+EXTERNC double Psanger(double Q);
 
 #endif /* AUX_MATH_H_ */

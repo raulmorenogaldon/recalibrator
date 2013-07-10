@@ -1,6 +1,7 @@
 #include "aux_bam.h"
 
-void compare_bams_qual(const char* bamPath0, const char* bamPath1, int cycles)
+ERROR_CODE
+compare_bams_qual(const char* bamPath0, const char* bamPath1, const int cycles)
 {
 	bam_file_t* bamFile0;
 	bam_file_t* bamFile1;
@@ -63,31 +64,35 @@ void compare_bams_qual(const char* bamPath0, const char* bamPath1, int cycles)
 	bam_batch_free(bamBatch1, 1);
 
 	printf("BAM closed.\n");
+
+	return NO_ERROR;
 }
 
-bam_header_t* create_empty_bam_header(unsigned int num_chroms) {
+ERROR_CODE
+create_empty_bam_header(const unsigned int num_chroms, bam_header_t *out_header)
+{
 
 	int i;
 
 	if(num_chroms == 0)
-		return NULL;
+		return INVALID_INPUT_PARAMS_0;
 
 	//Memory allocation for struct
-	bam_header_t *bam_header = (bam_header_t *) calloc(1, sizeof(bam_header_t));
+	out_header = (bam_header_t *) calloc(1, sizeof(bam_header_t));
 
 	//Create a header with chroms targets number
-	bam_header->n_targets = num_chroms;
-	bam_header->target_name = (char **) calloc(num_chroms, sizeof(char *));
-	bam_header->target_len = (uint32_t*) calloc(num_chroms, sizeof(uint32_t));
+	out_header->n_targets = num_chroms;
+	out_header->target_name = (char **) calloc(num_chroms, sizeof(char *));
+	out_header->target_len = (uint32_t*) calloc(num_chroms, sizeof(uint32_t));
 
 	for(i = 0; i < num_chroms; i++)
 	{
-		bam_header->target_name[i] = strdup("chr1");
-		bam_header->target_len[i] = strlen("chr1")+1;
+		out_header->target_name[i] = strdup("chr1");
+		out_header->target_len[i] = strlen("chr1")+1;
 	}
 
-	bam_header->text = strdup("@PG\tID:HPG-RECALIBRATOR\tVN:0.1\n");
-	bam_header->l_text = strlen(bam_header->text);
+	out_header->text = strdup("@PG\tID:HPG-RECALIBRATOR\tVN:0.1\n");
+	out_header->l_text = strlen(out_header->text);
 
-	return bam_header;
+	return NO_ERROR;
 }

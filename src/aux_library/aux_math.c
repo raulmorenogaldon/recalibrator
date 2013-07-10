@@ -3,7 +3,8 @@
 /**
  * Returns quality from probability.
  */
-inline double Qvalue(double P)
+inline double
+Qvalue(double P)
 {
 	#ifdef P_SOLEXA
 		return Qsolexa(P);
@@ -15,7 +16,8 @@ inline double Qvalue(double P)
 /**
  * Return probability from quality.
  */
-inline double Pvalue(double Q)
+inline double
+Pvalue(double Q)
 {
 	#ifdef P_SOLEXA
 		return Psolexa(Q);
@@ -27,7 +29,8 @@ inline double Pvalue(double Q)
 /**
  * Return Solexa quality from probability.
  */
-inline double Qsolexa(double p)
+inline double
+Qsolexa(double p)
 {
 	double ret = -10.0 * log10(p/(1-p));
 
@@ -42,7 +45,8 @@ inline double Qsolexa(double p)
 /**
  * Return probability from Solexa quality.
  */
-inline double Psolexa(double Q)
+inline double
+Psolexa(double Q)
 {
 	double ret = pow(10.0, -Q/10.0) / (pow(10.0, -Q/10.0) + 1);
 
@@ -57,7 +61,8 @@ inline double Psolexa(double Q)
 /**
  * Return Sanger quality from probability.
  */
-inline double Qsanger(double p)
+inline double
+Qsanger(double p)
 {
 	double ret = -10.0 * log10(p);
 
@@ -72,7 +77,8 @@ inline double Qsanger(double p)
 /**
  * Return probability from Solexa quality.
  */
-inline double Psanger(double Q)
+inline double
+Psanger(double Q)
 {
 	double ret = pow(10.0, -Q/10.0);
 

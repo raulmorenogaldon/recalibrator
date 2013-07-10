@@ -12,8 +12,8 @@
 #include <alignment.h>
 #include <recal_common.h>
 
-extern bam_header_t* create_empty_bam_header(unsigned int num_chroms);
+EXTERNC ERROR_CODE create_empty_bam_header(const unsigned int num_chroms, bam_header_t *out_header);
 
-extern void compare_bams_qual(const char* bamPath0, const char* bamPath1, int cycles);
+EXTERNC ERROR_CODE compare_bams_qual(const char* bamPath0, const char* bamPath1, const int cycles);
 
 #endif /* AUX_BAM_H_ */

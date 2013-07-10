@@ -1,6 +1,7 @@
 #include "aux_misc.h"
 
-void printf_proc_features()
+void
+printf_proc_features()
 {
 	int x64     = 0;
 	int MMX     = 0;
@@ -70,7 +71,8 @@ void printf_proc_features()
 	printf("\n");
 }
 
-void print_binary(unsigned int num)
+void
+print_binary(unsigned int num)
 {
 	unsigned int mask;
 

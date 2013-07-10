@@ -18,41 +18,41 @@
 /**
  * Returns quality from probability.
  */
-extern inline double Qvalue(double P);
+EXTERNC double Qvalue(double P);
 
 /**
  * Return probability from quality.
  */
-extern inline double Pvalue(double Q);
+EXTERNC double Pvalue(double Q);
 
 /**
  * Return Solexa quality from probability.
  */
-extern inline double Qsolexa(double p);
+EXTERNC double Qsolexa(double p);
 
 /**
  * Return probability from Solexa quality.
  */
-extern inline double Psolexa(double Q);
+EXTERNC double Psolexa(double Q);
 
 /**
  * Return Sanger quality from probability.
  */
-extern inline double Qsanger(double p);
+EXTERNC double Qsanger(double p);
 
 /**
  * Return probability from Solexa quality.
  */
-extern inline double Psanger(double Q);
+EXTERNC double Psanger(double Q);
 
 
 /***************************
  * BAM OPERATIONS
  **************************/
 
-extern bam_header_t* create_empty_bam_header(unsigned int num_chroms);
+EXTERNC ERROR_CODE create_empty_bam_header(const unsigned int num_chroms, bam_header_t *out_header);
 
-extern void compare_bams_qual(const char* bamPath0, const char* bamPath1, int cycles);
+EXTERNC ERROR_CODE compare_bams_qual(const char* bamPath0, const char* bamPath1, const int cycles);
 
 
 /***************************
@@ -62,25 +62,25 @@ extern void compare_bams_qual(const char* bamPath0, const char* bamPath1, int cy
 /**
  * Initializes vector with initial values.
  */
-extern void initialize_vector(unsigned int *vector, unsigned int size, int value);
+ERROR_CODE initialize_vector(unsigned int *vector, const size_t size, const int value);
 
 /**
  * Return vector of integers with initial values.
  */
-extern unsigned int *new_vector(unsigned int size, int value);
+ERROR_CODE new_vector(const size_t size, const int value, unsigned int *out_vector);
 
 /**
  * Return vector of double with initial values.
  */
-extern double *new_vector_d(unsigned int size, double value);
+ERROR_CODE new_vector_d(const size_t size, const double value, double *out_vector);
 
 
 /***************************
  * MISCELANEA OPERATIONS
  **************************/
 
-extern void printf_proc_features();
+EXTERNC void printf_proc_features();
 
-extern void print_binary(unsigned int num);
+EXTERNC void print_binary(unsigned int num);
 
 #endif /* AUX_LIBRARY_H_ */
