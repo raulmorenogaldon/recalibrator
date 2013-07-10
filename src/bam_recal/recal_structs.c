@@ -132,7 +132,7 @@ recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCL
 	}
 	else
 	{
-		printf("ERROR: unrecognized dinuc Q: %d, C: %d, D: %d, M: %d\n", qual, cycle, dinuc, miss);
+		printf("ERROR: unrecognized dinuc Q: %d, C: %d, D: %d, Match: %d\n", qual, cycle, dinuc, match);
 		return INVALID_DINUCLEOTIDE;
 	}
 
@@ -143,7 +143,7 @@ recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCL
  * Add recalibration data from vector of bases
  */
 ERROR_CODE
-recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const unsigned char *dinuc, const char *matches)
+recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const unsigned char *dinuc, const unsigned char *matches)
 {
 	int i;
 	int qual_index;

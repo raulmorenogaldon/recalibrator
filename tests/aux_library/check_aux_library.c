@@ -11,7 +11,7 @@ START_TEST (check_aux_bam)
 
 	for(num_chrom = 1; num_chrom < 10; num_chrom++)
 	{
-		header = create_empty_bam_header(num_chrom);
+		header = init_empty_bam_header(num_chrom);
 
 		/* Check output */
 		ck_assert(header);//, "create_empty_bam_header returns NULL\n");
@@ -25,7 +25,7 @@ START_TEST (check_aux_bam)
 	}
 
 	num_chrom = 0;
-	header = create_empty_bam_header(num_chrom);
+	header = init_empty_bam_header(num_chrom);
 	if(header)
 	{
 		ck_abort_msg("create_empty_bam_header must return NULL if num_chrom = 0");
