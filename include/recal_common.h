@@ -28,8 +28,7 @@
 #endif
 
 //#define ERROR_CODE unsigned char;
-
-typedef enum ERROR_C {
+enum ERROR_C {
 	NO_ERROR,
 
 	INVALID_INPUT_PARAMS_NULL,
@@ -37,8 +36,13 @@ typedef enum ERROR_C {
 	INVALID_INPUT_SIZE_0,
 
 	//Timestats specific
-	INVALID_INPUT_SLOT
+	INVALID_INPUT_SLOT,
 
-} ERROR_CODE;
+	//Recalibrate specific
+	INVALID_INPUT_QUAL,
+	INVALID_DINUCLEOTIDE
+};
+typedef enum ERROR_C ERROR_CODE;
+
 
 #endif /* COMMON_H_ */

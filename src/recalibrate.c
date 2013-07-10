@@ -87,7 +87,7 @@ int mymain(	int full,
 
 		//Create new data
 		printf("cycles: %d\n",cycles);
-		data = recal_new_info(cycles);
+		recal_new_info(cycles, &data);
 		
 		//Obtain reference filename and dirpath from full path
 		dir = strdup(reference);
@@ -129,7 +129,7 @@ int mymain(	int full,
 		if (!p1)
 		{
 			//New data
-			data = recal_new_info(cycles);
+			recal_new_info(cycles, &data);
 			
 			//Load data
 			recal_load_recal_info(datafile, data);
@@ -202,7 +202,7 @@ int mymain(	int full,
 	}
 	
 	//Free data memory	
-	recal_destroy_info(data);
+	recal_destroy_info(&data);
 	
 	return 0;
 }

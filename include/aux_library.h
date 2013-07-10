@@ -50,7 +50,7 @@ EXTERNC double Psanger(double Q);
  * BAM OPERATIONS
  **************************/
 
-EXTERNC ERROR_CODE create_empty_bam_header(const unsigned int num_chroms, bam_header_t *out_header);
+EXTERNC ERROR_CODE create_empty_bam_header(const unsigned int num_chroms, bam_header_t *header);
 
 EXTERNC ERROR_CODE compare_bams_qual(const char* bamPath0, const char* bamPath1, const int cycles);
 
@@ -62,17 +62,17 @@ EXTERNC ERROR_CODE compare_bams_qual(const char* bamPath0, const char* bamPath1,
 /**
  * Initializes vector with initial values.
  */
-ERROR_CODE initialize_vector(unsigned int *vector, const size_t size, const int value);
+EXTERNC ERROR_CODE initialize_vector(unsigned int *vector, const size_t size, const int value);
 
 /**
  * Return vector of integers with initial values.
  */
-ERROR_CODE new_vector(const size_t size, const int value, unsigned int *out_vector);
+EXTERNC ERROR_CODE new_vector(const size_t size, const int value, unsigned int *out_vector);
 
 /**
  * Return vector of double with initial values.
  */
-ERROR_CODE new_vector_d(const size_t size, const double value, double *out_vector);
+EXTERNC ERROR_CODE new_vector_d(const size_t size, const double value, double *out_vector);
 
 
 /***************************

@@ -9,7 +9,8 @@
 /**
  * Allocate new recalibration data.
  */
-recal_info_t *recal_new_info(int cycles)
+ERROR_CODE
+recal_new_info(const int cycles, recal_info_t **out_info)
 {
 	recal_info_t *data;
 	int vector_size = MAX_QUALITY - MIN_QUALITY;
@@ -28,74 +29,83 @@ recal_info_t *recal_new_info(int cycles)
 	data->total_delta = 0;
 
 	//Quality vectors
-	data->qual_miss = new_vector(vector_size, SMOOTH_CONSTANT_MISS);
-	data->qual_bases = new_vector(vector_size, SMOOTH_CONSTANT_BASES);
-	data->qual_delta = new_vector_d(vector_size, 0.0);
+	new_vector(vector_size, SMOOTH_CONSTANT_MISS, data->qual_miss);
+	new_vector(vector_size, SMOOTH_CONSTANT_BASES, data->qual_bases);
+	new_vector_d(vector_size, 0.0, data->qual_delta);
 
 	//Qual-Cycle matrix
-	data->qual_cycle_miss = new_vector(vector_size * cycles, SMOOTH_CONSTANT_MISS);
-	data->qual_cycle_bases = new_vector(vector_size * cycles, SMOOTH_CONSTANT_BASES);
-	data->qual_cycle_delta = new_vector_d(vector_size * cycles, 0.0);
+	new_vector(vector_size * cycles, SMOOTH_CONSTANT_MISS, data->qual_cycle_miss);
+	new_vector(vector_size * cycles, SMOOTH_CONSTANT_BASES, data->qual_cycle_bases);
+	new_vector_d(vector_size * cycles, 0.0, data->qual_cycle_delta);
 
 	//Qual-Dinuc matrix
-	data->qual_dinuc_miss = new_vector(vector_size * cycles, SMOOTH_CONSTANT_MISS);
-	data->qual_dinuc_bases = new_vector(vector_size * cycles, SMOOTH_CONSTANT_BASES);
-	data->qual_dinuc_delta = new_vector_d(vector_size * cycles, 0.0);
+	new_vector(vector_size * cycles, SMOOTH_CONSTANT_MISS, data->qual_dinuc_miss);
+	new_vector(vector_size * cycles, SMOOTH_CONSTANT_BASES, data->qual_dinuc_bases);
+	new_vector_d(vector_size * cycles, 0.0, data->qual_dinuc_delta);
 
-	return data;
+	*out_info = data;
+
+	return NO_ERROR;
 }
 
 /**
  * Free recalibration data.
  */
-void recal_destroy_info(recal_info_t *data)
+ERROR_CODE
+recal_destroy_info(recal_info_t **data)
 {
+	recal_info_t *d = *data;
+
 	//Free quality vector
-	free(data->qual_miss);
-	free(data->qual_bases);
-	free(data->qual_delta);
+	free(d->qual_miss);
+	free(d->qual_bases);
+	free(d->qual_delta);
 
 	//Free quality-cycle matrix
-	free(data->qual_cycle_miss);
-	free(data->qual_cycle_bases);
-	free(data->qual_cycle_delta);
+	free(d->qual_cycle_miss);
+	free(d->qual_cycle_bases);
+	free(d->qual_cycle_delta);
 
 	//Free quality-dinuc matrix
-	free(data->qual_dinuc_miss);
-	free(data->qual_dinuc_bases);
-	free(data->qual_dinuc_delta);
+	free(d->qual_dinuc_miss);
+	free(d->qual_dinuc_bases);
+	free(d->qual_dinuc_delta);
 
 	//Free struct
-	free(data);
+	free(d);
+	d = NULL;
+
+	return NO_ERROR;
 }
 
 /**
  * Add recalibration data from one base.
  */
-void recal_add_base(recal_info_t *data, int qual, int cycle, int dinuc, int miss)
+ERROR_CODE
+recal_add_base(recal_info_t *data, const int qual, const int cycle, const int dinuc, const int miss)
 {
 	int qual_index = qual - data->min_qual - 1;
 	int qual_cycle_index = qual_index * data->num_cycles + cycle;
 	int qual_dinuc_index = qual_index * data->num_dinuc + dinuc;
 
 	if(qual - 1 < MIN_QUALITY_TO_STAT)
-		return;
+		return INVALID_INPUT_QUAL;
 
 	//Error check
 	if(qual_index >= MAX_QUALITY - MIN_QUALITY || qual_index < 0)
 	{
 		printf("add_base: ERROR, qual must be positive and minor than MAX_QUALITY - MIN_QUALITY ==> Qual = %d\n", qual);
-		return;
+		return INVALID_INPUT_QUAL;
 	}
 	if(cycle < 0 || cycle > data->num_cycles - 1)
 	{
 		printf("add_base: ERROR, cycle must be positive and minor than NUM_CYCLES\n");
-		return;
+		return INVALID_INPUT_QUAL;
 	}
 	if(dinuc > NUM_DINUC - 1)
 	{
 		printf("add_base: ERROR, dinuc must be minor than NUM_DINUC %d \n", dinuc);
-		return;
+		return INVALID_INPUT_QUAL;
 	}
 
 	//Increase total counters
@@ -123,14 +133,17 @@ void recal_add_base(recal_info_t *data, int qual, int cycle, int dinuc, int miss
 	else
 	{
 		printf("ERROR: unrecognized dinuc Q: %d, C: %d, D: %d, M: %d\n", qual, cycle, dinuc, miss);
-		getchar();
+		return INVALID_DINUCLEOTIDE;
 	}
+
+	return NO_ERROR;
 }
 
 /**
  * Add recalibration data from vector of bases
  */
-void recal_add_base_v(recal_info_t *data, char *seq, char *quals, int init_cycle, int end_cycle, char *dinuc, char *misses)
+ERROR_CODE
+recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const char *dinuc, const char *misses)
 {
 	int i;
 	int qual_index;
@@ -171,12 +184,15 @@ void recal_add_base_v(recal_info_t *data, char *seq, char *quals, int init_cycle
 			}
 		}
 	}
+
+	return NO_ERROR;
 }
 
 /**
  * Compute deltas from bases and misses.
  */
-void recal_calc_deltas(recal_info_t* data)
+ERROR_CODE
+recal_calc_deltas(recal_info_t* data)
 {
 	double global_empirical, phred, err0;
 	double r_empirical;
@@ -250,6 +266,8 @@ void recal_calc_deltas(recal_info_t* data)
 	#ifdef D_TIME_DEBUG
 		time_set_slot(D_SLOT_CALC_DELTAS, clock(), TIME_GLOBAL_STATS);
 	#endif
+
+	return NO_ERROR;
 }
 
 /**
@@ -261,7 +279,8 @@ void recal_calc_deltas(recal_info_t* data)
 /**
  * Return dinucleotide enumeration from two bases.
  */
-enum DINUC recal_get_dinuc(char A, char B)
+ERROR_CODE
+recal_get_dinuc(const char A, const char B, DINUCLEOTIDE *out_dinuc)
 {
 	switch(A)
 	{
@@ -269,16 +288,16 @@ enum DINUC recal_get_dinuc(char A, char B)
 			switch(B)
 			{
 					case 'A':
-						return dAA;
+						*out_dinuc = dAA;
 					break;
 					case 'G':
-						return dAG;
+						*out_dinuc = dAG;
 					break;
 					case 'C':
-						return dAC;
+						*out_dinuc = dAC;
 					break;
 					case 'T':
-						return dAT;
+						*out_dinuc = dAT;
 					break;
 			}
 			break;
@@ -286,16 +305,16 @@ enum DINUC recal_get_dinuc(char A, char B)
 			switch(B)
 			{
 					case 'A':
-						return dGA;
+						*out_dinuc = dGA;
 					break;
 					case 'G':
-						return dGG;
+						*out_dinuc = dGG;
 					break;
 					case 'C':
-						return dGC;
+						*out_dinuc = dGC;
 					break;
 					case 'T':
-						return dGT;
+						*out_dinuc = dGT;
 					break;
 			}
 			break;
@@ -303,16 +322,16 @@ enum DINUC recal_get_dinuc(char A, char B)
 			switch(B)
 			{
 					case 'A':
-						return dCA;
+						*out_dinuc = dCA;
 					break;
 					case 'G':
-						return dCG;
+						*out_dinuc = dCG;
 					break;
 					case 'C':
-						return dCC;
+						*out_dinuc = dCC;
 					break;
 					case 'T':
-						return dCT;
+						*out_dinuc = dCT;
 					break;
 			}
 			break;
@@ -320,26 +339,26 @@ enum DINUC recal_get_dinuc(char A, char B)
 			switch(B)
 			{
 					case 'A':
-						return dTA;
+						*out_dinuc = dTA;
 					break;
 					case 'G':
-						return dTG;
+						*out_dinuc = dTG;
 					break;
 					case 'C':
-						return dTC;
+						*out_dinuc = dTC;
 					break;
 					case 'T':
-						return dTT;
+						*out_dinuc = dTT;
 					break;
 			}
 			break;
 			case '_':
 			case 'N':
-				return d_X;
+				*out_dinuc = d_X;
 			break;
 	}
 
-	return -1;
+	return NO_ERROR;
 }
 
 /**
@@ -351,7 +370,8 @@ enum DINUC recal_get_dinuc(char A, char B)
 /**
  * Print to file data from recalibration.
  */
-void recal_fprint_info(recal_info_t *data, const char *path)
+ERROR_CODE
+recal_fprint_info(const recal_info_t *data, const char *path)
 {
 	FILE *fp;
 	int i,j;
@@ -443,12 +463,15 @@ void recal_fprint_info(recal_info_t *data, const char *path)
 	}
 
 	fclose(fp);
+
+	return NO_ERROR;
 }
 
 /**
  * Save to file recalibration data.
  */
-void recal_save_recal_info(recal_info_t *data, const char *path)
+ERROR_CODE
+recal_save_recal_info(const recal_info_t *data, const char *path)
 {
 	FILE *fp;
 
@@ -479,12 +502,15 @@ void recal_save_recal_info(recal_info_t *data, const char *path)
 	fwrite(data->qual_dinuc_delta, sizeof(double), data->num_quals * data->num_dinuc, fp);
 
 	fclose(fp);
+
+	return NO_ERROR;
 }
 
 /**
  * Load from file recalibration data.
  */
-void recal_load_recal_info(const char *path, recal_info_t *data)
+ERROR_CODE
+recal_load_recal_info(const char *path, recal_info_t *data)
 {
 	FILE *fp;
 
@@ -515,4 +541,6 @@ void recal_load_recal_info(const char *path, recal_info_t *data)
 	fread(data->qual_dinuc_delta, sizeof(double), data->num_quals * data->num_dinuc, fp);
 
 	fclose(fp);
+
+	return NO_ERROR;
 }

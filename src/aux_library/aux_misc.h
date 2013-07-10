@@ -11,9 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <recal_common.h>
+#include <aux_library.h>
 
-EXTERNC void printf_proc_features();
-
-EXTERNC void print_binary(unsigned int num);
+/**
+ * Private functions
+ */
 
 #endif /* AUX_MISC_H_ */

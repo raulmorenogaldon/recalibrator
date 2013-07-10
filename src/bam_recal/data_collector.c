@@ -3,7 +3,8 @@
 /**
  * Get recalibration data from BAM path.
  */
-void recal_get_data_from_file(char *bam_path, char *ref_name, char *ref_path, recal_info_t *out_info)
+ERROR_CODE
+recal_get_data_from_file(char *bam_path, char *ref_name, char *ref_path, recal_info_t *out_info)
 {
 	genome_t* ref;
 	bam_file_t *bam_f;
@@ -32,12 +33,15 @@ void recal_get_data_from_file(char *bam_path, char *ref_name, char *ref_path, re
 	bam_fclose(bam_f);
 	genome_free(ref);
 	printf("BAM closed.\n");
+
+	return NO_ERROR;
 }
 
 /**
  * Get recalibration data from BAM file.
  */
-void recal_get_data_from_bam(bam_file_t *bam, genome_t* ref, recal_info_t* output_data)
+ERROR_CODE
+recal_get_data_from_bam(bam_file_t *bam, genome_t* ref, recal_info_t* output_data)
 {
 	bam_batch_t* batch;
 	int count = 0;
@@ -144,12 +148,15 @@ void recal_get_data_from_bam(bam_file_t *bam, genome_t* ref, recal_info_t* outpu
 
 	//Free batch
 	bam_batch_free(batch, 1);
+
+	return NO_ERROR;
 }
 
 /**
  * Get recalibration data from BAM batch of alignments.
  */
-void recal_get_data_from_bam_batch(bam_batch_t* batch, genome_t* ref, recal_info_t* output_data)
+ERROR_CODE
+recal_get_data_from_bam_batch(bam_batch_t* batch, genome_t* ref, recal_info_t* output_data)
 {
 	int i;
 
@@ -170,12 +177,15 @@ void recal_get_data_from_bam_batch(bam_batch_t* batch, genome_t* ref, recal_info
 		#endif
 		}
 	}
+
+	return NO_ERROR;
 }
 
 /**
  * Get recalibration data from alignment.
  */
-void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal_info_t* output_data)
+ERROR_CODE
+recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal_info_t* output_data)
 {
 	//alignment_t* aux_alig;
 	FILE *fp;
@@ -331,7 +341,7 @@ void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal_info_t
 	{
 		if(i > 0)
 		{
-			dinucs[i] = recal_get_dinuc(bam_seq[i-1], bam_seq[i]);
+			recal_get_dinuc(bam_seq[i-1], bam_seq[i], &dinucs[i]);
 			if(dinucs[i] == -1)
 			{
 				dinucs[i] = d_X;
@@ -353,4 +363,6 @@ void recal_get_data_from_bam_alignment(bam1_t* alig, genome_t* ref, recal_info_t
 	free(bam_seq);
 
 	//alignment_free(aux_alig);
+
+	return NO_ERROR;
 }

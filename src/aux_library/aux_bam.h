@@ -11,9 +11,10 @@
 #include <bam_file.h>
 #include <alignment.h>
 #include <recal_common.h>
+#include <aux_library.h>
 
-EXTERNC ERROR_CODE create_empty_bam_header(const unsigned int num_chroms, bam_header_t *out_header);
-
-EXTERNC ERROR_CODE compare_bams_qual(const char* bamPath0, const char* bamPath1, const int cycles);
+/**
+ * Private functions
+ */
 
 #endif /* AUX_BAM_H_ */

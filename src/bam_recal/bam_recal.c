@@ -3,7 +3,8 @@
 /**
  * Recalibrate BAM file from path and store in file.
  */
-void recal_recalibrate_bam_file(char *orig_bam_path, recal_info_t *bam_info, char *recal_bam_path)
+ERROR_CODE
+recal_recalibrate_bam_file(char *orig_bam_path, recal_info_t *bam_info, char *recal_bam_path)
 {
 	bam_file_t *orig_bam_f, *recal_bam_f;
 	bam_header_t *recal_bam_header;
@@ -13,9 +14,12 @@ void recal_recalibrate_bam_file(char *orig_bam_path, recal_info_t *bam_info, cha
 	orig_bam_f = bam_fopen(orig_bam_path);
 	printf("BAM opened!...\n");
 
+	//Allocate
+	recal_bam_header = (bam_header_t *) calloc(1, sizeof(bam_header_t));
+
 	//Create new bam
 	printf("Creating new bam file in \"%s\"...\n", recal_bam_path);
-	recal_bam_header = create_empty_bam_header(orig_bam_f->bam_header_p->n_targets);
+	create_empty_bam_header(orig_bam_f->bam_header_p->n_targets, recal_bam_header);
 	recal_bam_f = bam_fopen_mode(recal_bam_path, recal_bam_header, "w");
 	bam_fwrite_header(recal_bam_header, recal_bam_f);
 	printf("New BAM initialized!...\n");
@@ -36,12 +40,15 @@ void recal_recalibrate_bam_file(char *orig_bam_path, recal_info_t *bam_info, cha
 	bam_fclose(recal_bam_f);
 	printf("BAMs closed.\n");
 	printf("Recalibration DONE.\n");
+
+	return NO_ERROR;
 }
 
 /**
  * Recalibrate BAM file and store in file.
  */
-void recal_recalibrate_bam(bam_file_t *orig_bam_f, recal_info_t *bam_info, bam_file_t *recal_bam_f)
+ERROR_CODE
+recal_recalibrate_bam(bam_file_t *orig_bam_f, recal_info_t *bam_info, bam_file_t *recal_bam_f)
 {
 	bam_batch_t* batch;
 	int count = 0;
@@ -111,12 +118,15 @@ void recal_recalibrate_bam(bam_file_t *orig_bam_f, recal_info_t *bam_info, bam_f
 	#endif
 
 	printf("\n---------------------\n", count);
+
+	return NO_ERROR;
 }
 
 /**
  * Recalibrate BAM batch of alignments and store in file.
  */
-void recal_recalibrate_batch(bam_batch_t* batch, recal_info_t *bam_info, bam_file_t *recal_bam_f)
+ERROR_CODE
+recal_recalibrate_batch(bam_batch_t* batch, recal_info_t *bam_info, bam_file_t *recal_bam_f)
 {
 	int i;
 
@@ -132,12 +142,15 @@ void recal_recalibrate_batch(bam_batch_t* batch, recal_info_t *bam_info, bam_fil
 		time_set_slot(D_SLOT_RECAL_ALIG, clock(), TIME_GLOBAL_STATS);
 		#endif
 	}
+
+	return NO_ERROR;
 }
 
 /**
  * Recalibrate alignment and store in file.
  */
-void recal_recalibrate_alignment(bam1_t* alig, recal_info_t *bam_info, bam_file_t *recal_bam_f)
+ERROR_CODE
+recal_recalibrate_alignment(bam1_t* alig, recal_info_t *bam_info, bam_file_t *recal_bam_f)
 {
 	int qual_index;
 	int matrix_index;
@@ -179,7 +192,7 @@ void recal_recalibrate_alignment(bam1_t* alig, recal_info_t *bam_info, bam_file_
 			//dont take prev dinuc in first cycle (delta = 0)
 			if(i > 0)
 			{
-				dinuc = recal_get_dinuc(bam_seq[i-1], bam_seq[i]);
+				recal_get_dinuc(bam_seq[i-1], bam_seq[i], &dinuc);
 				matrix_index = qual_index * bam_info->num_dinuc + i;
 				delta_rd = bam_info->qual_dinuc_delta[matrix_index];
 			}
@@ -218,4 +231,6 @@ void recal_recalibrate_alignment(bam1_t* alig, recal_info_t *bam_info, bam_file_
 	alignment_free(aux_alig);
 	bam_destroy1(aux_alig1);
 	free(bam_seq);
+
+	return NO_ERROR;
 }
