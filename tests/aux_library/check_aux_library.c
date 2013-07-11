@@ -6,12 +6,13 @@ START_TEST (check_aux_bam)
 	// Not necessary
 	// compare_bams_qual(const char* bamPath0, const char* bamPath1, int cycles);
 
-	bam_header_t *header;
+	bam_header_t *header = NULL;
 	int num_chrom;
 
 	for(num_chrom = 1; num_chrom < 10; num_chrom++)
 	{
-		header = init_empty_bam_header(num_chrom);
+		header = (bam_header_t *)malloc(sizeof(bam_header_t));
+		init_empty_bam_header(num_chrom, header);
 
 		/* Check output */
 		ck_assert(header);//, "create_empty_bam_header returns NULL\n");
@@ -25,11 +26,12 @@ START_TEST (check_aux_bam)
 	}
 
 	num_chrom = 0;
-	header = init_empty_bam_header(num_chrom);
-	if(header)
+	header = (bam_header_t *)malloc(sizeof(bam_header_t));
+	if(!init_empty_bam_header(num_chrom, header))
 	{
-		ck_abort_msg("create_empty_bam_header must return NULL if num_chrom = 0");
+		ck_abort_msg("create_empty_bam_header must return ERROR");
 	}
+	free(header);
 }
 END_TEST
 
@@ -103,20 +105,20 @@ END_TEST
 
 START_TEST (check_aux_vector)
 {
-	unsigned int *uret;
-	double *dret;
+	unsigned int *uret = NULL;
+	double *dret = NULL;
 	int i;
 
-	uret = new_vector(0, 0);
+	new_vector(0, 0, &uret);
 	if(uret)
 		ck_abort_msg("new_vector must return NULL when size is vector is 0");
 
 	/* new_vector*/
-	uret = new_vector(1, 0);
+	new_vector(1, 0, &uret);
 	ck_assert(uret && uret[0] == 0);
 	free(uret);
 
-	uret = new_vector(100, 4);
+	new_vector(100, 4, &uret);
 	ck_assert(uret);
 	for(i = 0; i < 100; i++)
 		ck_assert(uret[i] == 4);
@@ -128,16 +130,16 @@ START_TEST (check_aux_vector)
 	free(uret);
 
 	/*new_vector_d */
-	dret = new_vector_d(0, 0);
+	new_vector_d(0, 0, &dret);
 	if(dret)
-		ck_abort_msg("new_vector must return NULL when size is vector is 0");
+		ck_abort_msg("new_vector_d must return NULL when size is vector is 0");
 	free(dret);
 
-	dret = new_vector_d(1, 0);
+	new_vector_d(1, 0, &dret);
 	ck_assert(dret && dret[0] == 0);
 	free(dret);
 
-	dret = new_vector_d(100, 4);
+	new_vector_d(100, 4, &dret);
 	ck_assert(dret);
 	for(i = 0; i < 100; i++)
 		ck_assert(dret[i] == 4);
@@ -147,33 +149,47 @@ END_TEST
 
 START_TEST (check_timestats)
 {
-	p_timestats timestats;
+	p_timestats timestats = NULL;
 
 	/* Check timestats creation */
 	ck_assert(!TIME_GLOBAL_STATS);
 	ck_assert(!timestats);
-	timestats = time_new_stats(20);
+	time_new_stats(20, &timestats);
 	ck_assert(timestats);
 	ck_assert(TIME_GLOBAL_STATS);
 
 	/* Check timing */
 
 	/* Fails */
-	time_init_slot(-1, 20, TIME_GLOBAL_STATS);
-	time_init_slot(20, 20, TIME_GLOBAL_STATS);
-	time_set_slot(-1, 20, TIME_GLOBAL_STATS);
-	time_set_slot(20, 20, TIME_GLOBAL_STATS);
+	if(!time_init_slot(-1, 20, TIME_GLOBAL_STATS))
+	{
+		ck_abort_msg("Must return error when slot is major than 20");
+	}
+	if(!time_init_slot(20, 20, TIME_GLOBAL_STATS))
+	{
+		ck_abort_msg("Must return error when slot is major than 20");
+	}
+	if(!time_set_slot(-1, 20, TIME_GLOBAL_STATS))
+	{
+		ck_abort_msg("Must return error when slot is major than 20");
+	}
+	if(!time_set_slot(20, 20, TIME_GLOBAL_STATS))
+	{
+		ck_abort_msg("Must return error when slot is major than 20");
+	}
 
-
-	time_init_slot(0, 0, TIME_GLOBAL_STATS);
-	time_set_slot(0, 20, TIME_GLOBAL_STATS);
+	ck_assert(time_init_slot(0, 0, TIME_GLOBAL_STATS) == NO_ERROR);
+	ck_assert(time_set_slot(0, 20, TIME_GLOBAL_STATS) == NO_ERROR);
 
 
 	/* Check timestats destroy */
-	time_destroy_stats(timestats);
+	ck_assert(time_destroy_stats(&TIME_GLOBAL_STATS) == NO_ERROR);
 
 	/* Try to destroy null pointer */
-	time_destroy_stats(NULL);
+	if(!time_destroy_stats(NULL))
+	{
+		ck_abort_msg("Destroy time stats must return error if NULL pointer is passed");
+	}
 
 }
 END_TEST

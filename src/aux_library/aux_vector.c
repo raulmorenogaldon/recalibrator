@@ -29,7 +29,10 @@ new_vector(const size_t size, const int value, unsigned int **out_vector)
 	unsigned int *vector;
 
 	if(size == 0)
+	{
+		*out_vector = NULL;
 		return INVALID_INPUT_SIZE_0;
+	}
 
 	vector = (unsigned int *)malloc(size * sizeof(unsigned int));
 
@@ -53,7 +56,10 @@ new_vector_d(const size_t size, const double value, double **out_vector)
 	double *vector;
 
 	if(size == 0)
+	{
+		*out_vector = NULL;
 		return INVALID_INPUT_SIZE_0;
+	}
 
 	vector = (double *)malloc(size * sizeof(double));
 

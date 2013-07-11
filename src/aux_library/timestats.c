@@ -54,7 +54,14 @@ ERROR_CODE
 time_destroy_stats(p_timestats *stats)
 {
 	int i;
-	time_stats_t *s = (time_stats_t *)stats;
+
+	if(!stats)
+	{
+		printf("Time - WARNING: Attempting to destroy NULL pointer time\n");
+		return INVALID_INPUT_PARAMS_NULL;
+	}
+
+	time_stats_t *s = (time_stats_t *)(*stats);
 
 	if(!s)
 	{
@@ -68,8 +75,11 @@ time_destroy_stats(p_timestats *stats)
 		free(s->slots[i]);
 	}
 
+	free(s->slots);
 	free(s);
 	*stats = NULL;
+
+	return NO_ERROR;
 }
 
 /**
