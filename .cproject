@@ -21,7 +21,11 @@
 					<folderInfo id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.262706802." name="/" resourcePath="">
 						<toolChain id="org.eclipse.linuxtools.cdt.autotools.core.toolChain.1083440700" name="GNU Autotools Toolchain" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolChain">
 							<targetPlatform id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.targetPlatform.766555259" isAbstract="false" name="GNU Autotools Target Platform" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.targetPlatform"/>
-							<builder id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.builder.890923810" keepEnvironmentInBuildfile="false" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.builder"/>
+							<builder id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.builder.890923810" keepEnvironmentInBuildfile="false" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.builder">
+								<outputEntries>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name=""/>
+								</outputEntries>
+							</builder>
 							<tool id="org.eclipse.linuxtools.cdt.autotools.core.gnu.toolchain.tool.configure.1968907789" name="configure" superClass="org.eclipse.linuxtools.cdt.autotools.core.gnu.toolchain.tool.configure">
 								<option id="org.eclipse.linuxtools.cdt.autotools.core.option.configure.name.972208012" name="Name" superClass="org.eclipse.linuxtools.cdt.autotools.core.option.configure.name" value="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.262706802" valueType="string"/>
 							</tool>
@@ -33,6 +37,7 @@
 									<listOptionValue builtIn="false" value="/home/rmoreno/workspace/compbio-hpg/bioinfo-libs/bioformats/bam-sam"/>
 									<listOptionValue builtIn="false" value="/home/rmoreno/workspace/compbio-hpg/bioinfo-libs/aligners/bwt"/>
 									<listOptionValue builtIn="false" value="/home/rmoreno/workspace/recalibrator/include"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/recalibrator/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.504432729" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
