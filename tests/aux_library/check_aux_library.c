@@ -149,6 +149,7 @@ END_TEST
 
 START_TEST (check_timestats)
 {
+	double mean, mean2;
 	p_timestats timestats = NULL;
 
 	/* Check timestats creation */
@@ -181,12 +182,23 @@ START_TEST (check_timestats)
 	ck_assert(time_init_slot(0, 0, TIME_GLOBAL_STATS) == NO_ERROR);
 	ck_assert(time_set_slot(0, 20, TIME_GLOBAL_STATS) == NO_ERROR);
 
+	ck_assert(time_get_mean_slot(0, TIME_GLOBAL_STATS, &mean) == NO_ERROR);
+	ck_assert(time_get_mean_slot(0, timestats, &mean2) == NO_ERROR);
+	ck_assert(mean == mean2);
+
+	ck_assert(time_get_min_slot(0, TIME_GLOBAL_STATS, &mean) == NO_ERROR);
+	ck_assert(time_get_min_slot(0, timestats, &mean2) == NO_ERROR);
+	ck_assert(mean == mean2);
+
+	ck_assert(time_get_max_slot(0, TIME_GLOBAL_STATS, &mean) == NO_ERROR);
+	ck_assert(time_get_max_slot(0, timestats, &mean2) == NO_ERROR);
+	ck_assert(mean == mean2);
 
 	/* Check timestats destroy */
 	ck_assert(time_destroy_stats(&TIME_GLOBAL_STATS) == NO_ERROR);
 
 	/* Try to destroy null pointer */
-	if(!time_destroy_stats(NULL))
+	if(time_destroy_stats(NULL) == NO_ERROR)
 	{
 		ck_abort_msg("Destroy time stats must return error if NULL pointer is passed");
 	}

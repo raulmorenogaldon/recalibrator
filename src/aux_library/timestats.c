@@ -143,7 +143,7 @@ time_set_slot(const unsigned int slot, const clock_t end_time, p_timestats stats
 ERROR_CODE
 time_get_mean_slot(const unsigned int slot, const p_timestats stats, double *out_mean)
 {
-	time_stats_t *s = (time_stats_t *)s;
+	time_stats_t *s = (time_stats_t *)stats;
 
 	if(!s)
 	{
