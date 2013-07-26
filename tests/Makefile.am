@@ -1,1 +1,1 @@
-SUBDIRS = aux_library
+SUBDIRS = aux_library recal

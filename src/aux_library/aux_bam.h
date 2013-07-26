@@ -12,6 +12,7 @@
 #include <alignment.h>
 #include <recal_common.h>
 #include <aux_library.h>
+#include <stdlib.h>
 
 /**
  * Private functions

@@ -4,7 +4,7 @@
  * Initializes vector with initial values.
  */
 ERROR_CODE
-initialize_vector(unsigned int *vector, const size_t size, const unsigned int value)
+initialize_vector(uint32_t *vector, const size_t size, const uint32_t value)
 {
 	int i;
 
@@ -23,10 +23,10 @@ initialize_vector(unsigned int *vector, const size_t size, const unsigned int va
  * Return vector of integers with initial values.
  */
 ERROR_CODE
-new_vector(const size_t size, const int value, unsigned int **out_vector)
+new_vector_bases(const size_t size, const base_t value, base_t **out_vector)
 {
 	int i;
-	unsigned int *vector;
+	base_t *vector;
 
 	if(size == 0)
 	{
@@ -34,12 +34,12 @@ new_vector(const size_t size, const int value, unsigned int **out_vector)
 		return INVALID_INPUT_SIZE_0;
 	}
 
-	vector = (unsigned int *)malloc(size * sizeof(unsigned int));
+	vector = (base_t *)malloc(size * sizeof(base_t));
 
 	for(i = 0; i < size; i++)
 		vector[i] = value;
 
-	printf("Created new vector with %d positions, total size %lu bytes\n", size, size * sizeof(unsigned int));
+	printf("Created new vector with %d positions, total size %lu bytes\n", size, size * sizeof(base_t));
 
 	*out_vector = vector;
 
@@ -50,10 +50,10 @@ new_vector(const size_t size, const int value, unsigned int **out_vector)
  * Return vector of double with initial values.
  */
 ERROR_CODE
-new_vector_d(const size_t size, const double value, double **out_vector)
+new_vector_miss(const size_t size, const error_t value, error_t **out_vector)
 {
 	int i;
-	double *vector;
+	error_t *vector;
 
 	if(size == 0)
 	{
@@ -61,14 +61,80 @@ new_vector_d(const size_t size, const double value, double **out_vector)
 		return INVALID_INPUT_SIZE_0;
 	}
 
-	vector = (double *)malloc(size * sizeof(double));
+	vector = (error_t *)malloc(size * sizeof(error_t));
 
 	for(i = 0; i < size; i++)
 		vector[i] = value;
 
-	printf("Created new vector with %d positions, total size %lu bytes\n", size, size * sizeof(double));
+	printf("Created new vector with %d positions, total size %lu bytes\n", size, size * sizeof(error_t));
 
 	*out_vector = vector;
+
+	return NO_ERROR;
+}
+
+ERROR_CODE
+new_vector_delta(const size_t size, const delta_t value, delta_t **out_vector)
+{
+	int i;
+	delta_t *vector;
+
+	if(size == 0)
+	{
+		*out_vector = NULL;
+		return INVALID_INPUT_SIZE_0;
+	}
+
+	vector = (delta_t *)malloc(size * sizeof(delta_t));
+
+	for(i = 0; i < size; i++)
+		vector[i] = value;
+
+	printf("Created new vector with %d positions, total size %lu bytes\n", size, size * sizeof(delta_t));
+
+	*out_vector = vector;
+
+	return NO_ERROR;
+}
+
+ERROR_CODE
+max_value(double *vector, size_t size, double *max)
+{
+	double maximum = -DBL_MAX;
+	double aux;
+	int i;
+
+	for(i = size-1; i >= 0; i--)
+	{
+		aux = vector[i];
+		if(aux > maximum)
+			maximum = aux;
+	}
+
+	*max = maximum;
+
+	return NO_ERROR;
+}
+
+ERROR_CODE
+max_index(double *vector, size_t size, uint16_t *max_i)
+{
+	double max = -DBL_MAX;
+	int index = -1;
+	double aux;
+	int i;
+
+	for(i = size-1; i >= 0; i--)
+	{
+		aux = vector[i];
+		if(aux > max)
+		{
+			max = aux;
+			index = i;
+		}
+	}
+
+	*max_i = index;
 
 	return NO_ERROR;
 }

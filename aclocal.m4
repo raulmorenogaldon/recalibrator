@@ -27,18 +27,18 @@ To do so, use the procedure documented by the package, typically `autoreconf'.])
 #
 # Check for the existence of bioinfo library.
 
-AC_DEFUN([AC_LIB_COMPBIO],
+AC_DEFUN([AC_LIB_OPENCB],
 #
 # Handle user hints
 #
-[AC_MSG_CHECKING([if compbio is wanted])
-AC_ARG_WITH([compbio],
-  AS_HELP_STRING([--with-compbio],
-                 [search for compbio in DIR]),
+[AC_MSG_CHECKING([if opencb is wanted])
+AC_ARG_WITH([opencb],
+  AS_HELP_STRING([--with-opencb],
+                 [search for opencb bioinfo-libs and common-libs in DIR]),
  [if test "$withval" != no ; then
    AC_MSG_RESULT([yes])
    if test -d "$withval" ; then
-     COMPBIO_HOME="$withval"
+     OPENCB_HOME="$withval"
    else
      AC_MSG_WARN([Sorry, $withval does not exist, checking usual places])
    fi
@@ -47,328 +47,215 @@ AC_ARG_WITH([compbio],
  fi],
  [AC_MSG_RESULT([yes])])
 
-if test -f "$COMPBIO_HOME/common-libs/libcommon.a" ; then
-        COMPBIO_INCDIR="$COMPBIO_INCDIR -I${COMPBIO_HOME}/common-libs/commons/ -I${COMPBIO_HOME}/common-libs/containers/ -I${COMPBIO_HOME}/common-libs/"
-        COMPBIO_LIBDIR="$COMPBIO_LIBDIR -L${COMPBIO_HOME}/common-libs/"
+AC_MSG_CHECKING([for libcommon.a])
+if test -f "$OPENCB_HOME/common-libs/libcommon.a" ; then
+	AC_MSG_RESULT([yes])
+        OPENCB_INCDIR="$OPENCB_INCDIR -I${OPENCB_HOME}/common-libs/commons/ -I${OPENCB_HOME}/common-libs/containers/ -I${OPENCB_HOME}/common-libs/"
+        OPENCB_LIBDIR="$OPENCB_LIBDIR -L${OPENCB_HOME}/common-libs/"
+else
+AC_MSG_RESULT([no])
+AC_MSG_ERROR([Please, set a valid opencb path])
 fi
 
-if test -f "$COMPBIO_HOME/bioinfo-libs/libbioinfo.a" ; then
-        COMPBIO_INCDIR="$COMPBIO_INCDIR -I${COMPBIO_HOME}/bioinfo-libs/bioformats/bam-sam/ -I${COMPBIO_HOME}bioinfo-libs/aligners/bwt/"
-        COMPBIO_LIBDIR="$COMPBIO_LIBDIR -L${COMPBIO_HOME}/bioinfo-libs/"
+AC_MSG_CHECKING([for libbioinfo.a])
+if test -f "$OPENCB_HOME/bioinfo-libs/libbioinfo.a" ; then
+	AC_MSG_RESULT([yes])
+        OPENCB_INCDIR="$OPENCB_INCDIR -I${OPENCB_HOME}/bioinfo-libs/bioformats/bam/ -I${OPENCB_HOME}/bioinfo-libs/bioformats/bam/samtools -I${OPENCB_HOME}/bioinfo-libs/aligners/bwt/"
+        OPENCB_LIBDIR="$OPENCB_LIBDIR -L${OPENCB_HOME}/bioinfo-libs/"
+else
+AC_MSG_RESULT([no])
+AC_MSG_ERROR([Please, set a valid opencb path])
 fi
 
 #
 # Locate bioinfo, if wanted
 #
-if test -n "${COMPBIO_HOME}" ; then
-        COMPBIO_OLD_LDFLAGS=$LDFLAGS
-        COMPBIO_OLD_CPPFLAGS=$CPPFLAGS
-        LDFLAGS="$COMPBIO_LIBDIR $LDFLAGS"
-        CPPFLAGS="$COMPBIO_INCDIR $CPPFLAGS"
+if test -n "${OPENCB_HOME}" ; then
+        OPENCB_OLD_LDFLAGS=$LDFLAGS
+        OPENCB_OLD_CPPFLAGS=$CPPFLAGS
+        LDFLAGS="$OPENCB_LIBDIR $LDFLAGS"
+        CPPFLAGS="$OPENCB_INCDIR $CPPFLAGS"
         AC_LANG_SAVE
         AC_LANG_C
         AC_CHECK_HEADERS([commons.h alignment.h bam_file.h genome.h], [ac_cv_bam_file_h=yes], [ac_cv_bam_file_h=no])
 	AC_CHECK_LIB([common], [init_log])
-        AC_CHECK_LIB([bioinfo], [bam_fopen], , ,[-lbam -lc -lz])
+        AC_CHECK_LIB([bioinfo], [bam_fopen], , ,[-lc -lz])
         AC_LANG_RESTORE
         if test "$ac_cv_lib_common_init_log" = "yes" && test "$ac_cv_lib_bioinfo_bam_fopen" = "yes" && test "$ac_cv_bam_file_h" = "yes" ; then
                 #
                 # If both library and header were found, use them
                 #
-                with_compbio=yes
+                with_opencb=yes
         else
                 #
                 # If either header or library was not found, revert and bomb
                 #
-                LDFLAGS="$COMPBIO_OLD_LDFLAGS"
-                CPPFLAGS="$COMPBIO_OLD_CPPFLAGS"
-                AC_MSG_ERROR([either specify a valid bioinfo installation with --with-bioinfo=DIR])
+                LDFLAGS="$OPENCB_OLD_LDFLAGS"
+                CPPFLAGS="$OPENCB_OLD_CPPFLAGS"
+                AC_MSG_ERROR([either specify a valid bioinfo installation with --with-opencb=DIR])
         fi
 fi
 ])
 
-# ===========================================================================
-#      http://www.gnu.org/software/autoconf-archive/ax_lib_samtools.html
-# ===========================================================================
+# pkg.m4 - Macros to locate and utilise pkg-config.            -*- Autoconf -*-
+# serial 1 (pkg-config-0.24)
+# 
+# Copyright © 2004 Scott James Remnant <scott@netsplit.com>.
 #
-# SYNOPSIS
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
 #
-#   AC_LIB_SAMTOOLS()
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
 #
-# DESCRIPTION
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-#   This macro searches for an installed samtools library. If nothing was
-#   specified when calling configure, it searches first in /usr/local and
-#   then tries with ld's default library search path. If the
-#   --with-samtools=DIR is specified, it will try to find it in
-#   DIR/include/bam/sam.h and DIR/lib/libbam.a. As a final try it will look
-#   in DIR/sam.h and DIR/libbam.a as the samtools library does not contain
-#   an install rule.
-#
-#   If --without-samtools is specified, the library is not searched at all.
-#
-#   If either the header file (sam.h) or the library (libbam) is not found,
-#   the configuration exits on error, asking for a valid samtools
-#   installation directory or --without-samtools.
-#
-#   The macro defines the symbol HAVE_SAMTOOLS if the library is found. You
-#   should use autoheader to include a definition for this symbol in a
-#   config.h file. Sample usage in a C/C++ source is as follows:
-#
-#     #ifdef HAVE_SAMTOOLS
-#     #include <sam.h>
-#     #endif /* HAVE_SAMTOOLS */
-#
-#   The following output variables are set with AC_SUBST:
-#
-#     SAMTOOLS_CPPFLAGS
-#     SAMTOOLS_LDFLAGS
-#     SAMTOOLS_LIBS
-#
-#   You can use them like this in Makefile.am:
-#
-#     AM_CPPFLAGS = $(SAMTOOLS_CPPFLAGS)
-#     AM_LDFLAGS = $(SAMTOOLS_LDFLAGS)
-#     program_LDADD = $(SAMTOOLS_LIBS)
-#
-# LICENSE
-#
-#   Copyright (c) 2013 Timothy Brown <tbrown@freeshell.org>
-#
-#   This program is free software; you can redistribute it and/or modify it
-#   under the terms of the GNU General Public License as published by the
-#   Free Software Foundation; either version 3 of the License, or (at your
-#   option) any later version.
-#
-#   This program is distributed in the hope that it will be useful, but
-#   WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-#   Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License along
-#   with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-#   As a special exception, the respective Autoconf Macro's copyright owner
-#   gives unlimited permission to copy, distribute and modify the configure
-#   scripts that are the output of Autoconf when processing the Macro. You
-#   need not follow the terms of the GNU General Public License when using
-#   or distributing such scripts, even though portions of the text of the
-#   Macro appear in them. The GNU General Public License (GPL) does govern
-#   all other use of the material that constitutes the Autoconf Macro.
-#
-#   This special exception to the GPL applies to versions of the Autoconf
-#   Macro released by the Autoconf Archive. When you make and distribute a
-#   modified version of the Autoconf Macro, you may extend this special
-#   exception to the GPL to apply to your modified version as well.
+# As a special exception to the GNU General Public License, if you
+# distribute this file as part of a program that contains a
+# configuration script generated by Autoconf, you may include it under
+# the same distribution terms that you use for the rest of that program.
 
-#serial 2
+# PKG_PROG_PKG_CONFIG([MIN-VERSION])
+# ----------------------------------
+AC_DEFUN([PKG_PROG_PKG_CONFIG],
+[m4_pattern_forbid([^_?PKG_[A-Z_]+$])
+m4_pattern_allow([^PKG_CONFIG(_(PATH|LIBDIR|SYSROOT_DIR|ALLOW_SYSTEM_(CFLAGS|LIBS)))?$])
+m4_pattern_allow([^PKG_CONFIG_(DISABLE_UNINSTALLED|TOP_BUILD_DIR|DEBUG_SPEW)$])
+AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])
+AC_ARG_VAR([PKG_CONFIG_PATH], [directories to add to pkg-config's search path])
+AC_ARG_VAR([PKG_CONFIG_LIBDIR], [path overriding pkg-config's built-in search path])
 
-AC_DEFUN([AC_LIB_SAMTOOLS],
+if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
+	AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
+fi
+if test -n "$PKG_CONFIG"; then
+	_pkg_min_version=m4_default([$1], [0.9.0])
+	AC_MSG_CHECKING([pkg-config is at least version $_pkg_min_version])
+	if $PKG_CONFIG --atleast-pkgconfig-version $_pkg_min_version; then
+		AC_MSG_RESULT([yes])
+	else
+		AC_MSG_RESULT([no])
+		PKG_CONFIG=""
+	fi
+fi[]dnl
+])# PKG_PROG_PKG_CONFIG
+
+# PKG_CHECK_EXISTS(MODULES, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #
-# Handle user hints
+# Check to see whether a particular set of modules exists.  Similar
+# to PKG_CHECK_MODULES(), but does not set variables or print errors.
 #
-[AC_MSG_CHECKING([if samtools is wanted])
-AC_ARG_WITH([samtools],
-  AS_HELP_STRING([--with-samtools],
-                 [search for samtools in DIR/include and DIR/lib]),
- [if test "$withval" != no ; then
-   AC_MSG_RESULT([yes])
-   if test -d "$withval" ; then
-     SAMTOOLS_HOME="$withval"
-   else
-     AC_MSG_WARN([Sorry, $withval does not exist, checking usual places])
-   fi
+# Please remember that m4 expands AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+# only at the first occurence in configure.ac, so if the first place
+# it's called might be skipped (such as if it is within an "if", you
+# have to call PKG_CHECK_EXISTS manually
+# --------------------------------------------------------------
+AC_DEFUN([PKG_CHECK_EXISTS],
+[AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+if test -n "$PKG_CONFIG" && \
+    AC_RUN_LOG([$PKG_CONFIG --exists --print-errors "$1"]); then
+  m4_default([$2], [:])
+m4_ifvaln([$3], [else
+  $3])dnl
+fi])
+
+# _PKG_CONFIG([VARIABLE], [COMMAND], [MODULES])
+# ---------------------------------------------
+m4_define([_PKG_CONFIG],
+[if test -n "$$1"; then
+    pkg_cv_[]$1="$$1"
+ elif test -n "$PKG_CONFIG"; then
+    PKG_CHECK_EXISTS([$3],
+                     [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ],
+		     [pkg_failed=yes])
  else
-   AC_MSG_RESULT([no])
- fi],
- [AC_MSG_RESULT([yes])])
+    pkg_failed=untried
+fi[]dnl
+])# _PKG_CONFIG
 
-if test -f "${SAMTOOLS_HOME}/include/bam/sam.h" ; then
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/bam"
-        SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
-elif test -f "${SAMTOOLS_HOME}/include/sam.h" ; then
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include"
-        SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
-elif test -f "${SAMTOOLS_HOME}/sam.h" ; then
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}"
-        SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}"
-elif test -f "/usr/local/include/bam/sam.h" ; then
-        SAMTOOLS_HOME="/usr/local"
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/bam"
-        SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
+# _PKG_SHORT_ERRORS_SUPPORTED
+# -----------------------------
+AC_DEFUN([_PKG_SHORT_ERRORS_SUPPORTED],
+[AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
 else
-        SAMTOOLS_HOME="/usr"
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/bam"
-        SAMTOOLS_LIBDIR=""
-fi
+        _pkg_short_errors_supported=no
+fi[]dnl
+])# _PKG_SHORT_ERRORS_SUPPORTED
 
-#
-# Locate samtools, if wanted
-#
-if test -n "${SAMTOOLS_HOME}" ; then
 
-        SAMTOOLS_OLD_LDFLAGS=$LDFLAGS
-        SAMTOOLS_OLD_CPPFLAGS=$CPPFLAGS
-        LDFLAGS="$LDFLAGS ${SAMTOOLS_LIBDIR}"
-        CPPFLAGS="$CPPFLAGS ${SAMTOOLS_INCDIR}"
-        AC_LANG_SAVE
-        AC_LANG_C
-        AC_CHECK_HEADER([sam.h], [ac_cv_sam_h=yes], [ac_cv_sam_h=no])
-        AC_CHECK_LIB([bam], [sam_open], , ,[-lc -lz])
-        AC_LANG_RESTORE
-        if test "$ac_cv_lib_bam_sam_open" = "yes" && test "$ac_cv_sam_h" = "yes" ; then
-                #
-                # If both library and header were found, use them
-                #
-                AC_MSG_CHECKING([samtools])
-                AC_MSG_RESULT([ok])
-		AC_DEFINE([HAVE_SAMTOOLS], [1], [Define if samtools is present.])
-                with_samtools=yes
-        else
-                #
-                # If either header or library was not found, revert and bomb
-                #
-                LDFLAGS="$SAMTOOLS_OLD_LDFLAGS"
-                CPPFLAGS="$SAMTOOLS_OLD_CPPFLAGS"
-                AC_MSG_CHECKING([samtools])
-                AC_MSG_RESULT([failed])
-                AC_MSG_ERROR([either specify a valid samtools installation with --with-samtools=DIR or disable samtools usage with --without-samtools])
+# PKG_CHECK_MODULES(VARIABLE-PREFIX, MODULES, [ACTION-IF-FOUND],
+# [ACTION-IF-NOT-FOUND])
+#
+#
+# Note that if there is a possibility the first call to
+# PKG_CHECK_MODULES might not happen, you should be sure to include an
+# explicit call to PKG_PROG_PKG_CONFIG in your configure.ac
+#
+#
+# --------------------------------------------------------------
+AC_DEFUN([PKG_CHECK_MODULES],
+[AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+AC_ARG_VAR([$1][_CFLAGS], [C compiler flags for $1, overriding pkg-config])dnl
+AC_ARG_VAR([$1][_LIBS], [linker flags for $1, overriding pkg-config])dnl
+
+pkg_failed=no
+AC_MSG_CHECKING([for $1])
+
+_PKG_CONFIG([$1][_CFLAGS], [cflags], [$2])
+_PKG_CONFIG([$1][_LIBS], [libs], [$2])
+
+m4_define([_PKG_TEXT], [Alternatively, you may set the environment variables $1[]_CFLAGS
+and $1[]_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.])
+
+if test $pkg_failed = yes; then
+   	AC_MSG_RESULT([no])
+        _PKG_SHORT_ERRORS_SUPPORTED
+        if test $_pkg_short_errors_supported = yes; then
+	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "$2" 2>&1`
+        else 
+	        $1[]_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "$2" 2>&1`
         fi
-fi
-])
+	# Put the nasty error message in config.log where it belongs
+	echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
 
-dnl AM_PATH_CHECK([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
-dnl Test for check, and define CHECK_CFLAGS and CHECK_LIBS
-dnl
+	m4_default([$4], [AC_MSG_ERROR(
+[Package requirements ($2) were not met:
 
-AC_DEFUN([AM_PATH_CHECK],
-[
-  AC_MSG_WARN([A@&t@M_PATH_CHECK() is deprecated])
-  AC_MSG_WARN([[use P@&t@KG_CHECK_MODULES([CHECK], [check >= 0.9.4]) instead]])
-  AC_ARG_WITH([check],
-  [  --with-check=PATH       prefix where check is installed [default=auto]])
- 
-  min_check_version=ifelse([$1], ,0.8.2,$1)
+$$1_PKG_ERRORS
 
-  AC_MSG_CHECKING(for check - version >= $min_check_version)
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
 
-  if test x$with_check = xno; then
-    AC_MSG_RESULT(disabled)
-    ifelse([$3], , AC_MSG_ERROR([disabling check is not supported]), [$3])
-  else
-    if test "x$with_check" != x; then
-      CHECK_CFLAGS="-I$with_check/include"
-      CHECK_LIBS="-L$with_check/lib -lcheck"
-    else
-      CHECK_CFLAGS=""
-      CHECK_LIBS="-lcheck"
-    fi
+_PKG_TEXT])[]dnl
+        ])
+elif test $pkg_failed = untried; then
+     	AC_MSG_RESULT([no])
+	m4_default([$4], [AC_MSG_FAILURE(
+[The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
 
-    ac_save_CFLAGS="$CFLAGS"
-    ac_save_LIBS="$LIBS"
+_PKG_TEXT
 
-    CFLAGS="$CFLAGS $CHECK_CFLAGS"
-    LIBS="$CHECK_LIBS $LIBS"
-
-    rm -f conf.check-test
-    AC_COMPILE_IFELSE([AC_LANG_SOURCE([AC_INCLUDES_DEFAULT([])
-#include <check.h>
-
-int main ()
-{
-  int major, minor, micro;
-  char *tmp_version;
-
-  system ("touch conf.check-test");
-
-  /* HP/UX 9 (%@#!) writes to sscanf strings */
-  tmp_version = strdup("$min_check_version");
-  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
-     printf("%s, bad version string\n", "$min_check_version");
-     return 1;
-   }
-    
-  if ((CHECK_MAJOR_VERSION != check_major_version) ||
-      (CHECK_MINOR_VERSION != check_minor_version) ||
-      (CHECK_MICRO_VERSION != check_micro_version))
-    {
-      printf("\n*** The check header file (version %d.%d.%d) does not match\n",
-	     CHECK_MAJOR_VERSION, CHECK_MINOR_VERSION, CHECK_MICRO_VERSION);
-      printf("*** the check library (version %d.%d.%d).\n",
-	     check_major_version, check_minor_version, check_micro_version);
-      return 1;
-    }
-
-  if ((check_major_version > major) ||
-      ((check_major_version == major) && (check_minor_version > minor)) ||
-      ((check_major_version == major) && (check_minor_version == minor) && (check_micro_version >= micro)))
-    {
-      return 0;
-    }
-  else
-    {
-      printf("\n*** An old version of check (%d.%d.%d) was found.\n",
-             check_major_version, check_minor_version, check_micro_version);
-      printf("*** You need a version of check being at least %d.%d.%d.\n", major, minor, micro);
-      printf("***\n"); 
-      printf("*** If you have already installed a sufficiently new version, this error\n");
-      printf("*** probably means that the wrong copy of the check library and header\n");
-      printf("*** file is being found. Rerun configure with the --with-check=PATH option\n");
-      printf("*** to specify the prefix where the correct version was installed.\n");
-    }
-
-  return 1;
-}
-])],, no_check=yes, [echo $ac_n "cross compiling; assumed OK... $ac_c"])
-
-    CFLAGS="$ac_save_CFLAGS"
-    LIBS="$ac_save_LIBS"
-
-    if test "x$no_check" = x ; then
-      AC_MSG_RESULT(yes)
-      ifelse([$2], , :, [$2])
-    else
-      AC_MSG_RESULT(no)
-      if test -f conf.check-test ; then
-        :
-      else
-        echo "*** Could not run check test program, checking why..."
-        CFLAGS="$CFLAGS $CHECK_CFLAGS"
-        LIBS="$CHECK_LIBS $LIBS"
-        AC_TRY_LINK([
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <check.h>
-], ,  [ echo "*** The test program compiled, but did not run. This usually means"
-        echo "*** that the run-time linker is not finding check. You'll need to set your"
-        echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
-        echo "*** to the installed location  Also, make sure you have run ldconfig if that"
-        echo "*** is required on your system"
-	echo "***"
-        echo "*** If you have an old version installed, it is best to remove it, although"
-        echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"],
-      [ echo "*** The test program failed to compile or link. See the file config.log for"
-        echo "*** the exact error that occured." ])
-      
-        CFLAGS="$ac_save_CFLAGS"
-        LIBS="$ac_save_LIBS"
-      fi
-
-      CHECK_CFLAGS=""
-      CHECK_LIBS=""
-
-      rm -f conf.check-test
-      ifelse([$3], , AC_MSG_ERROR([check not found]), [$3])
-    fi
-
-    AC_SUBST(CHECK_CFLAGS)
-    AC_SUBST(CHECK_LIBS)
-
-    rm -f conf.check-test
-
-  fi
-])
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.])[]dnl
+        ])
+else
+	$1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
+	$1[]_LIBS=$pkg_cv_[]$1[]_LIBS
+        AC_MSG_RESULT([yes])
+	$3
+fi[]dnl
+])# PKG_CHECK_MODULES
 
 # Copyright (C) 2002, 2003, 2005, 2006, 2007, 2008, 2011 Free Software
 # Foundation, Inc.

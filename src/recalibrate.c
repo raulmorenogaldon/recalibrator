@@ -85,6 +85,8 @@ int mymain(	int full,
 	printf("Using SSE3 features\n");
 	#endif
 
+	init_log();
+
 	//Execute phase 1
 	if (p1)
 	{
@@ -225,6 +227,8 @@ int mymain(	int full,
 	//Free data memory	
 	recal_destroy_info(&data);
 	
+	stop_log();
+
 	return 0;
 }
 

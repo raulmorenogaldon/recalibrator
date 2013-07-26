@@ -14,6 +14,13 @@
 #include <genome.h>
 #include <recal_common.h>
 
+typedef uint8_t qual_t;
+typedef double error_t;
+typedef double delta_t;
+typedef uint8_t base_t;
+typedef uint32_t cycle_t;
+typedef uint8_t dinuc_t;
+
 /**
  * \brief Recalibration data storage.
  *
@@ -59,7 +66,7 @@ typedef enum DINUC
  * \param cycles Number of maximum cycles to stat.
  * \param out_info Previously allocated info struct to initialize.
  */
-EXTERNC ERROR_CODE recal_init_info(const int cycles, recal_info_t **out_data);
+EXTERNC ERROR_CODE recal_init_info(const uint32_t cycles, recal_info_t **out_data);
 
 /**
  * \brief Free all resources of recalibration.
@@ -79,18 +86,19 @@ EXTERNC ERROR_CODE recal_destroy_info(recal_info_t **data);
  * \param dinuc Dinucleotide to add.
  * \param miss Indicate if match(!=0) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const int qual, const int cycle, const DINUCLEOTIDE dinuc, const BOOL match);
+EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const qual_t qual, const cycle_t cycle, const dinuc_t dinuc, const error_t match) __ATTR_HOT;
 
 /**
  * \brief Add recalibration data from vector of bases.
  *
  * \param data Vector of data structs to add stats.
  * \param qual Vector of qualities to add.
- * \param cycle Vector of cycles to add.
+ * \param cycle Init cycle to add.
+ * \param cycle End cycles to add.
  * \param dinuc Vector of dinucleotides to add.
  * \param miss Vector of match(!=0) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const int init_cycle, const int end_cycle, const unsigned char *dinuc, const unsigned char *matches);
+EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const base_t *seq, const qual_t *quals, const cycle_t init_cycle, const uint32_t num_cycles, const dinuc_t *dinuc, const error_t *matches) __ATTR_HOT;
 
 /**
  * \brief Compute deltas from bases and misses.
@@ -111,7 +119,7 @@ EXTERNC ERROR_CODE recal_calc_deltas(recal_info_t* data);
  * \param B Second base.
  * \param out_dinuc Pointer to output dinucleotide.
  */
-EXTERNC ERROR_CODE recal_get_dinuc(const char A, const char B, DINUCLEOTIDE *out_dinuc);
+EXTERNC ERROR_CODE recal_get_dinuc(const char A, const char B, dinuc_t *out_dinuc) __ATTR_HOT;
 
 
 /***********************************************
@@ -153,7 +161,7 @@ EXTERNC ERROR_CODE recal_get_data_from_bam_batch(const bam_batch_t* batch, const
  * \param ref Reference genome struct.
  * \param out_info Data struct to fill.
  */
-EXTERNC ERROR_CODE recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal_info_t* output_data);
+EXTERNC ERROR_CODE recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal_info_t* output_data) __ATTR_HOT;
 
 
 /***********************************************
@@ -194,7 +202,7 @@ EXTERNC ERROR_CODE recal_recalibrate_batch(const bam_batch_t* batch, const recal
  * \param bam_info Data struct with recalibration info.
  * \param recal_bam_f Recalibrated BAM output file struct.
  */
-EXTERNC ERROR_CODE recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, bam_file_t *recal_bam_f);
+EXTERNC ERROR_CODE recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, bam_file_t *recal_bam_f) __ATTR_HOT;
 
 
 /***********************************************

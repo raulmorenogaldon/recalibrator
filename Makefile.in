@@ -167,6 +167,9 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -228,9 +231,13 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src tests
 EXTRA_DIST = AUTHORS ChangeLog NEWS README THANKS
-DISTCHECK_CONFIGURE_FLAGS = --with-samtools=/home/rmoreno/ext/samtools-0.1.18/ 	\
-								--with-compbio=/home/rmoreno/workspace/compbio-hpg/	\
-								--prefix=/home/rmoreno/recalibrator
+
+#DISTCHECK_CONFIGURE_FLAGS	= 	--with-samtools=/home/rmoreno/ext/samtools-0.1.18/ 	\
+#								--with-compbio=/home/rmoreno/workspace/compbio-hpg/	\
+#								--prefix=/home/rmoreno/recalibrator
+DISTCHECK_CONFIGURE_FLAGS = --with-opencb=/home/rmoreno/workspace/OpenCB/	\
+								--prefix=/home/rmoreno/recalibrator \
+								CFLAGS="-O3 -std=c99 -Wall -D_REENTRANT -D_XOPEN_SOURCE=600 -fPIC"
 
 CLEANFILES = *~
 all: all-recursive

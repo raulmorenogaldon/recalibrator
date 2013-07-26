@@ -8,8 +8,8 @@
 #ifndef AUX_LIBRARY_H_
 #define AUX_LIBRARY_H_
 
+#include "bam_recal_library.h"
 #include "bam.h"
-
 
 /***************************
  * MATH OPERATIONS
@@ -51,6 +51,21 @@ EXTERNC double Qsanger(double p);
  */
 EXTERNC double Psanger(double q);
 
+EXTERNC double gaussian_function(double value, double a, double b, double c, double d);
+
+EXTERNC double log10_gamma(uint32_t n);
+
+/***************************
+ * QUALITY OPERATIONS
+ **************************/
+
+EXTERNC ERROR_CODE recal_get_estimated_Q(uint32_t *v_bases, size_t count, uint8_t start_quality, double *estimated_Q);
+
+EXTERNC ERROR_CODE recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, uint8_t *emp_qual);
+
+EXTERNC ERROR_CODE log10_Qemp_Reported(double Qemp, double Qreported, double *log);
+
+EXTERNC ERROR_CODE log10_Qemp_likelihood(double Qemp, uint32_t obs, uint32_t err, double *log);
 
 /***************************
  * BAM OPERATIONS
@@ -65,6 +80,9 @@ EXTERNC ERROR_CODE init_empty_bam_header(const unsigned int num_chroms, bam_head
 
 EXTERNC ERROR_CODE compare_bams_qual(const char* bamPath0, const char* bamPath1, const int cycles);
 
+EXTERNC char * new_sequence_from_bam(bam1_t *bam1);
+
+EXTERNC char * new_quality_from_bam(bam1_t *bam1, int base_quality);
 
 /***************************
  * VECTOR OPERATIONS
@@ -76,7 +94,7 @@ EXTERNC ERROR_CODE compare_bams_qual(const char* bamPath0, const char* bamPath1,
  * \param size Size of vector
  * \param value Value to initialize vector
  */
-EXTERNC ERROR_CODE initialize_vector(unsigned int *vector, const size_t size, const unsigned int value);
+EXTERNC ERROR_CODE initialize_vector(uint32_t *vector, const size_t size, const uint32_t value);
 
 /**
  * Return vector of integers with initial values.
@@ -84,7 +102,7 @@ EXTERNC ERROR_CODE initialize_vector(unsigned int *vector, const size_t size, co
  * \param value Initial value in all elements of the vector
  * \param out_vector Pointer to pointer which stores the vector
  */
-EXTERNC ERROR_CODE new_vector(const size_t size, const int value, unsigned int **out_vector);
+EXTERNC ERROR_CODE new_vector(const size_t size, const uint32_t value, uint32_t **out_vector);
 
 /**
  * Return vector of double with initial values.
@@ -92,8 +110,15 @@ EXTERNC ERROR_CODE new_vector(const size_t size, const int value, unsigned int *
  * \param value Initial value in all elements of the vector
  * \param out_vector Pointer to pointer which stores the vector
  */
-EXTERNC ERROR_CODE new_vector_d(const size_t size, const double value, double **out_vector);
+EXTERNC ERROR_CODE new_vector_bases(const size_t size, const base_t value, base_t **out_vector);
 
+EXTERNC ERROR_CODE new_vector_miss(const size_t size, const error_t value, error_t **out_vector);
+
+EXTERNC ERROR_CODE new_vector_delta(const size_t size, const delta_t value, delta_t **out_vector);
+
+EXTERNC ERROR_CODE max_value(double *vector, size_t size, double *max);
+
+EXTERNC ERROR_CODE max_index(double *vector, size_t size, uint16_t *max_i);
 
 /***************************
  * MISCELANEA OPERATIONS

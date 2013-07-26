@@ -615,6 +615,9 @@ LTLIBOBJS
 LIBOBJS
 CHECK_LIBS
 CHECK_CFLAGS
+PKG_CONFIG_LIBDIR
+PKG_CONFIG_PATH
+PKG_CONFIG
 LIBTOOL_DEPS
 CPP
 OTOOL64
@@ -735,9 +738,7 @@ enable_fast_install
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
-with_check
-with_samtools
-with_compbio
+with_opencb
 '
       ac_precious_vars='build_alias
 host_alias
@@ -747,7 +748,12 @@ CFLAGS
 LDFLAGS
 LIBS
 CPPFLAGS
-CPP'
+CPP
+PKG_CONFIG
+PKG_CONFIG_PATH
+PKG_CONFIG_LIBDIR
+CHECK_CFLAGS
+CHECK_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1384,9 +1390,8 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
-  --with-check=PATH       prefix where check is installed default=auto
-  --with-samtools         search for samtools in DIR/include and DIR/lib
-  --with-compbio          search for compbio in DIR
+  --with-opencb           search for opencb bioinfo-libs and common-libs in
+                          DIR
 
 Some influential environment variables:
   CC          C compiler command
@@ -1397,6 +1402,14 @@ Some influential environment variables:
   CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
               you have headers in a nonstandard directory <include dir>
   CPP         C preprocessor
+  PKG_CONFIG  path to pkg-config utility
+  PKG_CONFIG_PATH
+              directories to add to pkg-config's search path
+  PKG_CONFIG_LIBDIR
+              path overriding pkg-config's built-in search path
+  CHECK_CFLAGS
+              C compiler flags for CHECK, overriding pkg-config
+  CHECK_LIBS  linker flags for CHECK, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -11526,167 +11539,216 @@ fi
 
 
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: AM_PATH_CHECK() is deprecated" >&5
-$as_echo "$as_me: WARNING: AM_PATH_CHECK() is deprecated" >&2;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: use PKG_CHECK_MODULES([CHECK], [check >= 0.9.4]) instead" >&5
-$as_echo "$as_me: WARNING: use PKG_CHECK_MODULES([CHECK], [check >= 0.9.4]) instead" >&2;}
-
-# Check whether --with-check was given.
-if test "${with_check+set}" = set; then :
-  withval=$with_check;
-fi
 
 
-  min_check_version=0.8.2
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for check - version >= $min_check_version" >&5
-$as_echo_n "checking for check - version >= $min_check_version... " >&6; }
 
-  if test x$with_check = xno; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
-$as_echo "disabled" >&6; }
-    as_fn_error $? "disabling check is not supported" "$LINENO" 5
-  else
-    if test "x$with_check" != x; then
-      CHECK_CFLAGS="-I$with_check/include"
-      CHECK_LIBS="-L$with_check/lib -lcheck"
-    else
-      CHECK_CFLAGS=""
-      CHECK_LIBS="-lcheck"
-    fi
 
-    ac_save_CFLAGS="$CFLAGS"
-    ac_save_LIBS="$LIBS"
 
-    CFLAGS="$CFLAGS $CHECK_CFLAGS"
-    LIBS="$CHECK_LIBS $LIBS"
-
-    rm -f conf.check-test
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$ac_includes_default
-#include <check.h>
-
-int main ()
-{
-  int major, minor, micro;
-  char *tmp_version;
-
-  system ("touch conf.check-test");
-
-  /* HP/UX 9 (%@#!) writes to sscanf strings */
-  tmp_version = strdup("$min_check_version");
-  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
-     printf("%s, bad version string\n", "$min_check_version");
-     return 1;
-   }
-
-  if ((CHECK_MAJOR_VERSION != check_major_version) ||
-      (CHECK_MINOR_VERSION != check_minor_version) ||
-      (CHECK_MICRO_VERSION != check_micro_version))
-    {
-      printf("\n*** The check header file (version %d.%d.%d) does not match\n",
-	     CHECK_MAJOR_VERSION, CHECK_MINOR_VERSION, CHECK_MICRO_VERSION);
-      printf("*** the check library (version %d.%d.%d).\n",
-	     check_major_version, check_minor_version, check_micro_version);
-      return 1;
-    }
-
-  if ((check_major_version > major) ||
-      ((check_major_version == major) && (check_minor_version > minor)) ||
-      ((check_major_version == major) && (check_minor_version == minor) && (check_micro_version >= micro)))
-    {
-      return 0;
-    }
-  else
-    {
-      printf("\n*** An old version of check (%d.%d.%d) was found.\n",
-             check_major_version, check_minor_version, check_micro_version);
-      printf("*** You need a version of check being at least %d.%d.%d.\n", major, minor, micro);
-      printf("***\n");
-      printf("*** If you have already installed a sufficiently new version, this error\n");
-      printf("*** probably means that the wrong copy of the check library and header\n");
-      printf("*** file is being found. Rerun configure with the --with-check=PATH option\n");
-      printf("*** to specify the prefix where the correct version was installed.\n");
-    }
-
-  return 1;
-}
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
+if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
+	if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_PKG_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
 else
-  no_check=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-    CFLAGS="$ac_save_CFLAGS"
-    LIBS="$ac_save_LIBS"
-
-    if test "x$no_check" = x ; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-      :
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-      if test -f conf.check-test ; then
-        :
-      else
-        echo "*** Could not run check test program, checking why..."
-        CFLAGS="$CFLAGS $CHECK_CFLAGS"
-        LIBS="$CHECK_LIBS $LIBS"
-        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <check.h>
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-   echo "*** The test program compiled, but did not run. This usually means"
-        echo "*** that the run-time linker is not finding check. You'll need to set your"
-        echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
-        echo "*** to the installed location  Also, make sure you have run ldconfig if that"
-        echo "*** is required on your system"
-	echo "***"
-        echo "*** If you have an old version installed, it is best to remove it, although"
-        echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"
-else
-   echo "*** The test program failed to compile or link. See the file config.log for"
-        echo "*** the exact error that occured."
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-
-        CFLAGS="$ac_save_CFLAGS"
-        LIBS="$ac_save_LIBS"
-      fi
-
-      CHECK_CFLAGS=""
-      CHECK_LIBS=""
-
-      rm -f conf.check-test
-      as_fn_error $? "check not found" "$LINENO" 5
-    fi
-
-
-
-
-    rm -f conf.check-test
-
+  case $PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
   fi
+done
+  done
+IFS=$as_save_IFS
 
+  ;;
+esac
+fi
+PKG_CONFIG=$ac_cv_path_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PKG_CONFIG" >&5
+$as_echo "$PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_path_PKG_CONFIG"; then
+  ac_pt_PKG_CONFIG=$PKG_CONFIG
+  # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_ac_pt_PKG_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_PKG_CONFIG="$ac_pt_PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_PKG_CONFIG=$ac_cv_path_ac_pt_PKG_CONFIG
+if test -n "$ac_pt_PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_PKG_CONFIG" >&5
+$as_echo "$ac_pt_PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_PKG_CONFIG" = x; then
+    PKG_CONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    PKG_CONFIG=$ac_pt_PKG_CONFIG
+  fi
+else
+  PKG_CONFIG="$ac_cv_path_PKG_CONFIG"
+fi
+
+fi
+if test -n "$PKG_CONFIG"; then
+	_pkg_min_version=0.9.0
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking pkg-config is at least version $_pkg_min_version" >&5
+$as_echo_n "checking pkg-config is at least version $_pkg_min_version... " >&6; }
+	if $PKG_CONFIG --atleast-pkgconfig-version $_pkg_min_version; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		PKG_CONFIG=""
+	fi
+fi
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for CHECK" >&5
+$as_echo_n "checking for CHECK... " >&6; }
+
+if test -n "$CHECK_CFLAGS"; then
+    pkg_cv_CHECK_CFLAGS="$CHECK_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"check >= 0.9.4\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "check >= 0.9.4") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_CHECK_CFLAGS=`$PKG_CONFIG --cflags "check >= 0.9.4" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$CHECK_LIBS"; then
+    pkg_cv_CHECK_LIBS="$CHECK_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"check >= 0.9.4\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "check >= 0.9.4") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_CHECK_LIBS=`$PKG_CONFIG --libs "check >= 0.9.4" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        CHECK_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "check >= 0.9.4" 2>&1`
+        else
+	        CHECK_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "check >= 0.9.4" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$CHECK_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (check >= 0.9.4) were not met:
+
+$CHECK_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables CHECK_CFLAGS
+and CHECK_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables CHECK_CFLAGS
+and CHECK_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	CHECK_CFLAGS=$pkg_cv_CHECK_CFLAGS
+	CHECK_LIBS=$pkg_cv_CHECK_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
 
 # Checks for libraries.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gzread in -lz" >&5
@@ -12004,20 +12066,24 @@ _ACEOF
 
 fi
 
+#AC_CHECK_LIB([common],[init_log], , [AC_MSG_ERROR([Please, set a valid common-libs path in configure LDFLAGS parameters. Ex: ./configure LDFLAGS="-L/common-libs/"])])
+#AC_CHECK_LIB([bioinfo],[alignment_new], , [AC_MSG_ERROR([Please, set a valid bioinfo-libs path in configure LDFLAGS parameters. Ex: ./configure LDFLAGS="-L/bioinfo-libs/"])])
 
+#AC_LIB_SAMTOOLS
+#AC_LIB_COMPBIO
 #
 # Handle user hints
 #
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if samtools is wanted" >&5
-$as_echo_n "checking if samtools is wanted... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if opencb is wanted" >&5
+$as_echo_n "checking if opencb is wanted... " >&6; }
 
-# Check whether --with-samtools was given.
-if test "${with_samtools+set}" = set; then :
-  withval=$with_samtools; if test "$withval" != no ; then
+# Check whether --with-opencb was given.
+if test "${with_opencb+set}" = set; then :
+  withval=$with_opencb; if test "$withval" != no ; then
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
    if test -d "$withval" ; then
-     SAMTOOLS_HOME="$withval"
+     OPENCB_HOME="$withval"
    else
      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Sorry, $withval does not exist, checking usual places" >&5
 $as_echo "$as_me: WARNING: Sorry, $withval does not exist, checking usual places" >&2;}
@@ -12032,171 +12098,40 @@ $as_echo "yes" >&6; }
 fi
 
 
-if test -f "${SAMTOOLS_HOME}/include/bam/sam.h" ; then
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/bam"
-        SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
-elif test -f "${SAMTOOLS_HOME}/include/sam.h" ; then
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include"
-        SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
-elif test -f "${SAMTOOLS_HOME}/sam.h" ; then
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}"
-        SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}"
-elif test -f "/usr/local/include/bam/sam.h" ; then
-        SAMTOOLS_HOME="/usr/local"
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/bam"
-        SAMTOOLS_LIBDIR="-L${SAMTOOLS_HOME}/lib"
-else
-        SAMTOOLS_HOME="/usr"
-        SAMTOOLS_INCDIR="-I${SAMTOOLS_HOME}/include/bam"
-        SAMTOOLS_LIBDIR=""
-fi
-
-#
-# Locate samtools, if wanted
-#
-if test -n "${SAMTOOLS_HOME}" ; then
-
-        SAMTOOLS_OLD_LDFLAGS=$LDFLAGS
-        SAMTOOLS_OLD_CPPFLAGS=$CPPFLAGS
-        LDFLAGS="$LDFLAGS ${SAMTOOLS_LIBDIR}"
-        CPPFLAGS="$CPPFLAGS ${SAMTOOLS_INCDIR}"
-
-        ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-        ac_fn_c_check_header_mongrel "$LINENO" "sam.h" "ac_cv_header_sam_h" "$ac_includes_default"
-if test "x$ac_cv_header_sam_h" = xyes; then :
-  ac_cv_sam_h=yes
-else
-  ac_cv_sam_h=no
-fi
-
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for sam_open in -lbam" >&5
-$as_echo_n "checking for sam_open in -lbam... " >&6; }
-if ${ac_cv_lib_bam_sam_open+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lbam -lc -lz $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char sam_open ();
-int
-main ()
-{
-return sam_open ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_bam_sam_open=yes
-else
-  ac_cv_lib_bam_sam_open=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_bam_sam_open" >&5
-$as_echo "$ac_cv_lib_bam_sam_open" >&6; }
-if test "x$ac_cv_lib_bam_sam_open" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBBAM 1
-_ACEOF
-
-  LIBS="-lbam $LIBS"
-
-fi
-
-        ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-        if test "$ac_cv_lib_bam_sam_open" = "yes" && test "$ac_cv_sam_h" = "yes" ; then
-                #
-                # If both library and header were found, use them
-                #
-                { $as_echo "$as_me:${as_lineno-$LINENO}: checking samtools" >&5
-$as_echo_n "checking samtools... " >&6; }
-                { $as_echo "$as_me:${as_lineno-$LINENO}: result: ok" >&5
-$as_echo "ok" >&6; }
-
-$as_echo "#define HAVE_SAMTOOLS 1" >>confdefs.h
-
-                with_samtools=yes
-        else
-                #
-                # If either header or library was not found, revert and bomb
-                #
-                LDFLAGS="$SAMTOOLS_OLD_LDFLAGS"
-                CPPFLAGS="$SAMTOOLS_OLD_CPPFLAGS"
-                { $as_echo "$as_me:${as_lineno-$LINENO}: checking samtools" >&5
-$as_echo_n "checking samtools... " >&6; }
-                { $as_echo "$as_me:${as_lineno-$LINENO}: result: failed" >&5
-$as_echo "failed" >&6; }
-                as_fn_error $? "either specify a valid samtools installation with --with-samtools=DIR or disable samtools usage with --without-samtools" "$LINENO" 5
-        fi
-fi
-
-#
-# Handle user hints
-#
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if compbio is wanted" >&5
-$as_echo_n "checking if compbio is wanted... " >&6; }
-
-# Check whether --with-compbio was given.
-if test "${with_compbio+set}" = set; then :
-  withval=$with_compbio; if test "$withval" != no ; then
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for libcommon.a" >&5
+$as_echo_n "checking for libcommon.a... " >&6; }
+if test -f "$OPENCB_HOME/common-libs/libcommon.a" ; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-   if test -d "$withval" ; then
-     COMPBIO_HOME="$withval"
-   else
-     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Sorry, $withval does not exist, checking usual places" >&5
-$as_echo "$as_me: WARNING: Sorry, $withval does not exist, checking usual places" >&2;}
-   fi
- else
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        OPENCB_INCDIR="$OPENCB_INCDIR -I${OPENCB_HOME}/common-libs/commons/ -I${OPENCB_HOME}/common-libs/containers/ -I${OPENCB_HOME}/common-libs/"
+        OPENCB_LIBDIR="$OPENCB_LIBDIR -L${OPENCB_HOME}/common-libs/"
+else
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
- fi
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+as_fn_error $? "Please, set a valid opencb path" "$LINENO" 5
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for libbioinfo.a" >&5
+$as_echo_n "checking for libbioinfo.a... " >&6; }
+if test -f "$OPENCB_HOME/bioinfo-libs/libbioinfo.a" ; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-fi
-
-
-if test -f "$COMPBIO_HOME/common-libs/libcommon.a" ; then
-        COMPBIO_INCDIR="$COMPBIO_INCDIR -I${COMPBIO_HOME}/common-libs/commons/ -I${COMPBIO_HOME}/common-libs/containers/ -I${COMPBIO_HOME}/common-libs/"
-        COMPBIO_LIBDIR="$COMPBIO_LIBDIR -L${COMPBIO_HOME}/common-libs/"
-fi
-
-if test -f "$COMPBIO_HOME/bioinfo-libs/libbioinfo.a" ; then
-        COMPBIO_INCDIR="$COMPBIO_INCDIR -I${COMPBIO_HOME}/bioinfo-libs/bioformats/bam-sam/ -I${COMPBIO_HOME}bioinfo-libs/aligners/bwt/"
-        COMPBIO_LIBDIR="$COMPBIO_LIBDIR -L${COMPBIO_HOME}/bioinfo-libs/"
+        OPENCB_INCDIR="$OPENCB_INCDIR -I${OPENCB_HOME}/bioinfo-libs/bioformats/bam/ -I${OPENCB_HOME}/bioinfo-libs/bioformats/bam/samtools -I${OPENCB_HOME}/bioinfo-libs/aligners/bwt/"
+        OPENCB_LIBDIR="$OPENCB_LIBDIR -L${OPENCB_HOME}/bioinfo-libs/"
+else
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+as_fn_error $? "Please, set a valid opencb path" "$LINENO" 5
 fi
 
 #
 # Locate bioinfo, if wanted
 #
-if test -n "${COMPBIO_HOME}" ; then
-        COMPBIO_OLD_LDFLAGS=$LDFLAGS
-        COMPBIO_OLD_CPPFLAGS=$CPPFLAGS
-        LDFLAGS="$COMPBIO_LIBDIR $LDFLAGS"
-        CPPFLAGS="$COMPBIO_INCDIR $CPPFLAGS"
+if test -n "${OPENCB_HOME}" ; then
+        OPENCB_OLD_LDFLAGS=$LDFLAGS
+        OPENCB_OLD_CPPFLAGS=$CPPFLAGS
+        LDFLAGS="$OPENCB_LIBDIR $LDFLAGS"
+        CPPFLAGS="$OPENCB_INCDIR $CPPFLAGS"
 
         ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -12270,7 +12205,7 @@ if ${ac_cv_lib_bioinfo_bam_fopen+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lbioinfo -lbam -lc -lz $LIBS"
+LIBS="-lbioinfo -lc -lz $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -12319,14 +12254,14 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
                 #
                 # If both library and header were found, use them
                 #
-                with_compbio=yes
+                with_opencb=yes
         else
                 #
                 # If either header or library was not found, revert and bomb
                 #
-                LDFLAGS="$COMPBIO_OLD_LDFLAGS"
-                CPPFLAGS="$COMPBIO_OLD_CPPFLAGS"
-                as_fn_error $? "either specify a valid bioinfo installation with --with-bioinfo=DIR" "$LINENO" 5
+                LDFLAGS="$OPENCB_OLD_LDFLAGS"
+                CPPFLAGS="$OPENCB_OLD_CPPFLAGS"
+                as_fn_error $? "either specify a valid bioinfo installation with --with-opencb=DIR" "$LINENO" 5
         fi
 fi
 
@@ -12636,7 +12571,7 @@ done
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/common/Makefile src/aux_library/Makefile src/bam_recal/Makefile tests/Makefile tests/aux_library/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/common/Makefile src/aux_library/Makefile src/bam_recal/Makefile tests/Makefile tests/aux_library/Makefile tests/recal/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13654,6 +13589,7 @@ do
     "src/bam_recal/Makefile") CONFIG_FILES="$CONFIG_FILES src/bam_recal/Makefile" ;;
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
     "tests/aux_library/Makefile") CONFIG_FILES="$CONFIG_FILES tests/aux_library/Makefile" ;;
+    "tests/recal/Makefile") CONFIG_FILES="$CONFIG_FILES tests/recal/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

@@ -20,7 +20,7 @@ AC_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
 
 AM_PROG_CC_C_O
-AM_PATH_CHECK
+PKG_CHECK_MODULES([CHECK], [check >= 0.9.4])
 
 # Checks for libraries.
 AC_CHECK_LIB([z], [gzread])
@@ -30,9 +30,12 @@ AC_CHECK_LIB([pthread],[pthread_mutex_init])
 AC_CHECK_LIB([cprops],[cp_mempool_alloc])
 AC_CHECK_LIB([openmp],[omp_num_threads])
 AC_CHECK_LIB([argtable2],[arg_lit0])
+#AC_CHECK_LIB([common],[init_log], , [AC_MSG_ERROR([Please, set a valid common-libs path in configure LDFLAGS parameters. Ex: ./configure LDFLAGS="-L/common-libs/"])])
+#AC_CHECK_LIB([bioinfo],[alignment_new], , [AC_MSG_ERROR([Please, set a valid bioinfo-libs path in configure LDFLAGS parameters. Ex: ./configure LDFLAGS="-L/bioinfo-libs/"])])
 
-AC_LIB_SAMTOOLS
-AC_LIB_COMPBIO
+#AC_LIB_SAMTOOLS
+#AC_LIB_COMPBIO
+AC_LIB_OPENCB
 
 
 # Checks for header files.
@@ -59,5 +62,6 @@ AC_CONFIG_FILES([\
 				src/bam_recal/Makefile	\
 				tests/Makefile	\
 				tests/aux_library/Makefile	\
+				tests/recal/Makefile	\
 				])
 AC_OUTPUT

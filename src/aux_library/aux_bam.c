@@ -97,3 +97,54 @@ init_empty_bam_header(const unsigned int num_chroms, bam_header_t *header)
 
 	return NO_ERROR;
 }
+
+char *
+new_sequence_from_bam(bam1_t *bam1)
+{
+	char *bam_seq = bam1_seq(bam1);
+	int seq_len = bam1->core.l_qseq;
+
+	char *seq = (char *) _mm_malloc(seq_len * sizeof(char), MEM_ALIG_SIZE);
+
+	// nucleotide content
+	for (int i = 0; i < seq_len; i++) {
+		switch (bam1_seqi(bam_seq, i))
+		{
+		case 1:
+			seq[i] = 'A';
+			break;
+		case 2:
+			seq[i] = 'C';
+			break;
+		case 4:
+			seq[i] = 'G';
+			break;
+		case 8:
+			seq[i] = 'T';
+			break;
+		case 15:
+			seq[i] = 'N';
+			//printf("N");
+			break;
+		default:
+			seq[i] = 'N';
+			break;
+		}
+	}
+
+	return seq;
+}
+
+char *
+new_quality_from_bam(bam1_t *bam1, int base_quality)
+{
+	char *bam_qual = bam1_qual(bam1);
+	int qual_len = bam1->core.l_qseq;
+
+	char *qual = (char *) malloc(qual_len * sizeof(char));
+	for (int i = 0; i < qual_len; i++) {
+		qual[i] = base_quality + bam_qual[i];
+	}
+
+	return qual;
+}

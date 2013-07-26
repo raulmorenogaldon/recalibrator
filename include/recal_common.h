@@ -31,6 +31,10 @@
 #define TRUE 1
 #define FALSE 0
 
+#define MEM_ALIG_SIZE 16
+
+#define __ATTR_HOT __attribute__((hot))
+
 //#define ERROR_CODE unsigned char;
 enum ERROR_C {
 	NO_ERROR,

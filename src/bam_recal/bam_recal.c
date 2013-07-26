@@ -61,7 +61,7 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 	batch = bam_batch_new(MAX_BATCH_SIZE, MULTIPLE_CHROM_BATCH);
 
 	//Read batch
-	bam_fread_max_size(batch, MAX_BATCH_SIZE, 1, orig_bam_f);
+	bam_fread_max_size(batch, MAX_BATCH_SIZE, 0, orig_bam_f);
 
 	#ifdef USE_BATCH_POOL
 	printf("Using batch pool!\n");
@@ -92,7 +92,6 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 
 		//Recalibrate batch
 		recal_recalibrate_batch(batch, bam_info, recal_bam_f);
-
 		//Update read counter
 		count += batch->num_alignments;
 
@@ -106,7 +105,7 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 		batch = bam_batch_new(MAX_BATCH_SIZE, MULTIPLE_CHROM_BATCH);
 
 		//Read batch
-		bam_fread_max_size(batch, MAX_BATCH_SIZE, 1, orig_bam_f);
+		bam_fread_max_size(batch, MAX_BATCH_SIZE, 0, orig_bam_f);
 
 	}
 	#ifdef D_RECAL_INTER_RESULTS
@@ -152,26 +151,26 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info, 
 ERROR_CODE
 recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, bam_file_t *recal_bam_f)
 {
-	int qual_index;
-	int matrix_index;
-	int i;
-	enum DINUC dinuc;
+	unsigned int qual_index;
+	unsigned int matrix_index;
+	unsigned int i;
+	uint8_t dinuc;
 	double delta_r, delta_rc, delta_rd;
-	char *quals;
+	char *quals, *res_quals;
 	char *bam_seq;
+	double estimated_Q;
 
 	alignment_t* aux_alig;
 	bam1_t *aux_alig1;
 
-	//Convert bam1_t to alignment_t
-	aux_alig = alignment_new_by_bam(alig, 1);
-
 	//Bam seq fields
-	bam_seq = convert_to_sequence_string(bam1_seq(alig), alig->core.l_qseq);
+	bam_seq = new_sequence_from_bam(alig);
 
 	//Qual fields
-	quals = (char*) calloc(alig->core.l_qseq + 1, sizeof(char));
-	convert_to_quality_string_length(quals, bam1_qual(alig), alig->core.l_qseq, 1);
+	quals = new_quality_from_bam(alig, 0);
+	res_quals = (char *)malloc(alig->core.l_qseq * sizeof(char));
+	//quals = (char*) calloc(alig->core.l_qseq + 1, sizeof(char));
+	//convert_to_quality_string_length(quals, bam1_qual(alig), alig->core.l_qseq, 1);
 
 	//Iterates nucleotides in this read
 	dinuc = 0;
@@ -206,7 +205,13 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, ba
 			#endif
 
 			//Recalibration formula
-			quals[i] = quals[i] + bam_info->total_delta + delta_r + delta_rc + delta_rd;
+				double global_delta = bam_info->total_delta;
+				double calidad = (double)quals[i];
+				//double res = (double)quals[i] + bam_info->total_delta + delta_r + delta_rc + delta_rd;
+				recal_get_estimated_Q(bam_info->qual_bases, bam_info->num_quals, 0, &estimated_Q);
+				double res = estimated_Q + bam_info->total_delta + delta_r + delta_rc + delta_rd;
+				res_quals[i] = (char)res;
+			//quals[i] = (char)((double)quals[i] + bam_info->total_delta + delta_r + delta_rc + delta_rd);
 
 			#ifdef D_RECAL_INTER_RESULTS
 			if(rand() % D_RECAL_INTER_PROB == 1)
@@ -219,18 +224,26 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, ba
 		}
 	}
 
+	//Convert bam1_t to alignment_t
+	aux_alig = alignment_new_by_bam(alig, 0);
+
 	//Set qualities in alignment
 	free(aux_alig->quality);
-	aux_alig->quality = quals;
-	aux_alig1 = convert_to_bam(aux_alig, 1);
+	aux_alig->quality = res_quals;
+	//Fix reads in alignment (sequence conversion to string is bug)
+	free(aux_alig->sequence);
+	aux_alig->sequence = bam_seq;
 
+	aux_alig1 = convert_to_bam(aux_alig, 0);
+	bam_seq = new_sequence_from_bam(aux_alig1);
+	quals = new_quality_from_bam(aux_alig1, 0);
 	//Write in bam
 	bam_fwrite(aux_alig1, recal_bam_f);
 
 	//Memory free
+	free(quals);
 	alignment_free(aux_alig);
 	bam_destroy1(aux_alig1);
-	free(bam_seq);
 
 	return NO_ERROR;
 }

@@ -12,12 +12,13 @@
  * Recalibration data struct defines
  */
 #define MIN_QUALITY 0
-#define MAX_QUALITY 50
+#define MAX_QUALITY 94
 #define NUM_DINUC	17
 
 //Smoothing constants
-#define SMOOTH_CONSTANT_MISS 1 //5
-#define SMOOTH_CONSTANT_BASES 1 //16
+//#define SMOOTH_CONSTANT_MISS 1 //5
+//#define SMOOTH_CONSTANT_BASES 1 //16
+#define SMOOTH_CONSTANT 1
 
 /**
  * Recalibration parameters

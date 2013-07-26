@@ -1,6 +1,8 @@
 #ifndef DATA_COLLECTOR_H_
 #define DATA_COLLECTOR_H_
 
+#include <stdlib.h>
+#include <string.h>
 
 #include <bam_file.h>
 #include <genome.h>
@@ -9,10 +11,15 @@
 #include <bam_recal_library.h>
 #include <timestats.h>
 
+
+#include "alignment.h"
 #include "recal_structs.h"
 
 long int unmapped;
-
+long int duplicated;
+#ifdef NOT_MAPPING_QUAL_ZERO
+long int mapzero;
+#endif
 /***********************************************
  * BAM RECALIBRATION PHASE 1 - DATA COLLECT
  **********************************************/

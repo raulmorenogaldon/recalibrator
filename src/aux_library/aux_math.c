@@ -89,3 +89,22 @@ Psanger(double Q)
 
 	return ret;
 }
+
+double
+gaussian_function(double value, double a, double b, double c, double d)
+{
+	return a + b * exp(-pow(value-c,2)/(2*d*d));
+}
+
+/**
+ * Approximation for log10 n!
+ */
+double
+log10_gamma(uint32_t n)
+{
+	double ln = lgamma(n+1);
+
+	double l10 = ln * log10(M_E);
+
+	return l10;
+}
