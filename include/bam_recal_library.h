@@ -14,12 +14,6 @@
 #include <genome.h>
 #include <recal_common.h>
 
-typedef uint8_t qual_t;
-typedef double error_t;
-typedef double delta_t;
-typedef uint8_t base_t;
-typedef uint32_t cycle_t;
-typedef uint8_t dinuc_t;
 
 /**
  * \brief Recalibration data storage.
@@ -86,7 +80,7 @@ EXTERNC ERROR_CODE recal_destroy_info(recal_info_t **data);
  * \param dinuc Dinucleotide to add.
  * \param miss Indicate if match(!=0) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const qual_t qual, const cycle_t cycle, const dinuc_t dinuc, const error_t match) __ATTR_HOT;
+EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const uint8_t qual, const uint16_t cycle, const uint8_t dinuc, const double match) __ATTR_HOT;
 
 /**
  * \brief Add recalibration data from vector of bases.
@@ -98,7 +92,7 @@ EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const qual_t qual, const c
  * \param dinuc Vector of dinucleotides to add.
  * \param miss Vector of match(!=0) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const base_t *seq, const qual_t *quals, const cycle_t init_cycle, const uint32_t num_cycles, const dinuc_t *dinuc, const error_t *matches) __ATTR_HOT;
+EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const uint8_t *seq, const uint8_t *quals, const uint16_t init_cycle, const uint32_t num_cycles, const uint8_t *dinuc, const double *matches) __ATTR_HOT;
 
 /**
  * \brief Compute deltas from bases and misses.
@@ -119,7 +113,7 @@ EXTERNC ERROR_CODE recal_calc_deltas(recal_info_t* data);
  * \param B Second base.
  * \param out_dinuc Pointer to output dinucleotide.
  */
-EXTERNC ERROR_CODE recal_get_dinuc(const char A, const char B, dinuc_t *out_dinuc) __ATTR_HOT;
+EXTERNC ERROR_CODE recal_get_dinuc(const char A, const char B, uint8_t *out_dinuc) __ATTR_HOT;
 
 
 /***********************************************

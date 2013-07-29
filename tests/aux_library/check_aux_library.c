@@ -105,20 +105,20 @@ END_TEST
 
 START_TEST (check_aux_vector)
 {
-	unsigned int *uret = NULL;
+	uint32_t *uret = NULL;
 	double *dret = NULL;
 	int i;
 
-	new_vector(0, 0, &uret);
+	new_vector_uint32(0, 0, &uret);
 	if(uret)
 		ck_abort_msg("new_vector must return NULL when size is vector is 0");
 
 	/* new_vector*/
-	new_vector(1, 0, &uret);
+	new_vector_uint32(1, 0, &uret);
 	ck_assert(uret && uret[0] == 0);
 	free(uret);
 
-	new_vector(100, 4, &uret);
+	new_vector_uint32(100, 4, &uret);
 	ck_assert(uret);
 	for(i = 0; i < 100; i++)
 		ck_assert(uret[i] == 4);
@@ -130,16 +130,16 @@ START_TEST (check_aux_vector)
 	free(uret);
 
 	/*new_vector_d */
-	new_vector_d(0, 0, &dret);
+	new_vector_double(0, 0, &dret);
 	if(dret)
 		ck_abort_msg("new_vector_d must return NULL when size is vector is 0");
 	free(dret);
 
-	new_vector_d(1, 0, &dret);
+	new_vector_double(1, 0, &dret);
 	ck_assert(dret && dret[0] == 0);
 	free(dret);
 
-	new_vector_d(100, 4, &dret);
+	new_vector_double(100, 4, &dret);
 	ck_assert(dret);
 	for(i = 0; i < 100; i++)
 		ck_assert(dret[i] == 4);

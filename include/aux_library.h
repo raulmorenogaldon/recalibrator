@@ -8,7 +8,7 @@
 #ifndef AUX_LIBRARY_H_
 #define AUX_LIBRARY_H_
 
-#include "bam_recal_library.h"
+//#include "bam_recal_library.h"
 #include "bam.h"
 
 /***************************
@@ -59,9 +59,9 @@ EXTERNC double log10_gamma(uint32_t n);
  * QUALITY OPERATIONS
  **************************/
 
-EXTERNC ERROR_CODE recal_get_estimated_Q(uint32_t *v_bases, size_t count, uint8_t start_quality, double *estimated_Q);
+EXTERNC ERROR_CODE recal_get_estimated_Q(uint32_t *v_bases, uint32_t count, uint8_t start_quality, double *estimated_Q);
 
-EXTERNC ERROR_CODE recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, uint8_t *emp_qual);
+EXTERNC ERROR_CODE recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, double *emp_qual);
 
 EXTERNC ERROR_CODE log10_Qemp_Reported(double Qemp, double Qreported, double *log);
 
@@ -102,7 +102,6 @@ EXTERNC ERROR_CODE initialize_vector(uint32_t *vector, const size_t size, const 
  * \param value Initial value in all elements of the vector
  * \param out_vector Pointer to pointer which stores the vector
  */
-EXTERNC ERROR_CODE new_vector(const size_t size, const uint32_t value, uint32_t **out_vector);
 
 /**
  * Return vector of double with initial values.
@@ -110,11 +109,9 @@ EXTERNC ERROR_CODE new_vector(const size_t size, const uint32_t value, uint32_t 
  * \param value Initial value in all elements of the vector
  * \param out_vector Pointer to pointer which stores the vector
  */
-EXTERNC ERROR_CODE new_vector_bases(const size_t size, const base_t value, base_t **out_vector);
+EXTERNC ERROR_CODE new_vector_uint32(const size_t size, const uint32_t value, uint32_t **out_vector);
 
-EXTERNC ERROR_CODE new_vector_miss(const size_t size, const error_t value, error_t **out_vector);
-
-EXTERNC ERROR_CODE new_vector_delta(const size_t size, const delta_t value, delta_t **out_vector);
+EXTERNC ERROR_CODE new_vector_double(const size_t size, const double value, double **out_vector);
 
 EXTERNC ERROR_CODE max_value(double *vector, size_t size, double *max);
 

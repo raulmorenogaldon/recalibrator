@@ -224,9 +224,9 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	alignment_t *aux_alig;
 	uint8_t *quals;
 	uint8_t *bam_seq;
-	uint8_t *ref_seq;
+	char *ref_seq;
 	uint8_t aux_comp[16];
-	uint32_t init_pos, end_pos;
+	size_t init_pos, end_pos;
 	uint32_t cycles;
 	uint8_t *comp_res;
 	uint8_t *dinucs;
@@ -273,14 +273,14 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	//quals = aux_alig->quality;
 
 	//Allocations
-	ref_seq = (uint8_t *)_mm_malloc((cycles + 1) * sizeof(uint8_t), MEM_ALIG_SIZE);
+	ref_seq = (char *)_mm_malloc((cycles + 1) * sizeof(char), MEM_ALIG_SIZE);
 	comp_res = (uint8_t *)_mm_malloc(cycles * sizeof(uint8_t), MEM_ALIG_SIZE);
 	dinucs = (uint8_t *)_mm_malloc(cycles * sizeof(uint8_t), MEM_ALIG_SIZE);
 
 	//Obtain reference for this 100 nucleotides
 	flag = (uint32_t) alig->core.flag;
 
-	genome_read_sequence_by_chr_index(ref_seq, (flag & BAM_FREVERSE) ? 1 : 0, alig->core.tid, &init_pos, &end_pos, ref);
+	genome_read_sequence_by_chr_index(ref_seq, (flag & BAM_FREVERSE) ? 1 : 0, (unsigned int)alig->core.tid, &init_pos, &end_pos, ref);
 
 	//Iterates nucleotides in this read
 	for(i = 0; i < cycles; i++)

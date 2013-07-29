@@ -19,14 +19,11 @@ initialize_vector(uint32_t *vector, const size_t size, const uint32_t value)
 	return NO_ERROR;
 }
 
-/**
- * Return vector of integers with initial values.
- */
 ERROR_CODE
-new_vector_bases(const size_t size, const base_t value, base_t **out_vector)
+new_vector_uint32(const size_t size, const uint32_t value, uint32_t **out_vector)
 {
 	int i;
-	base_t *vector;
+	uint32_t *vector;
 
 	if(size == 0)
 	{
@@ -34,12 +31,12 @@ new_vector_bases(const size_t size, const base_t value, base_t **out_vector)
 		return INVALID_INPUT_SIZE_0;
 	}
 
-	vector = (base_t *)malloc(size * sizeof(base_t));
+	vector = (uint32_t *)malloc(size * sizeof(uint32_t));
 
 	for(i = 0; i < size; i++)
 		vector[i] = value;
 
-	printf("Created new vector with %d positions, total size %lu bytes\n", size, size * sizeof(base_t));
+	printf("Created new vector uint32 with %d positions, total size %lu bytes\n", (int)size, size * sizeof(uint32_t));
 
 	*out_vector = vector;
 
@@ -50,10 +47,10 @@ new_vector_bases(const size_t size, const base_t value, base_t **out_vector)
  * Return vector of double with initial values.
  */
 ERROR_CODE
-new_vector_miss(const size_t size, const error_t value, error_t **out_vector)
+new_vector_double(const size_t size, const double value, double **out_vector)
 {
 	int i;
-	error_t *vector;
+	double *vector;
 
 	if(size == 0)
 	{
@@ -61,36 +58,12 @@ new_vector_miss(const size_t size, const error_t value, error_t **out_vector)
 		return INVALID_INPUT_SIZE_0;
 	}
 
-	vector = (error_t *)malloc(size * sizeof(error_t));
+	vector = (double *)malloc(size * sizeof(double));
 
 	for(i = 0; i < size; i++)
 		vector[i] = value;
 
-	printf("Created new vector with %d positions, total size %lu bytes\n", size, size * sizeof(error_t));
-
-	*out_vector = vector;
-
-	return NO_ERROR;
-}
-
-ERROR_CODE
-new_vector_delta(const size_t size, const delta_t value, delta_t **out_vector)
-{
-	int i;
-	delta_t *vector;
-
-	if(size == 0)
-	{
-		*out_vector = NULL;
-		return INVALID_INPUT_SIZE_0;
-	}
-
-	vector = (delta_t *)malloc(size * sizeof(delta_t));
-
-	for(i = 0; i < size; i++)
-		vector[i] = value;
-
-	printf("Created new vector with %d positions, total size %lu bytes\n", size, size * sizeof(delta_t));
+	printf("Created new vector double with %d positions, total size %lu bytes\n", (int)size, size * sizeof(double));
 
 	*out_vector = vector;
 

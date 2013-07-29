@@ -5,34 +5,37 @@
  **************************/
 
 ERROR_CODE
-recal_get_estimated_Q(uint32_t *v_bases, size_t count, uint8_t start_quality, double *estimated_Q)
+recal_get_estimated_Q(uint32_t *v_bases, uint32_t count, uint8_t start_quality, double *estimated_Q)
 {
-	double error;
+	double err0;
 	double total_sum;
-	double total_bases;
+	uint32_t total_bases;
 	double aux;
 	uint8_t quality;
 	int i;
 
 	total_sum = 0.0;
+	total_bases = 0.0;
 
 	for(i = count-1; i >= 0; i--)
 	{
-		quality = i + start_quality;
-		error = v_bases[i] * pow(10, (-quality*0.1));
-		total_sum += error;
-		total_bases += v_bases[i];
+		quality = (uint8_t)i + start_quality;
+		err0 = (double)v_bases[i] * pow(10.0, (-((double)quality)*0.1));
+		total_sum += err0;
+		total_bases = total_bases + v_bases[i];
 	}
 
 	//Calc estimated Q
 	aux = total_sum / (double)total_bases;
-	*estimated_Q = Qvalue(aux);
+
+	aux = Qvalue(aux);
+	*estimated_Q = aux;
 
 	return NO_ERROR;
 }
 
 ERROR_CODE
-recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, uint8_t *emp_qual)
+recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, double *emp_qual)
 {
 	uint32_t mismatches;
 	uint32_t observations;
@@ -72,7 +75,7 @@ recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, uint8
 	//Get maximum log index
 	max_index(norm, 91, &mle);
 
-	*emp_qual = (uint8_t)mle;
+	*emp_qual = (double)mle;
 
 	return NO_ERROR;
 }

@@ -5,7 +5,7 @@ START_TEST (check_empirical_quality)
 {
 	unsigned int test;
 	size_t size = DATA_SIZE;
-	uint8_t result;
+	double result;
 
 	//Empirical
 	printf("==============================\n");
@@ -13,11 +13,11 @@ START_TEST (check_empirical_quality)
 	printf("==============================\n");
 	for(test = 0; test < size; test++)
 	{
-		recal_get_empirical_Q(qual_errors[test], qual_obs[test], quality[test], &result);
+		recal_get_empirical_Q(qual_errors[test], qual_obs[test], (double)quality[test], &result);
 
 		//Is correct?
-		printf("Test: %d, Result: %d, Expected: %d\n", test, result, qual_empirical[test]);
-		ck_assert_msg(result == qual_empirical[test], "Empirical Quality test failed.");
+		printf("Test: %d, Result: %d, Expected: %d\n", test, (unsigned int)result, (unsigned int)qual_empirical[test]);
+		ck_assert_msg(result == qual_empirical[test], "Empirical Quality test %d failed.", test);
 	}
 }
 END_TEST
@@ -25,8 +25,6 @@ END_TEST
 START_TEST (check_estimated_quality)
 {
 	double estimated_Q;
-	uint8_t result;
-
 
 	//Empirical
 	printf("==============================\n");
@@ -44,13 +42,12 @@ END_TEST
 START_TEST (check_recalibration)
 {
 	double estimated_Q;
-	uint8_t result;
 	recal_info_t *data;
 	unsigned int test;
 	unsigned int i;
 	uint8_t quality;
-	uint8_t test_global_emp;
-	uint8_t data_global_emp;
+	double test_global_emp;
+	double data_global_emp;
 	double test_estimated;
 	double data_estimated;
 
@@ -77,16 +74,6 @@ START_TEST (check_recalibration)
 
 	//Check estimated quality
 	recal_get_estimated_Q(qual_obs, DATA_SIZE, MINIMUM_QUALITY, &test_estimated);
-	/*for(i = 0; i < DATA_SIZE; i++)
-	{
-		printf("%d\t", qual_obs[i]);
-	}*/
-	printf("\n\n");
-	//recal_get_estimated_Q(qual_obs, DATA_SIZE, MINIMUM_QUALITY, &data_estimated);
-	/*for(i = 0; i < DATA_SIZE; i++)
-	{
-		printf("%d\t", qual_obs[i]);
-	}*/
 	recal_get_estimated_Q(&(data->qual_bases[6]), DATA_SIZE, MINIMUM_QUALITY, &data_estimated);
 	printf("Global estimated quality check...\n");
 	printf("Result: %.10f, Expected: %.10f, Diff: %.10f\n", data_estimated, test_estimated, data_estimated - test_estimated);
@@ -109,9 +96,9 @@ START_TEST (check_recalibration)
 	for(test = 0; test < DATA_SIZE; test++)
 	{
 		quality = test + MINIMUM_QUALITY;
-		printf("Quality: %d, Result: %.10f, Expected: %.10f, Diff: %.10f\n",
-				quality, data->qual_delta[quality], qual_deltas[test], data->qual_delta[quality] - qual_deltas[test]);
-		ck_assert_msg(fabs(data->qual_delta[quality] - qual_deltas[test]) < 0.0001 , "Global Delta test failed.");
+		printf("Quality: %d, \tResult: %.2f, \tExpected: %.2f, \t%.2f %d\n",
+				quality, data->qual_delta[quality], qual_deltas[test], data->qual_miss[quality], data->qual_bases[quality]);
+		ck_assert_msg(fabs(data->qual_delta[quality] - qual_deltas[test]) < 0.0001 , "Quality delta test failed.");
 	}
 
 	//recal_get_estimated_Q(obs, 33, 6, &estimated_Q);
