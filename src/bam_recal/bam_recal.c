@@ -207,10 +207,17 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, ba
 			//Recalibration formula
 				double global_delta = bam_info->total_delta;
 				double calidad = (double)quals[i];
-				//double res = (double)quals[i] + bam_info->total_delta + delta_r + delta_rc + delta_rd;
-				recal_get_estimated_Q(bam_info->qual_bases, bam_info->num_quals, 0, &estimated_Q);
-				double res = estimated_Q + bam_info->total_delta + delta_r + delta_rc + delta_rd;
-				res_quals[i] = (char)res;
+				if(calidad > MIN_QUALITY_TO_STAT)
+				{
+					//double res = (double)quals[i] + bam_info->total_delta + delta_r + delta_rc + delta_rd;
+					recal_get_estimated_Q(bam_info->qual_bases, bam_info->num_quals, 0, &estimated_Q);
+					double res = estimated_Q + bam_info->total_delta + delta_r + delta_rc + delta_rd;
+					res_quals[i] = (char)res;
+				}
+				else
+				{
+					res_quals[i] = calidad;
+				}
 			//quals[i] = (char)((double)quals[i] + bam_info->total_delta + delta_r + delta_rc + delta_rd);
 
 			#ifdef D_RECAL_INTER_RESULTS
