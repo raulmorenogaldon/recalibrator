@@ -92,7 +92,7 @@ EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const uint8_t qual, const 
  * \param dinuc Vector of dinucleotides to add.
  * \param miss Vector of match(!=0) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const uint8_t *seq, const uint8_t *quals, const uint16_t init_cycle, const uint32_t num_cycles, const uint8_t *dinuc, const double *matches) __ATTR_HOT;
+EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const uint8_t *seq, const uint8_t *quals, const uint16_t init_cycle, const uint32_t num_cycles, const uint8_t *dinuc, const uint8_t *matches) __ATTR_HOT;
 
 /**
  * \brief Compute deltas from bases and misses.

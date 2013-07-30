@@ -147,7 +147,7 @@ recal_add_base(recal_info_t *data, const uint8_t qual, const uint16_t cycle, con
  * Add recalibration data from vector of bases
  */
 ERROR_CODE
-recal_add_base_v(recal_info_t *data, const uint8_t *seq, const uint8_t *quals, const uint16_t init_cycle, const uint32_t num_cycles, const uint8_t *dinuc, const double *matches)
+recal_add_base_v(recal_info_t *data, const uint8_t *seq, const uint8_t *quals, const uint16_t init_cycle, const uint32_t num_cycles, const uint8_t *dinuc, const uint8_t *matches)
 {
 	int i;
 	uint32_t cycles;
@@ -167,7 +167,7 @@ recal_add_base_v(recal_info_t *data, const uint8_t *seq, const uint8_t *quals, c
 		#ifndef NOT_COUNT_NUCLEOTIDE_N
 		case 'N':
 		#endif
-			recal_add_base(data, quals[i], i + init_cycle, dinuc[i], matches[i]);
+			recal_add_base(data, quals[i], i + init_cycle, dinuc[i], (double)matches[i]);
 			break;
 
 		default:
@@ -193,6 +193,7 @@ recal_calc_deltas(recal_info_t* data)
 	double estimated_Q;
 	double est2;
 	double emp_Q;
+	double delta;
 
 	//Time measures
 	#ifdef D_TIME_DEBUG
@@ -243,9 +244,10 @@ recal_calc_deltas(recal_info_t* data)
 			//		- (double)(i /*+ data->min_qual*/)
 			//		- data->total_delta;
 
-			recal_get_empirical_Q(data->qual_miss[i], data->qual_bases[i], i/*data->total_delta + estimated_Q*/, &emp_Q);
-			data->qual_delta[i] = emp_Q - (data->total_delta + estimated_Q);
-			printf("Qual %d  \tEmpirical %.2f  \tDelta %.2f - %.2f %d\n", i, emp_Q, data->qual_delta[i], data->qual_miss[i], data->qual_bases[i]);
+			recal_get_empirical_Q(data->qual_miss[i], data->qual_bases[i], /*i*/data->total_delta + estimated_Q, &emp_Q);
+			delta = emp_Q - (data->total_delta + estimated_Q);
+			data->qual_delta[i] = delta;
+			//printf("Qual %d  \tEmpirical %.2f  \tDelta %.2f\n", i, emp_Q, data->qual_delta[i]);
 		}
 		else
 		{
@@ -267,11 +269,12 @@ recal_calc_deltas(recal_info_t* data)
 				//	- (data->total_delta + data->qual_delta[i]);
 				recal_get_empirical_Q(data->qual_cycle_miss[matrix_index], data->qual_cycle_bases[matrix_index],
 						data->qual_delta[i] + data->total_delta + estimated_Q, &emp_Q);
-				data->qual_cycle_delta[i] = emp_Q - (data->qual_delta[i] + data->total_delta + estimated_Q);
+				delta = emp_Q - (data->qual_delta[i] + data->total_delta + estimated_Q);
+				data->qual_cycle_delta[matrix_index] = delta;
 			}
 			else
 			{
-				data->qual_cycle_delta[i] = 0.0;
+				data->qual_cycle_delta[matrix_index] = 0.0;
 			}
 		}
 	}
@@ -289,11 +292,12 @@ recal_calc_deltas(recal_info_t* data)
 				//	- (data->total_delta + data->qual_delta[i]);
 				recal_get_empirical_Q(data->qual_dinuc_miss[matrix_index], data->qual_dinuc_bases[matrix_index],
 						data->qual_delta[i] + data->total_delta + estimated_Q, &emp_Q);
-				data->qual_dinuc_delta[i] = emp_Q - (data->qual_delta[i] + data->total_delta + estimated_Q);
+				delta = emp_Q - (data->qual_delta[i] + data->total_delta + estimated_Q);
+				data->qual_dinuc_delta[matrix_index] = delta;
 			}
 			else
 			{
-				data->qual_dinuc_delta[i] = 0.0;
+				data->qual_dinuc_delta[matrix_index] = 0.0;
 			}
 		}
 	}
