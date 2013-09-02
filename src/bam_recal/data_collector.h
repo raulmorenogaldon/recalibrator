@@ -17,6 +17,7 @@
 
 long int unmapped;
 long int duplicated;
+long int notprimary;
 #ifdef NOT_MAPPING_QUAL_ZERO
 long int mapzero;
 #endif

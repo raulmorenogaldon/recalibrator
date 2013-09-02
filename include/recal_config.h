@@ -27,6 +27,7 @@
 #define NOT_COUNT_NUCLEOTIDE_N
 #define STAT_FIRST_DINUC
 #define NOT_MAPPING_QUAL_ZERO //Reads with map score of 0 wont be stated
+#define NOT_PRIMARY_ALIGNMENT
 
 /**
  * BAM management
