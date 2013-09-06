@@ -9,6 +9,10 @@ START_TEST (check_aux_bam)
 	// Not necessary
 	// compare_bams_qual(const char* bamPath0, const char* bamPath1, int cycles);
 
+	printf("==============================\n");
+	printf("CHECKING init_empty_bam_header\n");
+	printf("==============================\n");
+
 	bam_header_t *header = NULL;
 	int num_chrom;
 
@@ -32,7 +36,7 @@ START_TEST (check_aux_bam)
 	header = (bam_header_t *)malloc(sizeof(bam_header_t));
 	if(!init_empty_bam_header(num_chrom, header))
 	{
-		ck_abort_msg("create_empty_bam_header must return ERROR");
+		ck_abort_msg("init_empty_bam_header must return ERROR");
 	}
 	free(header);
 
@@ -41,9 +45,9 @@ START_TEST (check_aux_bam)
 	char type[20];
 	uint8_t type_l;
 
-	printf("==============================\n");
+	printf("========================\n");
 	printf("CHECKING decompose_cigar\n");
-	printf("==============================\n");
+	printf("========================\n");
 
 	printf("CIGAR1: %s\n", CIGAR1);
 
@@ -119,6 +123,10 @@ START_TEST (check_aux_math)
 	double input;
 	char ret;
 
+	printf("===============\n");
+	printf("CHECKING Pvalue\n");
+	printf("===============\n");
+
 	input = 0.000000000000000000001;
 	test_qvalue(input);
 
@@ -163,6 +171,10 @@ START_TEST (check_aux_vector)
 	double *dret = NULL;
 	int i;
 
+	printf("========================\n");
+	printf("CHECKING new_vector_TYPE\n");
+	printf("========================\n");
+
 	new_vector_uint32(0, 0, &uret);
 	if(uret)
 		ck_abort_msg("new_vector must return NULL when size is vector is 0");
@@ -205,6 +217,10 @@ START_TEST (check_timestats)
 {
 	double mean, mean2;
 	p_timestats timestats = NULL;
+
+	printf("==================\n");
+	printf("CHECKING timestats\n");
+	printf("==================\n");
 
 	/* Check timestats creation */
 	ck_assert(!TIME_GLOBAL_STATS);
