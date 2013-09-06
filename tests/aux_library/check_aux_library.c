@@ -3,6 +3,9 @@
 
 START_TEST (check_aux_bam)
 {
+
+	int i;
+
 	// Not necessary
 	// compare_bams_qual(const char* bamPath0, const char* bamPath1, int cycles);
 
@@ -32,6 +35,57 @@ START_TEST (check_aux_bam)
 		ck_abort_msg("create_empty_bam_header must return ERROR");
 	}
 	free(header);
+
+	//Decompose CIGAR
+	char n_elem[20];
+	char type[20];
+	uint8_t type_l;
+
+	printf("==============================\n");
+	printf("CHECKING decompose_cigar\n");
+	printf("==============================\n");
+
+	printf("CIGAR1: %s\n", CIGAR1);
+
+	decompose_cigar(CIGAR1, CIGAR1_l, n_elem, type, &type_l, 10);
+
+	//Check CIGAR1
+	printf("LENGTH1: %d\n", type_l);
+	ck_assert(type_l == CIGAR1_elem_l);
+	for(i = 0; i < type_l; i++)
+	{
+		printf("Element: %d %c\n", CIGAR1_elems[i], CIGAR1_type[i]);
+		ck_assert(n_elem[i] == CIGAR1_elems[i]);
+		ck_assert(type[i] == CIGAR1_type[i]);
+	}
+
+	printf("CIGAR1: %s, with 2 max elements\n", CIGAR1);
+
+	decompose_cigar(CIGAR1, CIGAR1_l, n_elem, type, &type_l, 2);
+
+	//Check CIGAR1 with maximum 2 elements
+	printf("LENGTH1: %d\n", type_l);
+	ck_assert(type_l == 2);
+	for(i = 0; i < type_l; i++)
+	{
+		printf("Element: %d %c\n", CIGAR1_elems[i], CIGAR1_type[i]);
+		ck_assert(n_elem[i] == CIGAR1_elems[i]);
+		ck_assert(type[i] == CIGAR1_type[i]);
+	}
+
+	printf("CIGAR2: %s\n", CIGAR2);
+
+	decompose_cigar(CIGAR2, CIGAR2_l, n_elem, type, &type_l, 10);
+
+	//Check CIGAR2
+	printf("LENGTH2: %d\n", type_l);
+	ck_assert(type_l == CIGAR2_elem_l);
+	for(i = 0; i < type_l; i++)
+	{
+		printf("Element: %d %c\n", CIGAR2_elems[i], CIGAR2_type[i]);
+		ck_assert(n_elem[i] == CIGAR2_elems[i]);
+		ck_assert(type[i] == CIGAR2_type[i]);
+	}
 }
 END_TEST
 

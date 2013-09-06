@@ -84,6 +84,8 @@ EXTERNC char * new_sequence_from_bam(bam1_t *bam1);
 
 EXTERNC char * new_quality_from_bam(bam1_t *bam1, int base_quality);
 
+EXTERNC ERROR_CODE decompose_cigar(char *cigar, uint8_t cigar_length, char *n_elem, char *type, uint8_t *types_length, uint8_t max_types_length);
+
 /***************************
  * VECTOR OPERATIONS
  **************************/

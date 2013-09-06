@@ -148,3 +148,70 @@ new_quality_from_bam(bam1_t *bam1, int base_quality)
 
 	return qual;
 }
+
+ERROR_CODE
+decompose_cigar(char *cigar, uint8_t cigar_length, char *n_elem, char *type, uint8_t *types_length, uint8_t max_types_length)
+{
+	uint8_t u_elems;
+	char c_type;
+	char cigar_elem;
+	int pos;
+	int i;
+
+	if(cigar == NULL
+			|| cigar_length <= 0
+			|| n_elem == NULL
+			|| type == NULL
+			|| types_length == NULL)
+	{
+		return INVALID_INPUT_PARAMS_NULL;
+	}
+
+	pos = 0;
+	n_elem[pos] = 0;
+	for(i = 0; i < cigar_length; i++)
+	{
+		cigar_elem = cigar[i];
+
+		//Get number of elem
+		if(cigar_elem < '9' && cigar_elem > '0')
+		{
+			//Is number
+			n_elem[pos] *= 10;
+			n_elem[pos] += cigar_elem - '0';
+		}
+		else
+		{
+			//Is type
+			switch(cigar_elem)
+			{
+			case 'I':
+			case 'D':
+			case 'M':
+				if(n_elem[pos] > 0)	//Avoid void types like '0D', '0M' ..
+				{
+					type[pos] = cigar_elem;
+					pos++;
+
+					if(pos >= max_types_length)
+					{
+						goto decompose_cigar_end;
+					}
+
+					n_elem[pos] = 0;
+				}
+				break;
+			default:
+				//Unknown type, skip
+				n_elem[pos] = 0;
+			}
+		}
+	}
+
+	//Set type length
+	decompose_cigar_end:
+	if(types_length != NULL)
+		*types_length = pos;
+
+	return NO_ERROR;
+}

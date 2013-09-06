@@ -266,6 +266,9 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	//Get sequence
 	bam_seq = new_sequence_from_bam(alig);
 
+	//Decompose cigar for indels
+	//TODO
+
 	//Get cycles and positions
 	cycles = alig->core.l_qseq;
 	init_pos = alig->core.pos + 1;

@@ -13,6 +13,7 @@
 #include <recal_common.h>
 #include <aux_library.h>
 #include <stdlib.h>
+#include <string.h>
 
 /**
  * Private functions
