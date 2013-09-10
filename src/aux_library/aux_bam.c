@@ -264,3 +264,55 @@ supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uin
 
 	return NO_ERROR;
 }
+
+ERROR_CODE
+supress_indels_from_32_cigar(char *seq, uint8_t seq_l, uint32_t *cigar, uint8_t cigar_l, char *seq_res, uint8_t *seq_res_l)
+{
+	int i, j, seq_i, res_i;
+	char count;
+	uint32_t elem;
+	uint8_t type;
+
+	//Check null parameters
+	if(seq == NULL
+		|| cigar == NULL
+		|| seq_res == NULL
+		|| seq_res_l == NULL)
+	{
+		return INVALID_INPUT_PARAMS_NULL;
+	}
+
+	for(i = 0, seq_i = 0, res_i = 0; i < cigar_l; i++)
+	{
+		elem = cigar[i];
+		count = elem >> BAM_CIGAR_SHIFT;	//Get number of bases from cigar
+		type = elem & BAM_CIGAR_MASK;	//Get type from cigar
+
+		switch(type)
+		{
+		case BAM_CINS:	//Insertion
+			seq_i += count;
+			break;
+		case BAM_CDEL:	//Deletion
+			for(j = 0; j < count; j++)
+			{
+				seq_res[res_i] = 'X';
+				res_i++;
+			}
+			break;
+		default:	//Missmatch, etc...
+			memcpy(&seq_res[res_i], &seq[seq_i], count);
+			res_i += count;
+			seq_i += count;
+			break;
+		}
+	}
+
+	//Ser result length
+	*seq_res_l = res_i;
+
+	//Set string null character in last position
+	seq_res[res_i] = '\0';
+
+	return NO_ERROR;
+}

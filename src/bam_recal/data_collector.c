@@ -227,6 +227,9 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	uint8_t *dinucs;
 	uint32_t flag;
 
+	//Cigar
+	char *cigar;
+
 	#ifdef __SSE2__
 	__m128i v_ref, v_seq, v_comp;
 	#endif
@@ -268,6 +271,8 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 
 	//Decompose cigar for indels
 	//TODO
+	//cigar = alig->core
+	//decompose_cigar(, uint8_t cigar_l, char *n_elem, char *type, uint8_t *types_l, uint8_t max_types_length);
 
 	//Get cycles and positions
 	cycles = alig->core.l_qseq;

@@ -113,6 +113,24 @@ START_TEST (check_aux_bam)
 
 	//Test
 	ck_assert(strcmp(seq_res, aux_seq_res) == 0);
+
+	printf("=====================================\n");
+	printf("CHECKING supress_indels_from_32_cigar\n");
+	printf("=====================================\n");
+
+	printf("seq_cigar: %s\n", seq_cigar);
+	printf("seq_cigar in 32 bit:\n");
+	for(i = 0; i < alt_cigar_l; i++)
+	{
+		printf("0x%X ", alt_cigar[i]);
+	}
+	printf("\n");
+
+	supress_indels_from_32_cigar(seq, seq_l, alt_cigar, alt_cigar_l, aux_seq_res, &aux_seq_res_l);
+
+	printf("Sequence: %s\n", seq);
+	printf("Result sequence: %s\n", aux_seq_res);
+	printf("Expected: %s\n", seq_res);
 }
 END_TEST
 

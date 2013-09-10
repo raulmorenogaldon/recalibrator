@@ -34,5 +34,13 @@ char seq_cigar[11] = "5=2I2=3D1M";
 uint8_t seq_cigar_l = 10;
 char seq_res[12] = "AGGTGCTXXXT";
 uint8_t seq_res_l = 11;
+uint32_t alt_cigar[5] = {
+		(5 << BAM_CIGAR_SHIFT) + BAM_CPAD,	//(5 << 4) + '=',
+		(2 << BAM_CIGAR_SHIFT) + BAM_CINS,	//(2 << 4) + 'I',
+		(2 << BAM_CIGAR_SHIFT) + BAM_CPAD,	//(2 << 4) + '=',
+		(3 << BAM_CIGAR_SHIFT) + BAM_CDEL,	//(3 << 4) + 'D',
+		(1 << BAM_CIGAR_SHIFT) + BAM_CMATCH	//(1 << 4) + 'M'
+};
+uint8_t alt_cigar_l = 5;
 
 #endif /* CHECK_AUX_LIBRARY_H_ */
