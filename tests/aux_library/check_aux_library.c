@@ -3,7 +3,8 @@
 
 START_TEST (check_aux_bam)
 {
-
+	char aux_seq_res[15];
+	uint8_t aux_seq_res_l;
 	int i;
 
 	// Not necessary
@@ -58,7 +59,7 @@ START_TEST (check_aux_bam)
 	ck_assert(type_l == CIGAR1_elem_l);
 	for(i = 0; i < type_l; i++)
 	{
-		printf("Element: %d %c\n", CIGAR1_elems[i], CIGAR1_type[i]);
+		printf("Element: %d %c - %d %c\n", CIGAR1_elems[i], CIGAR1_type[i], n_elem[i], type[i]);
 		ck_assert(n_elem[i] == CIGAR1_elems[i]);
 		ck_assert(type[i] == CIGAR1_type[i]);
 	}
@@ -90,6 +91,28 @@ START_TEST (check_aux_bam)
 		ck_assert(n_elem[i] == CIGAR2_elems[i]);
 		ck_assert(type[i] == CIGAR2_type[i]);
 	}
+
+	printf("=======================\n");
+	printf("CHECKING supress_indels\n");
+	printf("=======================\n");
+
+	decompose_cigar(seq_cigar, seq_cigar_l, n_elem, type, &type_l, 10);
+
+	printf("seq_cigar: %s, with 10 max elements\n", seq_cigar);
+	printf("length: %d\n", type_l);
+	for(i = 0; i < type_l; i++)
+	{
+		printf("Element: %d %c\n", n_elem[i], type[i]);
+	}
+
+	supress_indels(seq, seq_l, n_elem, type, type_l, aux_seq_res, &aux_seq_res_l);
+
+	printf("Sequence: %s\n", seq);
+	printf("Result sequence: %s\n", aux_seq_res);
+	printf("Expected: %s\n", seq_res);
+
+	//Test
+	ck_assert(strcmp(seq_res, aux_seq_res) == 0);
 }
 END_TEST
 

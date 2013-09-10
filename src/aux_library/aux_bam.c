@@ -150,7 +150,7 @@ new_quality_from_bam(bam1_t *bam1, int base_quality)
 }
 
 ERROR_CODE
-decompose_cigar(char *cigar, uint8_t cigar_length, char *n_elem, char *type, uint8_t *types_length, uint8_t max_types_length)
+decompose_cigar(char *cigar, uint8_t cigar_l, char *n_elem, char *type, uint8_t *types_l, uint8_t max_types_length)
 {
 	uint8_t u_elems;
 	char c_type;
@@ -159,22 +159,22 @@ decompose_cigar(char *cigar, uint8_t cigar_length, char *n_elem, char *type, uin
 	int i;
 
 	if(cigar == NULL
-			|| cigar_length <= 0
+			|| cigar_l <= 0
 			|| n_elem == NULL
 			|| type == NULL
-			|| types_length == NULL)
+			|| types_l == NULL)
 	{
 		return INVALID_INPUT_PARAMS_NULL;
 	}
 
 	pos = 0;
 	n_elem[pos] = 0;
-	for(i = 0; i < cigar_length; i++)
+	for(i = 0; i < cigar_l; i++)
 	{
 		cigar_elem = cigar[i];
 
 		//Get number of elem
-		if(cigar_elem < '9' && cigar_elem > '0')
+		if(cigar_elem <= '9' && cigar_elem >= '0')
 		{
 			//Is number
 			n_elem[pos] *= 10;
@@ -183,11 +183,11 @@ decompose_cigar(char *cigar, uint8_t cigar_length, char *n_elem, char *type, uin
 		else
 		{
 			//Is type
-			switch(cigar_elem)
-			{
-			case 'I':
-			case 'D':
-			case 'M':
+			//switch(cigar_elem)
+			//{
+			//case 'I':
+			//case 'D':
+			//default:	//Missmatch, etc...
 				if(n_elem[pos] > 0)	//Avoid void types like '0D', '0M' ..
 				{
 					type[pos] = cigar_elem;
@@ -195,23 +195,72 @@ decompose_cigar(char *cigar, uint8_t cigar_length, char *n_elem, char *type, uin
 
 					if(pos >= max_types_length)
 					{
+						//Reached max number of cigar components
 						goto decompose_cigar_end;
 					}
 
 					n_elem[pos] = 0;
 				}
-				break;
-			default:
-				//Unknown type, skip
-				n_elem[pos] = 0;
-			}
+				//break;
+			//}
 		}
 	}
 
 	//Set type length
 	decompose_cigar_end:
-	if(types_length != NULL)
-		*types_length = pos;
+	if(types_l != NULL)
+		*types_l = pos;
+
+	return NO_ERROR;
+}
+
+ERROR_CODE
+supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uint8_t cigar_type_l, char *seq_res, uint8_t *seq_res_l)
+{
+	int i, j, seq_i, res_i;
+	char count;
+
+	//Check null parameters
+	if(seq == NULL
+		|| cigar_elem == NULL
+		|| cigar_type == NULL
+		|| cigar_type_l == NULL
+		|| seq_res == NULL
+		|| seq_res_l == NULL)
+	{
+		return INVALID_INPUT_PARAMS_NULL;
+	}
+
+	//Iterate cigar
+	for(i = 0, res_i = 0, seq_i = 0; i < cigar_type_l; i++)
+	{
+		switch(cigar_type[i])
+		{
+		case 'I':	//Insertion
+			seq_i += cigar_elem[i];
+			break;
+		case 'D':	//Deletion
+			count = cigar_elem[i];
+			for(j = 0; j < count; j++)
+			{
+				seq_res[res_i] = 'X';
+				res_i++;
+			}
+			break;
+		default:	//Missmatch, etc...
+			count = cigar_elem[i];
+			memcpy(&seq_res[res_i], &seq[seq_i], count);
+			res_i += count;
+			seq_i += count;
+			break;
+		}
+	}
+
+	//Ser result length
+	*seq_res_l = res_i;
+
+	//Set string null character in las position
+	seq_res[res_i] = '\0';
 
 	return NO_ERROR;
 }
