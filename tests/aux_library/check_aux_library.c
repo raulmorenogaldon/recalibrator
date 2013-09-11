@@ -131,6 +131,9 @@ START_TEST (check_aux_bam)
 	printf("Sequence: %s\n", seq);
 	printf("Result sequence: %s\n", aux_seq_res);
 	printf("Expected: %s\n", seq_res);
+
+	//Test
+	ck_assert(strcmp(seq_res, aux_seq_res) == 0);
 }
 END_TEST
 
