@@ -297,7 +297,7 @@ supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cig
 			for(j = 0; j < count; j++)
 			{
 				seq_res[res_i] = 'X';
-				if(qual && qual_res) qual[res_i] = 0;
+				if(qual && qual_res) qual_res[res_i] = '!';
 				res_i++;
 			}
 			break;
@@ -315,6 +315,7 @@ supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cig
 
 	//Set string null character in last position
 	seq_res[res_i] = '\0';
+	qual_res[res_i] = '\0';
 
 	return NO_ERROR;
 }

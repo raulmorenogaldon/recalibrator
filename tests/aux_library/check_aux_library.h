@@ -29,10 +29,12 @@ char CIGAR2_elem_l = 3;
 
 //supress_indels
 char seq[11] = "AGGTGCGCTT";
+char seq_qual[11] = "8587647890";
 uint8_t seq_l = 10;
 char seq_cigar[11] = "5=2I2=3D1M";
 uint8_t seq_cigar_l = 10;
 char seq_res[12] = "AGGTGCTXXXT";
+char seq_qual_res[12] = "8587689!!!0";
 uint8_t seq_res_l = 11;
 uint32_t alt_cigar[5] = {
 		(5 << BAM_CIGAR_SHIFT) + BAM_CPAD,	//(5 << 4) + '=',

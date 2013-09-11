@@ -4,6 +4,7 @@
 START_TEST (check_aux_bam)
 {
 	char aux_seq_res[15];
+	char aux_seq_qual[15];
 	uint8_t aux_seq_res_l;
 	int i;
 
@@ -126,11 +127,14 @@ START_TEST (check_aux_bam)
 	}
 	printf("\n");
 
-	supress_indels_from_32_cigar(seq, seq_l, alt_cigar, alt_cigar_l, aux_seq_res, &aux_seq_res_l);
+	supress_indels_from_32_cigar(seq, seq_qual, seq_l, alt_cigar, alt_cigar_l, aux_seq_res, aux_seq_qual, &aux_seq_res_l);
 
 	printf("Sequence: %s\n", seq);
 	printf("Result sequence: %s\n", aux_seq_res);
 	printf("Expected: %s\n", seq_res);
+	printf("Quals: %s\n", seq_qual);
+	printf("Result quals: %s\n", aux_seq_qual);
+	printf("Expected: %s\n", seq_qual_res);
 
 	//Test
 	ck_assert(strcmp(seq_res, aux_seq_res) == 0);
