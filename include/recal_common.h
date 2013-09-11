@@ -48,7 +48,7 @@ enum ERROR_C {
 
 	//Recalibrate specific
 	INVALID_INPUT_QUAL,
-	INVALID_DINUCLEOTIDE
+	INVALID_INPUT_DINUC
 };
 typedef enum ERROR_C ERROR_CODE;
 

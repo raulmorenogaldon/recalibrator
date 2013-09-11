@@ -266,7 +266,7 @@ supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uin
 }
 
 ERROR_CODE
-supress_indels_from_32_cigar(char *seq, uint8_t seq_l, uint32_t *cigar, uint8_t cigar_l, char *seq_res, uint8_t *seq_res_l)
+supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cigar, uint8_t cigar_l, char *seq_res, char *qual_res, uint8_t *seq_res_l)
 {
 	int i, j, seq_i, res_i;
 	char count;
@@ -297,11 +297,13 @@ supress_indels_from_32_cigar(char *seq, uint8_t seq_l, uint32_t *cigar, uint8_t 
 			for(j = 0; j < count; j++)
 			{
 				seq_res[res_i] = 'X';
+				if(qual && qual_res) qual[res_i] = 0;
 				res_i++;
 			}
 			break;
 		default:	//Missmatch, etc...
 			memcpy(&seq_res[res_i], &seq[seq_i], count);
+			if(qual && qual_res) memcpy(&qual_res[res_i], &qual[seq_i], count);
 			res_i += count;
 			seq_i += count;
 			break;

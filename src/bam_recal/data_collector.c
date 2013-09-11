@@ -269,13 +269,25 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	//Get sequence
 	bam_seq = new_sequence_from_bam(alig);
 
+	//Get quals
+	quals = new_quality_from_bam(alig, 0);
+
 	//Decompose cigar for indels
 	//TODO
 	//cigar = alig->core
 	//decompose_cigar(, uint8_t cigar_l, char *n_elem, char *type, uint8_t *types_l, uint8_t max_types_length);
+	static char res_seq[128];
+	static char res_qual[128];
+	uint8_t res_seq_l;
+	supress_indels_from_32_cigar(bam_seq, quals, alig->core.l_qseq, bam1_cigar(alig), alig->core.n_cigar, &res_seq[0], &res_qual[0], &res_seq_l);
+	_mm_free(bam_seq);
+	free(quals);
+	bam_seq = &res_seq[0];
+	quals = &res_qual[0];
 
 	//Get cycles and positions
-	cycles = alig->core.l_qseq;
+	//cycles = alig->core.l_qseq;
+	cycles = res_seq_l;
 	init_pos = alig->core.pos + 1;
 	end_pos = alig->core.pos + cycles;
 
@@ -291,8 +303,6 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 		}
 	}*/
 
-	//Get quals
-	quals = new_quality_from_bam(alig, 0);
 	//bam_seq = aux_alig->sequence;
 	//quals = aux_alig->quality;
 
@@ -367,9 +377,8 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	_mm_free(ref_seq);
 	_mm_free(comp_res);
 	_mm_free(dinucs);
-	_mm_free(bam_seq);
-	free(quals);
-	//alignment_free(aux_alig);
+	//_mm_free(bam_seq);
+	//free(quals);
 
 	return NO_ERROR;
 }

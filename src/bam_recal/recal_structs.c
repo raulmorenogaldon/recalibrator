@@ -93,23 +93,23 @@ recal_add_base(recal_info_t *data, const uint8_t qual, const uint16_t cycle, con
 	int qual_dinuc_index = qual_index * data->num_dinuc + dinuc;
 
 	if(qual < MIN_QUALITY_TO_STAT)
-		return INVALID_INPUT_QUAL;
+		return NO_ERROR;
 
 	//Error check
 	if(qual_index >= MAX_QUALITY - MIN_QUALITY || qual_index < 0)
 	{
-		printf("add_base: ERROR, qual must be positive and minor than MAX_QUALITY - MIN_QUALITY ==> Qual = %d\n", qual);
+		printf("add_base: ERROR, qual must be positive and minor than MAX_QUALITY - MIN_QUALITY ==> Qual = %d, Cycle = %d, Dinuc = %d, %s\n", qual, cycle, dinuc, match ? "Miss" : "");
 		return INVALID_INPUT_QUAL;
 	}
-	if(cycle < 0 || cycle > data->num_cycles - 1)
+	//if(cycle < 0 || cycle > data->num_cycles - 1)
 	{
-		printf("add_base: ERROR, cycle must be positive and minor than NUM_CYCLES\n");
-		return INVALID_INPUT_QUAL;
+	//	printf("add_base: ERROR, cycle must be positive and minor than NUM_CYCLES\n");
+	//	return INVALID_INPUT_QUAL;
 	}
 	if(dinuc > NUM_DINUC - 1)
 	{
 		printf("add_base: ERROR, dinuc must be minor than NUM_DINUC %d \n", dinuc);
-		return INVALID_INPUT_QUAL;
+		return INVALID_INPUT_DINUC;
 	}
 
 	//Increase total counters
@@ -137,7 +137,7 @@ recal_add_base(recal_info_t *data, const uint8_t qual, const uint16_t cycle, con
 	else
 	{
 		printf("ERROR: unrecognized dinuc Q: %d, C: %d, D: %d, Match: %d\n", qual, cycle, dinuc, match);
-		return INVALID_DINUCLEOTIDE;
+		return INVALID_INPUT_DINUC;
 	}
 
 	return NO_ERROR;
@@ -151,6 +151,7 @@ recal_add_base_v(recal_info_t *data, const uint8_t *seq, const uint8_t *quals, c
 {
 	int i;
 	uint32_t cycles;
+	ERROR_CODE err;
 
 	cycles = num_cycles;
 
@@ -167,7 +168,22 @@ recal_add_base_v(recal_info_t *data, const uint8_t *seq, const uint8_t *quals, c
 		#ifndef NOT_COUNT_NUCLEOTIDE_N
 		case 'N':
 		#endif
-			recal_add_base(data, quals[i], i + init_cycle, dinuc[i], (double)matches[i]);
+			err = recal_add_base(data, quals[i], i + init_cycle, dinuc[i], (double)matches[i]);
+			if(err)
+			{
+				switch(err)
+				{
+				case INVALID_INPUT_QUAL:
+					printf("Error INVALID_INPUT_QUAL Base: %c\n", seq[i]);
+					break;
+				case INVALID_INPUT_DINUC:
+					printf("Error INVALID_INPUT_DINUC Base: %c\n", seq[i]);
+					break;
+				default:
+					printf("Error UNKNOWN Base: %c\n", seq[i]);
+					break;
+				}
+			}
 			break;
 
 		default:
