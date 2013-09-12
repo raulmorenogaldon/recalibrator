@@ -135,9 +135,13 @@ START_TEST (check_aux_bam)
 	printf("Quals: %s\n", seq_qual);
 	printf("Result quals: %s\n", aux_seq_qual);
 	printf("Expected: %s\n", seq_qual_res);
+	printf("Length: %d\n", aux_seq_res_l);
+	printf("Expected: %d\n", seq_res_l);
 
 	//Test
 	ck_assert(strcmp(seq_res, aux_seq_res) == 0);
+	ck_assert(strcmp(seq_qual_res, aux_seq_qual) == 0);
+	ck_assert(seq_res_l == aux_seq_res_l);
 }
 END_TEST
 

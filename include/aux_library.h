@@ -88,7 +88,7 @@ EXTERNC ERROR_CODE decompose_cigar(char *cigar, uint8_t cigar_l, char *n_elem, c
 
 EXTERNC ERROR_CODE supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uint8_t cigar_type_l, char *seq_res, uint8_t *seq_res_l);
 
-EXTERNC ERROR_CODE supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cigar, uint8_t cigar_l, char *seq_res, char *qual_res, uint8_t *seq_res_l);
+EXTERNC ERROR_CODE supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cigar, uint16_t cigar_l, char *seq_res, char *qual_res, uint8_t *seq_res_l);
 
 /***************************
  * VECTOR OPERATIONS

@@ -227,6 +227,10 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	uint8_t *dinucs;
 	uint32_t flag;
 
+	char a_res_seq[128];
+	char a_res_qual[128];
+	uint8_t res_seq_l = 0;
+
 	//Cigar
 	char *cigar;
 
@@ -276,18 +280,16 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	//TODO
 	//cigar = alig->core
 	//decompose_cigar(, uint8_t cigar_l, char *n_elem, char *type, uint8_t *types_l, uint8_t max_types_length);
-	static char res_seq[128];
-	static char res_qual[128];
-	uint8_t res_seq_l;
-	supress_indels_from_32_cigar(bam_seq, quals, alig->core.l_qseq, bam1_cigar(alig), alig->core.n_cigar, &res_seq[0], &res_qual[0], &res_seq_l);
-	_mm_free(bam_seq);
-	free(quals);
-	bam_seq = &res_seq[0];
-	quals = &res_qual[0];
+
+	//supress_indels_from_32_cigar(bam_seq, quals, alig->core.l_qseq, bam1_cigar(alig), alig->core.n_cigar, a_res_seq, a_res_qual, &res_seq_l);
+	//_mm_free(bam_seq);
+	//free(quals);
+	//bam_seq = a_res_seq;
+	//quals = a_res_qual;
 
 	//Get cycles and positions
-	//cycles = alig->core.l_qseq;
-	cycles = res_seq_l;
+	cycles = alig->core.l_qseq;
+	//cycles = res_seq_l;
 	init_pos = alig->core.pos + 1;
 	end_pos = alig->core.pos + cycles;
 

@@ -266,10 +266,10 @@ supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uin
 }
 
 ERROR_CODE
-supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cigar, uint8_t cigar_l, char *seq_res, char *qual_res, uint8_t *seq_res_l)
+supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cigar, uint16_t cigar_l, char *seq_res, char *qual_res, uint8_t *seq_res_l)
 {
 	int i, j, seq_i, res_i;
-	char count;
+	uint32_t count;
 	uint32_t elem;
 	uint8_t type;
 
@@ -282,7 +282,9 @@ supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cig
 		return INVALID_INPUT_PARAMS_NULL;
 	}
 
-	for(i = 0, seq_i = 0, res_i = 0; i < cigar_l; i++)
+	seq_i = 0;
+	res_i = 0;
+	for(i = 0; i < cigar_l; i++)
 	{
 		elem = cigar[i];
 		count = elem >> BAM_CIGAR_SHIFT;	//Get number of bases from cigar
@@ -301,10 +303,18 @@ supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cig
 				res_i++;
 			}
 			break;
-		default:	//Missmatch, etc...
-			memcpy(&seq_res[res_i], &seq[seq_i], count);
-			if(qual && qual_res) memcpy(&qual_res[res_i], &qual[seq_i], count);
+		case BAM_CMATCH:
+		case BAM_CPAD:
+			//memcpy(&seq_res[res_i], &seq[seq_i], count * sizeof(char));
+			for(j = 0; j < count; j++)
+			{
+				seq_res[res_i + j] = seq[seq_i + j];
+			}
+			if(qual && qual_res) memcpy(&qual_res[res_i], &qual[seq_i], count * sizeof(char));
 			res_i += count;
+			seq_i += count;
+			break;
+		default:	//Missmatch, etc...
 			seq_i += count;
 			break;
 		}
