@@ -1,0 +1,31 @@
+Compilation instructions:
+
+This project uses GNU Build System for compilation and distribution. 
+
+Here is an example script to configure compilation:
+
+***********************************************************************************************
+#!/bin/sh
+./configure 	--prefix=/install_path \
+				      --with-opencb=/OpenCB_install_path \
+				      CFLAGS="-O0 -g -pg -std=c99 -Wall -D_REENTRANT -D_XOPEN_SOURCE=600 -fPIC"	#For debug compilation
+***********************************************************************************************
+
+Next, execute "make" for compilation and "make install" to install the program in prefix path.
+In this example the program is compiled with debug like flags. 
+For an optimized compilation use other flags like "-O3".
+
+
+Utilization instructions:
+
+Recalibrator is compiled on a binary executable by default, named "recal" and is in /install_path/bin path.
+
+Here is an example script to call recal:
+***********************************************************************************************
+bin/recal -C 150 	-R "/path_to_reference_binary/dna_compression.bin" \
+			            -I "/path_to_bam/input.bam" \
+			            -o "/path_to_output/output.bam" \
+			            -d "binary.data" -i "text.info"
+***********************************************************************************************
+
+For an explanation of program options execute "recal --help".
