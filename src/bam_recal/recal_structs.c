@@ -101,10 +101,10 @@ recal_add_base(recal_info_t *data, const uint8_t qual, const uint16_t cycle, con
 		printf("add_base: ERROR, qual must be positive and minor than MAX_QUALITY - MIN_QUALITY ==> Qual = %d, Cycle = %d, Dinuc = %d, %s\n", qual, cycle, dinuc, match ? "Miss" : "");
 		return INVALID_INPUT_QUAL;
 	}
-	//if(cycle < 0 || cycle > data->num_cycles - 1)
+	if(cycle < 0 || cycle > data->num_cycles - 1)
 	{
-	//	printf("add_base: ERROR, cycle must be positive and minor than NUM_CYCLES\n");
-	//	return INVALID_INPUT_QUAL;
+		printf("add_base: ERROR, cycle must be positive and minor than NUM_CYCLES (%d), Cycle: %d\n", data->num_cycles, cycle);
+		return INVALID_INPUT_QUAL;
 	}
 	if(dinuc > NUM_DINUC - 1)
 	{

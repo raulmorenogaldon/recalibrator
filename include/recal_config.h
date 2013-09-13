@@ -29,6 +29,8 @@
 #define NOT_MAPPING_QUAL_ZERO //Reads with map score of 0 wont be stated
 #define NOT_PRIMARY_ALIGNMENT
 
+#define INDEL_SUPPRESSION_BUFFER_SIZE 1000
+
 /**
  * BAM management
  */

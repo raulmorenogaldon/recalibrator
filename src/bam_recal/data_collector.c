@@ -217,8 +217,8 @@ ERROR_CODE
 recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal_info_t* output_data)
 {
 	alignment_t *aux_alig;
-	uint8_t *quals;
-	uint8_t *bam_seq;
+	char *quals;
+	char *bam_seq;
 	char *ref_seq;
 	uint8_t aux_comp[16];
 	size_t init_pos, end_pos;
@@ -227,9 +227,9 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	uint8_t *dinucs;
 	uint32_t flag;
 
-	char a_res_seq[128];
-	char a_res_qual[128];
-	uint8_t res_seq_l = 0;
+	static char a_res_seq[INDEL_SUPPRESSION_BUFFER_SIZE];
+	static char a_res_qual[INDEL_SUPPRESSION_BUFFER_SIZE];
+	static uint8_t res_seq_l = 0;
 
 	//Cigar
 	char *cigar;
@@ -276,20 +276,20 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	//Get quals
 	quals = new_quality_from_bam(alig, 0);
 
-	//Decompose cigar for indels
-	//TODO
-	//cigar = alig->core
-	//decompose_cigar(, uint8_t cigar_l, char *n_elem, char *type, uint8_t *types_l, uint8_t max_types_length);
+	//Indel suppression
+ 	supress_indels_from_32_cigar(bam_seq, quals, alig->core.l_qseq, bam1_cigar(alig), alig->core.n_cigar, a_res_seq, a_res_qual, &res_seq_l);
+	_mm_free(bam_seq);
+	free(quals);
 
-	//supress_indels_from_32_cigar(bam_seq, quals, alig->core.l_qseq, bam1_cigar(alig), alig->core.n_cigar, a_res_seq, a_res_qual, &res_seq_l);
-	//_mm_free(bam_seq);
-	//free(quals);
-	//bam_seq = a_res_seq;
-	//quals = a_res_qual;
+	bam_seq = (char *) _mm_malloc (sizeof(char) * res_seq_l, MEM_ALIG_SIZE);
+	quals = (char *) malloc (sizeof(char) * res_seq_l);
+	memcpy(bam_seq, a_res_seq, res_seq_l * sizeof(char));
+	memcpy(quals, a_res_qual, res_seq_l * sizeof(char));
+
 
 	//Get cycles and positions
-	cycles = alig->core.l_qseq;
-	//cycles = res_seq_l;
+	//cycles = alig->core.l_qseq;
+	cycles = res_seq_l;
 	init_pos = alig->core.pos + 1;
 	end_pos = alig->core.pos + cycles;
 
@@ -370,17 +370,16 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	//Add data
 	recal_add_base_v(output_data, bam_seq, quals, 0, cycles, dinucs, comp_res);
 
-
 	//Set last sequence for duplicates
 	strcpy(ult_seq, bam_seq);
-	l_ult_seq = cycles;
+	l_ult_seq = alig->core.l_qseq;
 	pos_ult_seq = init_pos;
 
 	_mm_free(ref_seq);
 	_mm_free(comp_res);
 	_mm_free(dinucs);
-	//_mm_free(bam_seq);
-	//free(quals);
+	_mm_free(bam_seq);
+	free(quals);
 
 	return NO_ERROR;
 }

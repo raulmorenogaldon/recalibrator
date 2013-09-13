@@ -266,7 +266,7 @@ supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uin
 }
 
 ERROR_CODE
-supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cigar, uint16_t cigar_l, char *seq_res, char *qual_res, uint8_t *seq_res_l)
+supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cigar, uint16_t cigar_l, char *seq_res, char *qual_res, uint8_t *seq_res_l)
 {
 	int i, j, seq_i, res_i;
 	uint32_t count;
@@ -293,6 +293,8 @@ supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cig
 		switch(type)
 		{
 		case BAM_CINS:	//Insertion
+			if(count + seq_i > seq_l)
+				count = seq_l - seq_i;
 			seq_i += count;
 			break;
 		case BAM_CDEL:	//Deletion
@@ -305,16 +307,13 @@ supress_indels_from_32_cigar(char *seq, char *qual, uint8_t seq_l, uint32_t *cig
 			break;
 		case BAM_CMATCH:
 		case BAM_CPAD:
-			//memcpy(&seq_res[res_i], &seq[seq_i], count * sizeof(char));
-			for(j = 0; j < count; j++)
-			{
-				seq_res[res_i + j] = seq[seq_i + j];
-			}
+		default:
+			if(count + seq_i > seq_l)
+				count = seq_l - seq_i;
+
+			memcpy(&seq_res[res_i], &seq[seq_i], count * sizeof(char));
 			if(qual && qual_res) memcpy(&qual_res[res_i], &qual[seq_i], count * sizeof(char));
 			res_i += count;
-			seq_i += count;
-			break;
-		default:	//Missmatch, etc...
 			seq_i += count;
 			break;
 		}
