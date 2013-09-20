@@ -1,7 +1,7 @@
 #include "data_collector.h"
 #include "string.h"
 
-static char ult_seq[100];
+static char *ult_seq;
 static int l_ult_seq = 0;
 static int pos_ult_seq;
 
@@ -371,9 +371,9 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	recal_add_base_v(output_data, bam_seq, quals, 0, cycles, dinucs, comp_res);
 
 	//Set last sequence for duplicates
-	strcpy(ult_seq, bam_seq);
-	l_ult_seq = alig->core.l_qseq;
-	pos_ult_seq = init_pos;
+	//strcpy(ult_seq, bam_seq);
+	//l_ult_seq = alig->core.l_qseq;
+	//pos_ult_seq = init_pos;
 
 	_mm_free(ref_seq);
 	_mm_free(comp_res);
