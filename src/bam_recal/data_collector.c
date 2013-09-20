@@ -1,9 +1,11 @@
 #include "data_collector.h"
 #include "string.h"
 
-static char *ult_seq;
-static int l_ult_seq = 0;
-static int pos_ult_seq;
+#ifdef CHECK_DUPLICATES
+	static char *ult_seq = NULL;
+	static int l_ult_seq = 0;
+	static int pos_ult_seq;
+#endif
 
 /**
  * Get recalibration data from BAM path.
@@ -49,7 +51,7 @@ ERROR_CODE
 recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t* output_data)
 {
 	bam_batch_t* batch;
-	uint8_t *last_seq;
+	char *last_seq;
 	uint32_t l_last_seq;
 	uint32_t pos_last_seq;
 	bam1_t *last_alig;
@@ -100,7 +102,10 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 	pool = pool_new(3, MAX_BATCH_SIZE);
 	#endif
 
-	last_seq = (uint8_t *)malloc(sizeof(uint8_t));	// Avoid comprobation in bucle and always use free
+	#ifdef CHECK_DUPLICATES
+		ult_seq = (char *)malloc(sizeof(char) * output_data->num_cycles);
+	#endif
+	last_seq = (char *)malloc(sizeof(char));	// Avoid comprobation in bucle and always use free
 	while(batch->num_alignments != 0
 		#ifdef D_MAX_READS
 			&& count < D_MAX_READS
@@ -182,6 +187,9 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 	//Free batch
 	bam_batch_free(batch, 1);
 	free(last_seq);
+	#ifdef CHECK_DUPLICATES
+		free(ult_seq);
+	#endif
 
 	return NO_ERROR;
 }
@@ -294,16 +302,21 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	end_pos = alig->core.pos + cycles;
 
 	//Duplicates check
-	/*if(l_ult_seq)
+	#ifdef CHECK_DUPLICATES
 	{
-		if(pos_ult_seq == init_pos && l_ult_seq == cycles && strcmp(bam_seq, ult_seq) == 0)
+		if(l_ult_seq)
 		{
-			//printf("\nDUPLICATE POS: %d CYCLES: %d\n\tSEQ:  %s\n\tLAST: %s", init_pos, cycles, bam_seq, ult_seq);
-			duplicated++;
-			_mm_free(bam_seq);
-			return NO_ERROR;
+			if(pos_ult_seq == init_pos && l_ult_seq == cycles && strcmp(bam_seq, ult_seq) == 0)
+			{
+				//printf("\nDUPLICATE POS: %d CYCLES: %d\n\tSEQ:  %s\n\tLAST: %s", init_pos, cycles, bam_seq, ult_seq);
+				duplicated++;
+				_mm_free(bam_seq);
+				free(quals);
+				return NO_ERROR;
+			}
 		}
-	}*/
+	}
+	#endif
 
 	//bam_seq = aux_alig->sequence;
 	//quals = aux_alig->quality;
@@ -371,15 +384,22 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	recal_add_base_v(output_data, bam_seq, quals, 0, cycles, dinucs, comp_res);
 
 	//Set last sequence for duplicates
-	//strcpy(ult_seq, bam_seq);
-	//l_ult_seq = alig->core.l_qseq;
-	//pos_ult_seq = init_pos;
+	#ifdef CHECK_DUPLICATES
+	{
+		strcpy(ult_seq, bam_seq);
+		l_ult_seq = alig->core.l_qseq;
+		pos_ult_seq = init_pos;
+	}
+	#endif
 
-	_mm_free(ref_seq);
-	_mm_free(comp_res);
-	_mm_free(dinucs);
-	_mm_free(bam_seq);
-	free(quals);
+	//Free resources
+	{
+		_mm_free(ref_seq);
+		_mm_free(comp_res);
+		_mm_free(dinucs);
+		_mm_free(bam_seq);
+		free(quals);
+	}
 
 	return NO_ERROR;
 }

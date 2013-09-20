@@ -28,14 +28,15 @@
 #define STAT_FIRST_DINUC
 #define NOT_MAPPING_QUAL_ZERO //Reads with map score of 0 wont be stated
 #define NOT_PRIMARY_ALIGNMENT
+//#define CHECK_DUPLICATES
 
-#define INDEL_SUPPRESSION_BUFFER_SIZE 1000
+#define INDEL_SUPPRESSION_BUFFER_SIZE 200
 
 /**
  * BAM management
  */
-//#define MAX_BATCH_SIZE 1000000000
-#define MAX_BATCH_SIZE 1000000
+#define MAX_BATCH_SIZE 1000000000
+//#define MAX_BATCH_SIZE 1000000
 
 /**
  * Probability math limits
