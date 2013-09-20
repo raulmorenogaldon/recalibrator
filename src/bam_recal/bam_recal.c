@@ -72,6 +72,8 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 		printf("=======================\nQual intermediate results\n");
 	#endif
 
+	printf("---------------------\n", count);
+
 	while(batch->num_alignments != 0
 		#ifdef D_MAX_READS_W
 			&& count < D_MAX_READS_W
@@ -96,7 +98,8 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 		count += batch->num_alignments;
 
 		//Show total progress
-		printf("\n\tTotal alignments recalibrated: %d\n", count);
+		printf("Total alignments recalibrated: %d\r", count);
+		fflush(stdout);
 
 		//Free memory and take a new batch
 		#ifndef USE_BATCH_POOL

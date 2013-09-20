@@ -143,7 +143,8 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 		count += batch->num_alignments;
 
 		//Show total progress
-		printf("\n Total alignments readed: %d", count);
+		printf("Total alignments readed: %d\r", count);
+		fflush(stdout);
 
 		//Get last alignment
 		free(last_seq);
