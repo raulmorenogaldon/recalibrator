@@ -21,7 +21,9 @@
  * This struct hold all data necessary to perform recalibrations.
  */
 struct recal_info;
+struct data_collect_env;
 typedef struct recal_info recal_info_t;
+typedef struct data_collect_env recal_data_collect_env_t;
 
 /**
  * \brief Dinucleotide enumeration.
@@ -70,6 +72,10 @@ EXTERNC ERROR_CODE recal_init_info(const uint32_t cycles, recal_info_t **out_dat
  * \param data Data struct to free
  */
 EXTERNC ERROR_CODE recal_destroy_info(recal_info_t **data);
+
+EXTERNC ERROR_CODE recal_get_data_init_env(const uint32_t cycles, recal_data_collect_env_t *collect_env);
+
+EXTERNC ERROR_CODE recal_get_data_destroy_env(recal_data_collect_env_t *collect_env);
 
 /**
  * \brief Add recalibration data from one base.
@@ -155,8 +161,7 @@ EXTERNC ERROR_CODE recal_get_data_from_bam_batch(const bam_batch_t* batch, const
  * \param ref Reference genome struct.
  * \param out_info Data struct to fill.
  */
-EXTERNC ERROR_CODE recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal_info_t* output_data) __ATTR_HOT;
-
+EXTERNC ERROR_CODE recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal_info_t* output_data, recal_data_collect_env_t *collect_env) __ATTR_HOT;
 
 /***********************************************
  * BAM RECALIBRATION PHASE 2 - RECALIBRATION

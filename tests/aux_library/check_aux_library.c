@@ -5,7 +5,7 @@ START_TEST (check_aux_bam)
 {
 	char aux_seq_res[15];
 	char aux_seq_qual[15];
-	uint8_t aux_seq_res_l;
+	uint32_t aux_seq_res_l;
 	int i;
 
 	// Not necessary
@@ -127,7 +127,7 @@ START_TEST (check_aux_bam)
 	}
 	printf("\n");
 
-	supress_indels_from_32_cigar(seq, seq_qual, seq_l, alt_cigar, alt_cigar_l, aux_seq_res, aux_seq_qual, &aux_seq_res_l);
+	supress_indels_from_32_cigar(seq, seq_qual, seq_l, alt_cigar, alt_cigar_l, aux_seq_res, aux_seq_qual, &aux_seq_res_l, 20);
 
 	printf("Sequence: %s\n", seq);
 	printf("Result sequence: %s\n", aux_seq_res);
@@ -142,6 +142,24 @@ START_TEST (check_aux_bam)
 	ck_assert(strcmp(seq_res, aux_seq_res) == 0);
 	ck_assert(strcmp(seq_qual_res, aux_seq_qual) == 0);
 	ck_assert(seq_res_l == aux_seq_res_l);
+
+	printf("--------------------------------\n");
+	printf("With limit 5 in result sequence (using same CIGAR)\n");
+	supress_indels_from_32_cigar(seq, seq_qual, seq_l, alt_cigar, alt_cigar_l, aux_seq_res, aux_seq_qual, &aux_seq_res_l, 6);
+
+	printf("Sequence: %s\n", seq);
+	printf("Result sequence: %s\n", aux_seq_res);
+	printf("Expected: %s\n", seq_res_2);
+	printf("Quals: %s\n", seq_qual);
+	printf("Result quals: %s\n", aux_seq_qual);
+	printf("Expected: %s\n", seq_qual_res_2);
+	printf("Length: %d\n", aux_seq_res_l);
+	printf("Expected: %d\n", seq_res_l_2);
+
+	//Test
+	ck_assert(strcmp(seq_res_2, aux_seq_res) == 0);
+	ck_assert(strcmp(seq_qual_res_2, aux_seq_qual) == 0);
+	ck_assert(seq_res_l_2 == aux_seq_res_l);
 }
 END_TEST
 

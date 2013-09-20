@@ -82,13 +82,17 @@ EXTERNC ERROR_CODE compare_bams_qual(const char* bamPath0, const char* bamPath1,
 
 EXTERNC char * new_sequence_from_bam(bam1_t *bam1);
 
+EXTERNC ERROR_CODE new_sequence_from_bam_ref(bam1_t *bam1, char *seq, uint32_t max_l);
+
 EXTERNC char * new_quality_from_bam(bam1_t *bam1, int base_quality);
+
+EXTERNC ERROR_CODE new_quality_from_bam_ref(bam1_t *bam1, int base_quality, char *qual, uint32_t max_l);
 
 EXTERNC ERROR_CODE decompose_cigar(char *cigar, uint8_t cigar_l, char *n_elem, char *type, uint8_t *types_l, uint8_t max_types_length);
 
 EXTERNC ERROR_CODE supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uint8_t cigar_type_l, char *seq_res, uint8_t *seq_res_l);
 
-EXTERNC ERROR_CODE supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cigar, uint16_t cigar_l, char *seq_res, char *qual_res, uint8_t *seq_res_l);
+EXTERNC ERROR_CODE supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cigar, uint16_t cigar_l, char *seq_res, char *qual_res, uint32_t *seq_res_l, uint32_t max_res_l);
 
 /***************************
  * VECTOR OPERATIONS

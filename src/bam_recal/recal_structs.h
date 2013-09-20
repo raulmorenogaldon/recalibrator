@@ -34,6 +34,22 @@ struct recal_info {
     double* qual_dinuc_delta;		//Deltas per quality-dinuc pair
 };
 
+
+typedef struct data_collect_env {
+
+	//Sequence storage
+	char *bam_seq;
+	char *bam_quals;
+
+	//Auxiliar
+	char *aux_res_seq;
+	char *aux_res_qual;
+
+	//Maximum length
+	uint32_t bam_seq_max_l;
+
+} recal_data_collect_env_t;
+
 /**
  * PRIVATE FUNCTIONS
  */

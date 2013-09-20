@@ -135,6 +135,44 @@ new_sequence_from_bam(bam1_t *bam1)
 	return seq;
 }
 
+ERROR_CODE
+new_sequence_from_bam_ref(bam1_t *bam1, char *seq, uint32_t max_l)
+{
+	char *bam_seq = bam1_seq(bam1);
+	int seq_len = bam1->core.l_qseq;
+
+	if(seq_len > max_l)
+		seq_len = max_l;
+
+	// nucleotide content
+	for (int i = 0; i < seq_len; i++) {
+		switch (bam1_seqi(bam_seq, i))
+		{
+		case 1:
+			seq[i] = 'A';
+			break;
+		case 2:
+			seq[i] = 'C';
+			break;
+		case 4:
+			seq[i] = 'G';
+			break;
+		case 8:
+			seq[i] = 'T';
+			break;
+		case 15:
+			seq[i] = 'N';
+			//printf("N");
+			break;
+		default:
+			seq[i] = 'N';
+			break;
+		}
+	}
+
+	return NO_ERROR;
+}
+
 char *
 new_quality_from_bam(bam1_t *bam1, int base_quality)
 {
@@ -147,6 +185,22 @@ new_quality_from_bam(bam1_t *bam1, int base_quality)
 	}
 
 	return qual;
+}
+
+ERROR_CODE
+new_quality_from_bam_ref(bam1_t *bam1, int base_quality, char *qual, uint32_t max_l)
+{
+	char *bam_qual = bam1_qual(bam1);
+	int qual_len = bam1->core.l_qseq;
+
+	if(qual_len > max_l)
+		qual_len = max_l;
+
+	for (int i = 0; i < qual_len; i++) {
+		qual[i] = base_quality + bam_qual[i];
+	}
+
+	return NO_ERROR;
 }
 
 ERROR_CODE
@@ -266,7 +320,7 @@ supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uin
 }
 
 ERROR_CODE
-supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cigar, uint16_t cigar_l, char *seq_res, char *qual_res, uint8_t *seq_res_l)
+supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cigar, uint16_t cigar_l, char *seq_res, char *qual_res, uint32_t *seq_res_l, uint32_t max_res_l)
 {
 	int i, j, seq_i, res_i;
 	uint32_t count;
@@ -303,6 +357,11 @@ supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cig
 				seq_res[res_i] = 'X';
 				if(qual && qual_res) qual_res[res_i] = '!';
 				res_i++;
+				if(res_i >= max_res_l - 1)	//Check array limit
+				{
+					res_i = max_res_l - 1;
+					i = cigar_l;	//End loop
+				}
 			}
 			break;
 		case BAM_CMATCH:
@@ -310,6 +369,12 @@ supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cig
 		default:
 			if(count + seq_i > seq_l)
 				count = seq_l - seq_i;
+
+			if(res_i + count >= max_res_l - 1)	//Check array limit
+			{
+				count = max_res_l - 1 - res_i;
+				i = cigar_l;	//End loop
+			}
 
 			memcpy(&seq_res[res_i], &seq[seq_i], count * sizeof(char));
 			if(qual && qual_res) memcpy(&qual_res[res_i], &qual[seq_i], count * sizeof(char));

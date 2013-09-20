@@ -36,6 +36,9 @@ uint8_t seq_cigar_l = 10;
 char seq_res[12] = "AGGTGCTXXXT";
 char seq_qual_res[12] = "8587689!!!0";
 uint8_t seq_res_l = 11;
+char seq_res_2[12] = "AGGTG";
+char seq_qual_res_2[12] = "85876";
+uint8_t seq_res_l_2 = 5;
 uint32_t alt_cigar[5] = {
 		(5 << BAM_CIGAR_SHIFT) + BAM_CPAD,	//(5 << 4) + '=',
 		(2 << BAM_CIGAR_SHIFT) + BAM_CINS,	//(2 << 4) + 'I',
