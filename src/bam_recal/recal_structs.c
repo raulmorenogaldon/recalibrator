@@ -586,12 +586,12 @@ recal_save_recal_info(const recal_info_t *data, const char *path)
 
 	fwrite(data, sizeof(uint8_t), 1, fp);
 	fwrite(data, sizeof(uint32_t), 3, fp);
-	fwrite(data, sizeof(double), 1, fp);
 
 	//Save total counters
 	fwrite(&data->total_miss, sizeof(double), 1, fp);
 	fwrite(&data->total_bases, sizeof(uint32_t), 1, fp);
 	fwrite(&data->total_delta, sizeof(double), 1, fp);
+	fwrite(&data->total_estimated_Q, sizeof(double), 1, fp);
 
 	//Save qual counters
 	fwrite(data->qual_miss, sizeof(double), data->num_quals, fp);
@@ -627,12 +627,12 @@ recal_load_recal_info(const char *path, recal_info_t *data)
 
 	fread(data, sizeof(uint8_t), 1, fp);
 	fread(data, sizeof(uint32_t), 3, fp);
-	fread(data, sizeof(double), 1, fp);
 
 	//Read total counters
 	fread(&data->total_miss, sizeof(double), 1, fp);
 	fread(&data->total_bases, sizeof(uint32_t), 1, fp);
 	fread(&data->total_delta, sizeof(double), 1, fp);
+	fread(&data->total_estimated_Q, sizeof(double), 1, fp);
 
 	//Read qual counters
 	fread(data->qual_miss, sizeof(double), data->num_quals, fp);

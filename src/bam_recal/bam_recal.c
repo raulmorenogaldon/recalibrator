@@ -52,6 +52,7 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 {
 	bam_batch_t* batch;
 	int count = 0;
+	ERROR_CODE err;
 
 	#ifdef USE_BATCH_POOL
 	bam_pool_t* pool;
@@ -93,7 +94,9 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 		#endif
 
 		//Recalibrate batch
-		recal_recalibrate_batch(batch, bam_info, recal_bam_f);
+		err = recal_recalibrate_batch(batch, bam_info, recal_bam_f);
+		if(err)
+			printf("ERROR (recal_recalibrate_batch): %d\n", err);
 		//Update read counter
 		count += batch->num_alignments;
 
@@ -131,6 +134,7 @@ ERROR_CODE
 recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info, bam_file_t *recal_bam_f)
 {
 	int i;
+	ERROR_CODE err;
 
 	//Get data environment
 	recal_recalibration_env_t *recalibration_env;
@@ -145,7 +149,7 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info, 
 	}
 
 	//Initialize get data environment
-	recalibration_env = (recal_data_collect_env_t *) malloc(sizeof(recal_data_collect_env_t));
+	recalibration_env = (recal_recalibration_env_t *) malloc(sizeof(recal_recalibration_env_t));
 	recal_recalibration_init_env(bam_info->num_cycles, recalibration_env);
 
 	//Process all alignments of the batchs
@@ -155,7 +159,9 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info, 
 		time_init_slot(D_SLOT_RECAL_ALIG, clock(), TIME_GLOBAL_STATS);
 		#endif
 		//Process every alignment
-		recal_recalibrate_alignment(batch->alignments_p[i], bam_info, recal_bam_f, recalibration_env);
+		err = recal_recalibrate_alignment(batch->alignments_p[i], bam_info, recal_bam_f, recalibration_env);
+		if(err)
+			printf("ERROR (recal_recalibrate_alignment): %d\n", err);
 		#ifdef D_TIME_DEBUG
 		time_set_slot(D_SLOT_RECAL_ALIG, clock(), TIME_GLOBAL_STATS);
 		#endif
