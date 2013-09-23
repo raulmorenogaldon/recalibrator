@@ -22,8 +22,10 @@
  */
 struct recal_info;
 struct data_collect_env;
+struct recalibration_env;
 typedef struct recal_info recal_info_t;
 typedef struct data_collect_env recal_data_collect_env_t;
+typedef struct recalibration_env recal_recalibration_env_t;
 
 /**
  * \brief Dinucleotide enumeration.
@@ -76,6 +78,10 @@ EXTERNC ERROR_CODE recal_destroy_info(recal_info_t **data);
 EXTERNC ERROR_CODE recal_get_data_init_env(const uint32_t cycles, recal_data_collect_env_t *collect_env);
 
 EXTERNC ERROR_CODE recal_get_data_destroy_env(recal_data_collect_env_t *collect_env);
+
+EXTERNC ERROR_CODE recal_recalibration_init_env(const uint32_t cycles, recal_recalibration_env_t *recalibration_env);
+
+EXTERNC ERROR_CODE recal_recalibration_destroy_env(recal_recalibration_env_t *recalibration_env);
 
 /**
  * \brief Add recalibration data from one base.
@@ -201,7 +207,7 @@ EXTERNC ERROR_CODE recal_recalibrate_batch(const bam_batch_t* batch, const recal
  * \param bam_info Data struct with recalibration info.
  * \param recal_bam_f Recalibrated BAM output file struct.
  */
-EXTERNC ERROR_CODE recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, bam_file_t *recal_bam_f) __ATTR_HOT;
+EXTERNC ERROR_CODE recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, bam_file_t *recal_bam_f, recal_recalibration_env_t *recalibration_env) __ATTR_HOT;
 
 
 /***********************************************

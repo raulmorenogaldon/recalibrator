@@ -132,6 +132,22 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info, 
 {
 	int i;
 
+	//Get data environment
+	recal_recalibration_env_t *recalibration_env;
+
+	//CHECK ARGUMENTS
+	{
+		//Check nulls
+		if(!batch || !bam_info || !recal_bam_f)
+		{
+			return INVALID_INPUT_PARAMS_NULL;
+		}
+	}
+
+	//Initialize get data environment
+	recalibration_env = (recal_data_collect_env_t *) malloc(sizeof(recal_data_collect_env_t));
+	recal_recalibration_init_env(bam_info->num_cycles, recalibration_env);
+
 	//Process all alignments of the batchs
 	for(i = 0; i < batch->num_alignments; i++)
 	{
@@ -139,11 +155,14 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info, 
 		time_init_slot(D_SLOT_RECAL_ALIG, clock(), TIME_GLOBAL_STATS);
 		#endif
 		//Process every alignment
-		recal_recalibrate_alignment(batch->alignments_p[i], bam_info, recal_bam_f);
+		recal_recalibrate_alignment(batch->alignments_p[i], bam_info, recal_bam_f, recalibration_env);
 		#ifdef D_TIME_DEBUG
 		time_set_slot(D_SLOT_RECAL_ALIG, clock(), TIME_GLOBAL_STATS);
 		#endif
 	}
+
+	//Destroy environment
+	recal_recalibration_destroy_env(recalibration_env);
 
 	return NO_ERROR;
 }
@@ -152,32 +171,71 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info, 
  * Recalibrate alignment and store in file.
  */
 ERROR_CODE
-recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, bam_file_t *recal_bam_f)
+recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, bam_file_t *recal_bam_f, recal_recalibration_env_t *recalibration_env)
 {
 	unsigned int qual_index;
 	unsigned int matrix_index;
 	unsigned int i;
 	uint8_t dinuc;
-	double delta_r, delta_rc, delta_rd;
-	char *quals, *res_quals;
+
+	//Sequence
 	char *bam_seq;
+	char *bam_quals;
+	char *res_quals;
+	uint32_t bam_seq_l;
+	uint32_t bam_seq_max_l;
+
+	//Recalibration
 	double estimated_Q;
+	double delta_r, delta_rc, delta_rd;
 
 	alignment_t* aux_alig;
 	bam1_t *aux_alig1;
 
-	//Bam seq fields
+	//CHECK ARGUMENTS (Assuming this function is called always from recal_recalibrate_batch)
+	{
+		//Check nulls
+		if(!alig)
+			return INVALID_INPUT_PARAMS_NULL;
+	}
+
+	//FILTERS
+	{
+
+	}
+
+	//SET VARS
+	{
+		bam_quals = recalibration_env->bam_quals;
+		bam_seq_l = 0;
+		bam_seq_max_l = recalibration_env->bam_seq_max_l;
+	}
+
+	//Sequence length
+	bam_seq_l = alig->core.l_qseq;
+	if(bam_seq_l > bam_seq_max_l || bam_seq_l == 0)
+	{
+		return INVALID_SEQ_LENGTH;
+	}
+
+	//Get sequence
 	bam_seq = new_sequence_from_bam(alig);
 
+	//Get quals
+	new_quality_from_bam_ref(alig, 0, bam_quals, bam_seq_max_l);
+
+	//Allocate for result
+	res_quals = (char *)malloc(bam_seq_l * sizeof(char));
+
+	//Bam seq fields
+	//bam_seq = new_sequence_from_bam(alig);
+
 	//Qual fields
-	quals = new_quality_from_bam(alig, 0);
-	res_quals = (char *)malloc(alig->core.l_qseq * sizeof(char));
-	//quals = (char*) calloc(alig->core.l_qseq + 1, sizeof(char));
-	//convert_to_quality_string_length(quals, bam1_qual(alig), alig->core.l_qseq, 1);
+	//quals = new_quality_from_bam(alig, 0);
 
 	//Iterates nucleotides in this read
 	dinuc = 0;
-	for(i = 0; i < alig->core.l_qseq; i++)
+	for(i = 0; i < bam_seq_l; i++)
 	{
 		//Compare only if the nucleotide is not "N"
 		#ifdef NOT_COUNT_NUCLEOTIDE_N
@@ -185,7 +243,7 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, ba
 		#endif
 		{
 			//Recalibrate quality
-			qual_index = quals[i] - bam_info->min_qual;
+			qual_index = bam_quals[i] - bam_info->min_qual;
 			delta_r = bam_info->qual_delta[qual_index];
 
 			matrix_index = qual_index * bam_info->num_cycles + i;
@@ -208,20 +266,20 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, ba
 			#endif
 
 			//Recalibration formula
-				double global_delta = bam_info->total_delta;
-				double calidad = (double)quals[i];
-				if(calidad > MIN_QUALITY_TO_STAT)
-				{
-					//double res = (double)quals[i] + bam_info->total_delta + delta_r + delta_rc + delta_rd;
-					//recal_get_estimated_Q(bam_info->qual_bases, bam_info->num_quals, 0, &estimated_Q);
-					//double res = estimated_Q + bam_info->total_delta + delta_r + delta_rc + delta_rd;
-					double res = bam_info->total_estimated_Q + bam_info->total_delta + delta_r + delta_rc + delta_rd;
-					res_quals[i] = (char)res;
-				}
-				else
-				{
-					res_quals[i] = calidad;
-				}
+			double global_delta = bam_info->total_delta;
+			double calidad = (double)bam_quals[i];
+			if(calidad > MIN_QUALITY_TO_STAT)
+			{
+				//double res = (double)quals[i] + bam_info->total_delta + delta_r + delta_rc + delta_rd;
+				//recal_get_estimated_Q(bam_info->qual_bases, bam_info->num_quals, 0, &estimated_Q);
+				//double res = estimated_Q + bam_info->total_delta + delta_r + delta_rc + delta_rd;
+				double res = bam_info->total_estimated_Q + bam_info->total_delta + delta_r + delta_rc + delta_rd;
+				res_quals[i] = (char)res;
+			}
+			else
+			{
+				res_quals[i] = calidad;
+			}
 			//quals[i] = (char)((double)quals[i] + bam_info->total_delta + delta_r + delta_rc + delta_rd);
 
 			#ifdef D_RECAL_INTER_RESULTS
@@ -239,20 +297,24 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, ba
 	aux_alig = alignment_new_by_bam(alig, 0);
 
 	//Set qualities in alignment
-	free(aux_alig->quality);
-	aux_alig->quality = res_quals;
+	//free(aux_alig->quality);
+	//aux_alig->quality = res_quals;
+	memcpy(aux_alig->quality, res_quals, bam_seq_l);
+
 	//Fix reads in alignment (sequence conversion to string is bug)
-	free(aux_alig->sequence);
-	aux_alig->sequence = bam_seq;
+	//free(aux_alig->sequence);
+	//aux_alig->sequence = bam_seq;
+	memcpy(aux_alig->sequence, bam_seq, bam_seq_l);
 
 	aux_alig1 = convert_to_bam(aux_alig, 0);
-	bam_seq = new_sequence_from_bam(aux_alig1);
-	quals = new_quality_from_bam(aux_alig1, 0);
+	//bam_seq = new_sequence_from_bam(aux_alig1);
+	//bam_quals = new_quality_from_bam(aux_alig1, 0);
 	//Write in bam
 	bam_fwrite(aux_alig1, recal_bam_f);
 
 	//Memory free
-	free(quals);
+	free(bam_seq);
+	free(res_quals);
 	alignment_free(aux_alig);
 	bam_destroy1(aux_alig1);
 

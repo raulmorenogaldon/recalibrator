@@ -119,6 +119,35 @@ recal_get_data_destroy_env(recal_data_collect_env_t *collect_env)
 	return NO_ERROR;
 }
 
+ERROR_CODE
+recal_recalibration_init_env(const uint32_t cycles, recal_recalibration_env_t *recalibration_env)
+{
+	if(!recalibration_env)
+		return INVALID_INPUT_PARAMS_NULL;
+
+	//Quality storage
+	recalibration_env->bam_quals = (char *) malloc (sizeof(char) * cycles);
+
+	//Maximum length
+	recalibration_env->bam_seq_max_l = cycles;
+
+	return NO_ERROR;
+}
+
+ERROR_CODE
+recal_recalibration_destroy_env(recal_recalibration_env_t *recalibration_env)
+{
+	if(!recalibration_env)
+		return INVALID_INPUT_PARAMS_NULL;
+
+	free(recalibration_env->bam_quals);
+
+
+	free(recalibration_env);
+
+	return NO_ERROR;
+}
+
 /**
  * Add recalibration data from one base.
  */

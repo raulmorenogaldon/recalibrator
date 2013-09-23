@@ -51,6 +51,16 @@ typedef struct data_collect_env {
 
 } recal_data_collect_env_t;
 
+typedef struct recalibration_env {
+
+	//Quality storage
+	char *bam_quals;
+
+	//Maximum length
+	uint32_t bam_seq_max_l;
+
+} recal_recalibration_env_t;
+
 /**
  * PRIVATE FUNCTIONS
  */
