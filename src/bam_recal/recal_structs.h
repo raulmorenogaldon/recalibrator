@@ -20,6 +20,7 @@ struct recal_info {
 	double total_miss;				//Total misses
 	uint32_t total_bases;				//Total bases
 	double total_delta;			//Global delta
+	double total_estimated_Q;	//Global estimated Quality
 
 	double* qual_miss;				//Misses per quality
     uint32_t* qual_bases;				//Bases per quality

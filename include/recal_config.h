@@ -30,7 +30,7 @@
 #define NOT_PRIMARY_ALIGNMENT
 //#define CHECK_DUPLICATES
 
-#define INDEL_SUPPRESSION_BUFFER_SIZE 200
+//#define D_MAX_READS_W 1000
 
 /**
  * BAM management

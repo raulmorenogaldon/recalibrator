@@ -255,28 +255,6 @@ recal_calc_deltas(recal_info_t* data)
 
 	printf("Processing deltas...\n");
 
-	//Global delta
-	//data->total_miss = 11;
-	//global_empirical = (double)(data->total_miss) / (double)(data->total_bases);
-	//phred = 0.0;
-	//sum_errors = 0.0;
-	//for(i = 0; i < data->num_quals; i++)
-	{
-		//if(data->min_qual + i != 0)
-		{
-			//err0 = 1.0 / (10.0 * log10(data->min_qual + i + 1));
-			//err0 = 1.0 / ((double)(data->min_qual + i));
-			//err0 = Pvalue((double)(/*data->min_qual +*/ i));
-			//phred += err0 * ((double)data->qual_bases[i] - 1.0);
-		}
-	}
-	//phred = phred / (double)data->total_bases;
-	//int calidad_phred =  Qvalue(phred);
-	//int calidad_global = Qvalue(global_empirical);
-	//estimated_Q = Qvalue(sum_errors / (double)data->total_bases);
-
-	//data->total_delta = Qvalue(global_empirical) - Qvalue(phred);
-
 	//Estimated Q
 	recal_get_estimated_Q(data->qual_bases, data->num_quals, (uint8_t)0, &estimated_Q);
 
@@ -284,6 +262,7 @@ recal_calc_deltas(recal_info_t* data)
 	recal_get_empirical_Q(data->total_miss, data->total_bases, estimated_Q, &emp_Q);
 
 	//Calc global delta
+	data->total_estimated_Q = estimated_Q;
 	data->total_delta = emp_Q - estimated_Q;
 	printf("Estimated %.2f \tEmpirical %.2f \t TotalDelta %.2f\n", estimated_Q, emp_Q, data->total_delta);
 
@@ -481,8 +460,8 @@ recal_fprint_info(const recal_info_t *data, const char *path)
 	printf("\n----------------\nPrinting data on \"%s\" file...\n----------------\n", path);
 
 	//Print general info
-	fprintf(fp, "==============================\nGENERAL: \nTotal miss: %lu\nTotal bases: %lu\nTotal delta: %.2f\n",
-			(long unsigned int)data->total_miss, (long unsigned int)data->total_bases, (float)data->total_delta);
+	fprintf(fp, "==============================\nGENERAL: \nTotal miss: %lu\nTotal bases: %lu\nTotal delta: %.2f\nEstimated Q: %.2f\n",
+			(long unsigned int)data->total_miss, (long unsigned int)data->total_bases, (float)data->total_delta, (float)data->total_estimated_Q);
 
 	//Print quality infos
 	fprintf(fp, "==============================\nQUAL VECTOR:\n");
@@ -578,6 +557,7 @@ recal_save_recal_info(const recal_info_t *data, const char *path)
 
 	fwrite(data, sizeof(uint8_t), 1, fp);
 	fwrite(data, sizeof(uint32_t), 3, fp);
+	fwrite(data, sizeof(double), 1, fp);
 
 	//Save total counters
 	fwrite(&data->total_miss, sizeof(double), 1, fp);
@@ -618,6 +598,7 @@ recal_load_recal_info(const char *path, recal_info_t *data)
 
 	fread(data, sizeof(uint8_t), 1, fp);
 	fread(data, sizeof(uint32_t), 3, fp);
+	fread(data, sizeof(double), 1, fp);
 
 	//Read total counters
 	fread(&data->total_miss, sizeof(double), 1, fp);
