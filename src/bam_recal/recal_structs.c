@@ -123,7 +123,7 @@ recal_get_data_destroy_env(recal_data_collect_env_t *collect_env)
  * Add recalibration data from one base.
  */
 ERROR_CODE
-recal_add_base(recal_info_t *data, const uint8_t qual, const uint16_t cycle, const uint8_t dinuc, const double match)
+recal_add_base(recal_info_t *data, const char qual, const uint32_t cycle, const char dinuc, const double match)
 {
 	int qual_index = qual - data->min_qual;
 	int qual_cycle_index = qual_index * data->num_cycles + cycle;
@@ -184,7 +184,7 @@ recal_add_base(recal_info_t *data, const uint8_t qual, const uint16_t cycle, con
  * Add recalibration data from vector of bases
  */
 ERROR_CODE
-recal_add_base_v(recal_info_t *data, const uint8_t *seq, const uint8_t *quals, const uint16_t init_cycle, const uint32_t num_cycles, const uint8_t *dinuc, const uint8_t *matches)
+recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const uint16_t init_cycle, const uint32_t num_cycles, const char *dinuc, const char *matches)
 {
 	int i;
 	uint32_t cycles;

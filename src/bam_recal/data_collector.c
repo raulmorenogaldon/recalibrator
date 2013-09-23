@@ -50,6 +50,7 @@ ERROR_CODE
 recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t* output_data)
 {
 	bam_batch_t* batch;
+	ERROR_CODE err;
 
 	//Duplicate check
 	char *last_seq;
@@ -97,8 +98,6 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 
 	printf("\nNum alignments in batchs: %d\n----------------\n", batch->num_alignments);
 
-
-
 	#ifdef USE_BATCH_POOL
 	printf("Using batch pool!\n");
 	pool = pool_new(3, MAX_BATCH_SIZE);
@@ -136,10 +135,13 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 		#ifdef D_TIME_DEBUG
 			time_init_slot(D_SLOT_GET_DATA_BATCH, clock(), TIME_GLOBAL_STATS);
 		#endif
-		recal_get_data_from_bam_batch(batch, ref, output_data);
+		err = recal_get_data_from_bam_batch(batch, ref, output_data);
 		#ifdef D_TIME_DEBUG
 			time_set_slot(D_SLOT_GET_DATA_BATCH, clock(), TIME_GLOBAL_STATS);
 		#endif
+
+		if(err)
+			printf("ERROR (recal_get_data_from_bam_batch): %d\n", err);
 
 		//Update read counter
 		count += batch->num_alignments;
@@ -211,9 +213,10 @@ recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, rec
 	//CHECK ARGUMENTS
 	{
 		//Check nulls
-		if(!batch || !ref || !output_data || !collect_env)
+		if(!batch || !ref || !output_data)
+		{
 			return INVALID_INPUT_PARAMS_NULL;
-
+		}
 	}
 
 	//Initialize get data environment
