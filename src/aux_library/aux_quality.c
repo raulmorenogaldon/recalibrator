@@ -4,6 +4,9 @@
  * QUALITY OPERATIONS
  **************************/
 
+/**
+ * Obtains estimated global quality from a vector of bases.
+ */
 ERROR_CODE
 recal_get_estimated_Q(uint32_t *v_bases, uint32_t count, uint8_t start_quality, double *estimated_Q)
 {
@@ -17,23 +20,29 @@ recal_get_estimated_Q(uint32_t *v_bases, uint32_t count, uint8_t start_quality, 
 	total_sum = 0.0;
 	total_bases = 0.0;
 
+	//Obtains global base count and error count
 	for(i = count-1; i >= 0; i--)
 	{
-		quality = (uint8_t)i + start_quality;
-		err0 = (double)v_bases[i] * pow(10.0, (-((double)quality)*0.1));
+		quality = (uint8_t)i + start_quality;	/* Get quality for this component*/
+		err0 = (double)v_bases[i] * pow(10.0, (-((double)quality)*0.1));	/* Calculate error based in count of bases and what quality have */
+		//Increment global counters
 		total_sum += err0;
 		total_bases = total_bases + v_bases[i];
 	}
 
-	//Calc estimated Q
+	//Calculate estimated global probability
 	aux = total_sum / (double)total_bases;
 
+	//Obtain quality from probability
 	aux = Qvalue(aux);
-	*estimated_Q = aux;
+	*estimated_Q = aux;	/* Set estimated global quality in result pointer */
 
 	return NO_ERROR;
 }
 
+/**
+ * Obtains empirical quality from a count of bases and misses and a theorical quality.
+ */
 ERROR_CODE
 recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, double *emp_qual)
 {
@@ -80,6 +89,9 @@ recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, doubl
 	return NO_ERROR;
 }
 
+/**
+ * Obtains how much one empirical quality approximates one theorical quality, expressed by logarithm.
+ */
 ERROR_CODE
 log10_Qemp_Reported(double Qemp, double Qreported, double *log)
 {
@@ -104,6 +116,10 @@ log10_Qemp_Reported(double Qemp, double Qreported, double *log)
 	return NO_ERROR;
 }
 
+/**
+ * Obtains how much one empirical quality approximates one theorical quality expressed by a count of observations and errors.
+ * Result is expressed by a logarithm.
+ */
 ERROR_CODE
 log10_Qemp_likelihood(double Qemp, uint32_t obs, uint32_t err, double *log)
 {

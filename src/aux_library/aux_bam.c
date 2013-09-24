@@ -98,6 +98,9 @@ init_empty_bam_header(const unsigned int num_chroms, bam_header_t *header)
 	return NO_ERROR;
 }
 
+/**
+ * Get string containing bam1 sequence nucleotides.
+ */
 char *
 new_sequence_from_bam(bam1_t *bam1)
 {
@@ -135,6 +138,9 @@ new_sequence_from_bam(bam1_t *bam1)
 	return seq;
 }
 
+/**
+ * Get string containing bam1 sequence nucleotides.
+ */
 ERROR_CODE
 new_sequence_from_bam_ref(bam1_t *bam1, char *seq, uint32_t max_l)
 {
@@ -173,6 +179,9 @@ new_sequence_from_bam_ref(bam1_t *bam1, char *seq, uint32_t max_l)
 	return NO_ERROR;
 }
 
+/**
+ * Get string containing bam1 quality for every nucleotide.
+ */
 char *
 new_quality_from_bam(bam1_t *bam1, int base_quality)
 {
@@ -187,6 +196,9 @@ new_quality_from_bam(bam1_t *bam1, int base_quality)
 	return qual;
 }
 
+/**
+ * Get string containing bam1 quality for every nucleotide.
+ */
 ERROR_CODE
 new_quality_from_bam_ref(bam1_t *bam1, int base_quality, char *qual, uint32_t max_l)
 {
@@ -203,6 +215,9 @@ new_quality_from_bam_ref(bam1_t *bam1, int base_quality, char *qual, uint32_t ma
 	return NO_ERROR;
 }
 
+/**
+ * Decomponse a string cigar in two vectors, containing number of ocurrences for every cigar operation (I, D, =, M, etc..)
+ */
 ERROR_CODE
 decompose_cigar(char *cigar, uint8_t cigar_l, char *n_elem, char *type, uint8_t *types_l, uint8_t max_types_length)
 {
@@ -319,6 +334,9 @@ supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uin
 	return NO_ERROR;
 }
 
+/**
+ * Get sequence and quality vector supressing insertions and adding deletions.
+ */
 ERROR_CODE
 supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cigar, uint16_t cigar_l, char *seq_res, char *qual_res, uint32_t *seq_res_l, uint32_t max_res_l)
 {

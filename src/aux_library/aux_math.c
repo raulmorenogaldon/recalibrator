@@ -90,6 +90,9 @@ Psanger(double Q)
 	return ret;
 }
 
+/**
+ * Return evaluation of gaussian function.
+ */
 double
 gaussian_function(double value, double a, double b, double c, double d)
 {
@@ -97,7 +100,7 @@ gaussian_function(double value, double a, double b, double c, double d)
 }
 
 /**
- * Approximation for log10 n!
+ * Return approximation for log10(n!)
  */
 double
 log10_gamma(uint32_t n)

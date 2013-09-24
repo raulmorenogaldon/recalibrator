@@ -19,6 +19,9 @@ initialize_vector(uint32_t *vector, const size_t size, const uint32_t value)
 	return NO_ERROR;
 }
 
+/**
+ * Return vector of integers with initial values.
+ */
 ERROR_CODE
 new_vector_uint32(const size_t size, const uint32_t value, uint32_t **out_vector)
 {
@@ -70,6 +73,9 @@ new_vector_double(const size_t size, const double value, double **out_vector)
 	return NO_ERROR;
 }
 
+/**
+ * Return vector of double with initial values.
+ */
 ERROR_CODE
 max_value(double *vector, size_t size, double *max)
 {
@@ -89,6 +95,9 @@ max_value(double *vector, size_t size, double *max)
 	return NO_ERROR;
 }
 
+/**
+ * Get component index of vector max value.
+ */
 ERROR_CODE
 max_index(double *vector, size_t size, uint16_t *max_i)
 {
