@@ -11,7 +11,7 @@
  */
 
 /**
- * Allocate new recalibration data.
+ * Initialize empty recalibration data struct.
  */
 ERROR_CODE
 recal_init_info(const uint32_t cycles, recal_info_t **out_data)
@@ -53,7 +53,7 @@ recal_init_info(const uint32_t cycles, recal_info_t **out_data)
 }
 
 /**
- * Free recalibration data.
+ * Free all resources of recalibration.
  */
 ERROR_CODE
 recal_destroy_info(recal_info_t **data)
@@ -82,6 +82,9 @@ recal_destroy_info(recal_info_t **data)
 	return NO_ERROR;
 }
 
+/**
+ * Initialize empty data collection environment struct.
+ */
 ERROR_CODE
 recal_get_data_init_env(const uint32_t cycles, recal_data_collect_env_t *collect_env)
 {
@@ -102,6 +105,9 @@ recal_get_data_init_env(const uint32_t cycles, recal_data_collect_env_t *collect
 	return NO_ERROR;
 }
 
+/**
+ * Free all resources of data collect environment.
+ */
 ERROR_CODE
 recal_get_data_destroy_env(recal_data_collect_env_t *collect_env)
 {
@@ -119,6 +125,9 @@ recal_get_data_destroy_env(recal_data_collect_env_t *collect_env)
 	return NO_ERROR;
 }
 
+/**
+ * Initialize empty recalibration environment struct.
+ */
 ERROR_CODE
 recal_recalibration_init_env(const uint32_t cycles, recal_recalibration_env_t *recalibration_env)
 {
@@ -134,6 +143,9 @@ recal_recalibration_init_env(const uint32_t cycles, recal_recalibration_env_t *r
 	return NO_ERROR;
 }
 
+/**
+ * Free all resources of recalibration environment.
+ */
 ERROR_CODE
 recal_recalibration_destroy_env(recal_recalibration_env_t *recalibration_env)
 {

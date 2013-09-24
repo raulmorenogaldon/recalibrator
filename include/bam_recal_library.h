@@ -21,7 +21,19 @@
  * This struct hold all data necessary to perform recalibrations.
  */
 struct recal_info;
+
+/**
+ * \brief Data collect environment storage.
+ *
+ * This struct hold all environment necessary to perform data collection.
+ */
 struct data_collect_env;
+
+/**
+ * \brief Recalibration environment storage.
+ *
+ * This struct hold all environment necessary to perform recalibration.
+ */
 struct recalibration_env;
 typedef struct recal_info recal_info_t;
 typedef struct data_collect_env recal_data_collect_env_t;
@@ -75,12 +87,38 @@ EXTERNC ERROR_CODE recal_init_info(const uint32_t cycles, recal_info_t **out_dat
  */
 EXTERNC ERROR_CODE recal_destroy_info(recal_info_t **data);
 
+/**
+ * \brief Initialize empty data collection environment struct.
+ *
+ * \param cycles Number of maximum cycles to handle.
+ * \param collect_env Previously allocated info struct to initialize.
+ */
 EXTERNC ERROR_CODE recal_get_data_init_env(const uint32_t cycles, recal_data_collect_env_t *collect_env);
 
+/**
+ * \brief Free all resources of data collect environment.
+ *
+ * Free all data struct attributes including itself at the end.
+ *
+ * \param data Data collect struct to free
+ */
 EXTERNC ERROR_CODE recal_get_data_destroy_env(recal_data_collect_env_t *collect_env);
 
+/**
+ * \brief Initialize empty recalibration environment struct.
+ *
+ * \param cycles Number of maximum cycles to handle.
+ * \param recalibration_env Previously allocated info struct to initialize.
+ */
 EXTERNC ERROR_CODE recal_recalibration_init_env(const uint32_t cycles, recal_recalibration_env_t *recalibration_env);
 
+/**
+ * \brief Free all resources of recalibration environment.
+ *
+ * Free all data struct attributes including itself at the end.
+ *
+ * \param data Recalibration environment struct to free
+ */
 EXTERNC ERROR_CODE recal_recalibration_destroy_env(recal_recalibration_env_t *recalibration_env);
 
 /**
@@ -90,19 +128,22 @@ EXTERNC ERROR_CODE recal_recalibration_destroy_env(recal_recalibration_env_t *re
  * \param qual Quality to add.
  * \param cycle Cycle to add.
  * \param dinuc Dinucleotide to add.
- * \param miss Indicate if match(!=0) or not (0)
+ * \param match Indicate if match(!=0) or not (0)
  */
 EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const char qual, const uint32_t cycle, const char dinuc, const double match) __ATTR_HOT;
 
 /**
  * \brief Add recalibration data from vector of bases.
  *
+ * Function checks if sequence nucleotides are valid.
+ *
  * \param data Vector of data structs to add stats.
- * \param qual Vector of qualities to add.
- * \param cycle Init cycle to add.
- * \param cycle End cycles to add.
+ * \param seq Sequence vector.
+ * \param quals Qualities vector to add.
+ * \param init_cycle Init cycle to add.
+ * \param num_cycles Number of cycles to add.
  * \param dinuc Vector of dinucleotides to add.
- * \param miss Vector of match(!=0) or not (0)
+ * \param matches Vector of match(!=0) or not (0)
  */
 EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const uint16_t init_cycle, const uint32_t num_cycles, const char *dinuc, const char *matches) __ATTR_HOT;
 
@@ -166,6 +207,7 @@ EXTERNC ERROR_CODE recal_get_data_from_bam_batch(const bam_batch_t* batch, const
  * \param batch BAM alignment struct to process.
  * \param ref Reference genome struct.
  * \param out_info Data struct to fill.
+ * \param collect_env Enviroment struct neccessary for data collection.
  */
 EXTERNC ERROR_CODE recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal_info_t* output_data, recal_data_collect_env_t *collect_env) __ATTR_HOT;
 
@@ -206,6 +248,7 @@ EXTERNC ERROR_CODE recal_recalibrate_batch(const bam_batch_t* batch, const recal
  * \param alig BAM alignment struct to recalibrate.
  * \param bam_info Data struct with recalibration info.
  * \param recal_bam_f Recalibrated BAM output file struct.
+ * \param recalibration_env Enviroment struct neccessary for data collection.
  */
 EXTERNC ERROR_CODE recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, bam_file_t *recal_bam_f, recal_recalibration_env_t *recalibration_env) __ATTR_HOT;
 
