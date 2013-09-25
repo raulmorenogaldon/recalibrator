@@ -161,7 +161,7 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 		#ifndef USE_BATCH_POOL
 		bam_batch_free(batch, 1);
 		#endif
-		batch = bam_batch_new(MAX_BATCH_SIZE, MULTIPLE_CHROM_BATCH);
+		batch = bam_batch_new(MAX_BATCH_SIZE, SINGLE_CHROM_BATCH);
 
 		//Read batch
 		#ifdef D_TIME_DEBUG
@@ -205,7 +205,22 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 ERROR_CODE
 recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, recal_info_t* output_data)
 {
-	int i;
+	int i, j;
+
+	//Batch splitting
+	bam_batch_t *current_batch;
+	bam_batch_t *v_batchs;
+	size_t batchs_l;
+
+	//Auxiliar alignments
+	bam1_t *first_alig;
+	bam1_t *last_alig;
+	uint32_t flag;
+
+	//Reference sequence
+	char *reference;
+	size_t ref_pos;
+	size_t ref_last_pos;
 
 	//Get data environment
 	recal_data_collect_env_t *collect_env;
@@ -223,21 +238,62 @@ recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, rec
 	collect_env = (recal_data_collect_env_t *) malloc(sizeof(recal_data_collect_env_t));
 	recal_get_data_init_env(output_data->num_cycles, collect_env);
 
-	//Process all alignments of the batchs
-	for(i = 0; i < batch->num_alignments; i++)
+	//Obtain first and last alignment
+	first_alig = batch->alignments_p[0];
+	last_alig = batch->alignments_p[batch->num_alignments - 1];
+
+	//Obtain reference position and length
+	ref_pos = first_alig->core.pos + 1;
+	ref_last_pos = last_alig->core.pos + last_alig->core.l_qseq;
+
+	//Obtain reference for this 100 nucleotides
+	flag = (uint32_t) first_alig->core.flag;
+
+	//Obtain reference
+	//reference = (char *)_mm_malloc(sizeof(char) * ref_last_pos - ref_pos + 1000, MEM_ALIG_SIZE);
+	//genome_read_sequence_by_chr_index(reference, (flag & BAM_FREVERSE) ? 1 : 0, (unsigned int)first_alig->core.tid, &ref_pos, &ref_last_pos, ref);
+
+	printf("Number alignments in original batch: %d\n", batch->num_alignments);
+
+	//Get number of chroms in this batch
+	//TODO: chrom count function
+
+	//Split batchs
+	v_batchs = (bam_batch_t *) malloc(sizeof(bam_batch_t) * 30);
+	batch_split_by_chrom(batch, v_batchs, &batchs_l, 30);
+
+	printf("Number of splitted batchs: %d\n", batchs_l);
+
+	//Process every batch
+	for(j = 0; j < batchs_l; j++)
 	{
-		#ifdef D_TIME_DEBUG
-			time_init_slot(D_SLOT_GET_DATA_ALIG, clock(), TIME_GLOBAL_STATS);
-		#endif
-		//Recollection
-		recal_get_data_from_bam_alignment(batch->alignments_p[i], ref, output_data, collect_env);
-		#ifdef D_TIME_DEBUG
-			time_set_slot(D_SLOT_GET_DATA_ALIG, clock(), TIME_GLOBAL_STATS);
-		#endif
+		//Get next branch
+		current_batch = &v_batchs[j];
+		//printf("BATCH %d: Chrom = %d, Aligs = %d, Startpos: %d\n", j, current_batch->alignments_p[0]->core.tid, current_batch->num_alignments, current_batch->alignments_p[0]->core.pos);
+
+		//Process all alignments of the batch
+		for(i = 0; i < current_batch->num_alignments; i++)
+		{
+			#ifdef D_TIME_DEBUG
+				time_init_slot(D_SLOT_GET_DATA_ALIG, clock(), TIME_GLOBAL_STATS);
+			#endif
+				//printf("-%d \t\t%d\n", current_batch->alignments_p[i]->core.pos, current_batch->alignments_p[i]->core.tid);
+			//Recollection
+			recal_get_data_from_bam_alignment(current_batch->alignments_p[i], ref, output_data, collect_env);
+			#ifdef D_TIME_DEBUG
+				time_set_slot(D_SLOT_GET_DATA_ALIG, clock(), TIME_GLOBAL_STATS);
+			#endif
+		}
+		free(current_batch->alignments_p);
 	}
+
+	free(v_batchs);
 
 	//Destroy environment
 	recal_get_data_destroy_env(collect_env);
+
+	//Destroy reference
+	//_mm_free(reference);
 
 	return NO_ERROR;
 }

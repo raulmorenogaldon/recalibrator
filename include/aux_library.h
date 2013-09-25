@@ -10,6 +10,7 @@
 
 //#include "bam_recal_library.h"
 #include "bam.h"
+#include "bam_file.h"
 
 /***************************
  * MATH OPERATIONS
@@ -182,6 +183,8 @@ EXTERNC ERROR_CODE supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, ch
  * \param max_res_l Maximum number of components result vectors can handle.
  */
 EXTERNC ERROR_CODE supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cigar, uint16_t cigar_l, char *seq_res, char *qual_res, uint32_t *seq_res_l, uint32_t max_res_l);
+
+EXTERNC ERROR_CODE batch_split_by_chrom(bam_batch_t *batch, bam_batch_t *v_batchs, size_t *res_batch_l, size_t max_res_batchs);
 
 /***************************
  * VECTOR OPERATIONS

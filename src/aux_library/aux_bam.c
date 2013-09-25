@@ -1,4 +1,5 @@
 #include "aux_bam.h"
+#include <assert.h>
 
 ERROR_CODE
 compare_bams_qual(const char* bamPath0, const char* bamPath1, const int cycles)
@@ -408,6 +409,77 @@ supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cig
 	//Set string null character in last position
 	seq_res[res_i] = '\0';
 	qual_res[res_i] = '\0';
+
+	return NO_ERROR;
+}
+
+ERROR_CODE
+batch_split_by_chrom(bam_batch_t *batch, bam_batch_t *v_batchs, size_t *res_batch_l, size_t max_res_batchs)
+{
+	int32_t last_chrom;
+	int32_t actual_chrom;
+	int i;
+
+	bam_batch_t *actual_batch;
+	int actual_batch_i;
+	size_t count;
+
+	//CHECK PARAMS
+	{
+		if(!batch || !v_batchs || !res_batch_l || max_res_batchs == 0)
+			return INVALID_INPUT_PARAMS_NULL;
+	}
+
+	//Fill batchs
+	actual_batch_i = 0;
+	actual_batch = v_batchs;
+	actual_chrom = -1;
+	last_chrom = batch->alignments_p[0]->core.tid;
+	count = 0;
+	for(i = 0; i < batch->num_alignments; i++)
+	{
+		//Get next alignment chrom id
+		actual_chrom = batch->alignments_p[i]->core.tid;
+
+		//Check alignment chrom
+		if(actual_chrom != last_chrom)
+		{
+			//Check valid count
+			assert(count != 0);
+
+			//Copy alignments to new batch
+			actual_batch->alignments_p = (bam1_t **) malloc(sizeof(bam1_t *) * count);
+			actual_batch->num_alignments = count;
+			actual_batch->allocated_alignments = count;
+			memcpy(actual_batch->alignments_p, &batch->alignments_p[i - count], count * sizeof(bam1_t*));
+			//memset(&batch->alignments_p[i - count - 1], NULL, sizeof(bam1_t *) * count);	/* Set NULL in original batch */
+			count = 0;
+
+			//Set last chrom
+			last_chrom = actual_chrom;
+			actual_batch_i++;
+			assert(actual_batch_i < max_res_batchs);	/* This must not happen */
+
+			//Initialize batch
+			actual_batch = &v_batchs[actual_batch_i];
+			actual_batch->type = SINGLE_CHROM_BATCH;
+			actual_batch->allocated_alignments = 0;
+			actual_batch->num_alignments = 0;
+		}
+
+		//Count alignments for this batch
+		count++;
+	}
+
+	//Copy alignments to new batch
+	actual_batch->alignments_p = (bam1_t **) malloc(sizeof(bam1_t *) * count);
+	actual_batch->num_alignments = count;
+	actual_batch->allocated_alignments = count;
+	memcpy(actual_batch->alignments_p, &batch->alignments_p[i - count], count * sizeof(bam1_t*));
+	//memset(&batch->alignments_p[i - count - 1], NULL, sizeof(bam1_t *) * count);	/* Set NULL in original batch */
+
+	//Set number of result batchs
+	*res_batch_l = actual_batch_i + 1;
 
 	return NO_ERROR;
 }
