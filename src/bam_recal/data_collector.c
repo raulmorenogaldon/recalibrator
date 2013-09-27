@@ -410,8 +410,9 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	//Iterates nucleotides in this read
 	for(i = 0; i < bam_seq_l; i++)
 	{
-		/*#ifdef __SSE2__ //SSE Block
-		if( (i + 16) < alig->core.l_qseq)
+#ifdef USE_SSE
+		//#ifdef __SSE2__ //SSE Block
+		if( (i + 16) < bam_seq_l)
 		{
 			//Use SSE
 			//_mm_prefetch(&ref_seq[i + 16], _MM_HINT_T0);
@@ -430,7 +431,7 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 			i += 15;
 		}
 		else
-		#endif //SSE Block*/
+#endif //SSE Block
 		{
 			if(ref_seq[i] != bam_seq[i])
 			{

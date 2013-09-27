@@ -31,6 +31,7 @@ recal_init_info(const uint32_t cycles, recal_info_t **out_data)
 	data->total_miss = 0.0;
 	data->total_bases = 0;
 	data->total_delta = 0.0;
+	data->total_estimated_Q = 0.0;
 
 	//Quality vectors
 	new_vector_double(vector_size, 0.0, &(data->qual_miss));

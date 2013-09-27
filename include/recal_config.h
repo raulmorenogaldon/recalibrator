@@ -30,6 +30,7 @@
 #define NOT_PRIMARY_ALIGNMENT
 //#define CHECK_DUPLICATES
 //#define SPLIT_BATCHS_BY_CHROM
+#define USE_SSE
 
 //#define D_MAX_READS_W 1000
 
