@@ -29,6 +29,7 @@
 #define NOT_MAPPING_QUAL_ZERO //Reads with map score of 0 wont be stated
 #define NOT_PRIMARY_ALIGNMENT
 //#define CHECK_DUPLICATES
+//#define SPLIT_BATCHS_BY_CHROM
 
 //#define D_MAX_READS_W 1000
 
