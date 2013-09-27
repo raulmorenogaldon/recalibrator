@@ -414,6 +414,41 @@ supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cig
 }
 
 ERROR_CODE
+batch_count_chroms(bam_batch_t *batch, size_t *chrom_l)
+{
+	int i;
+	int32_t last_chrom;
+	int32_t actual_chrom;
+	size_t result;
+
+	//CHECK PARAMS
+	{
+		if(!batch || !chrom_l)
+			return INVALID_INPUT_PARAMS_NULL;
+	}
+
+	last_chrom = -1;
+	result = 0;
+	for(i = 0; i < batch->num_alignments; i++)
+	{
+		//Set actual chrom
+		actual_chrom = batch->alignments_p[i]->core.tid;
+
+		//Count chroms
+		if(actual_chrom != last_chrom)
+		{
+			last_chrom = actual_chrom;
+			result++;
+		}
+	}
+
+	//Set result
+	*chrom_l = result;
+
+	return NO_ERROR;
+}
+
+ERROR_CODE
 batch_split_by_chrom(bam_batch_t *batch, bam_batch_t *v_batchs, size_t *res_batch_l, size_t max_res_batchs)
 {
 	int32_t last_chrom;
