@@ -26,11 +26,11 @@ recal_recalibrate_bam_file(const char *orig_bam_path, const recal_info_t *bam_in
 
 	//Recalibrate bams
 	#ifdef D_TIME_DEBUG
-		time_init_slot(D_SLOT_RECALIBRATE, clock(), TIME_GLOBAL_STATS);
+		time_init_slot(D_SLOT_RECALIBRATE, TIME_GLOBAL_STATS);
 	#endif
 	recal_recalibrate_bam(orig_bam_f, bam_info, recal_bam_f);
 	#ifdef D_TIME_DEBUG
-		time_set_slot(D_SLOT_RECALIBRATE, clock(), TIME_GLOBAL_STATS);
+		time_set_slot(D_SLOT_RECALIBRATE, TIME_GLOBAL_STATS);
 	#endif
 
 	//Memory free
@@ -156,14 +156,14 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info, 
 	for(i = 0; i < batch->num_alignments; i++)
 	{
 		#ifdef D_TIME_DEBUG
-		time_init_slot(D_SLOT_RECAL_ALIG, clock(), TIME_GLOBAL_STATS);
+		time_init_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS);
 		#endif
 		//Process every alignment
 		err = recal_recalibrate_alignment(batch->alignments_p[i], bam_info, recal_bam_f, recalibration_env);
 		if(err)
 			printf("ERROR (recal_recalibrate_alignment): %d\n", err);
 		#ifdef D_TIME_DEBUG
-		time_set_slot(D_SLOT_RECAL_ALIG, clock(), TIME_GLOBAL_STATS);
+		time_set_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS);
 		#endif
 	}
 

@@ -30,6 +30,7 @@ AC_CHECK_LIB([pthread],[pthread_mutex_init])
 AC_CHECK_LIB([cprops],[cp_mempool_alloc])
 AC_CHECK_LIB([openmp],[omp_num_threads])
 AC_CHECK_LIB([argtable2],[arg_lit0])
+AC_CHECK_LIB([rt],[clock_gettime])
 #AC_CHECK_LIB([common],[init_log], , [AC_MSG_ERROR([Please, set a valid common-libs path in configure LDFLAGS parameters. Ex: ./configure LDFLAGS="-L/common-libs/"])])
 #AC_CHECK_LIB([bioinfo],[alignment_new], , [AC_MSG_ERROR([Please, set a valid bioinfo-libs path in configure LDFLAGS parameters. Ex: ./configure LDFLAGS="-L/bioinfo-libs/"])])
 
