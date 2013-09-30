@@ -11,6 +11,8 @@
 #include <bam_recal_library.h>
 #include <timestats.h>
 
+#include <omp.h>
+
 
 #include "alignment.h"
 #include "recal_structs.h"

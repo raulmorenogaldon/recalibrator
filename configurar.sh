@@ -2,7 +2,7 @@
 
 ./configure 	--prefix=/home/rmoreno/recalibrator \
 				--with-opencb=/home/rmoreno/workspace/OpenCB/ \
-				CFLAGS="-O0 -g -pg -std=c99 -Wall -D_REENTRANT -D_XOPEN_SOURCE=600 -fPIC"	
+				CFLAGS="-O0 -g -pg -std=c99 -Wall -D_REENTRANT -D_XOPEN_SOURCE=600 -fPIC -fopenmp"
 				
 #./configure 	--prefix=/home/rmoreno/recalibrator \
 #				--with-opencb=/home/rmoreno/workspace/OpenCB/ \

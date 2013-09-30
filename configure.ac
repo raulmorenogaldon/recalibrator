@@ -14,6 +14,7 @@ AM_INIT_AUTOMAKE
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_MAKE_SET
+AC_OPENMP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_LIBTOOL
@@ -28,7 +29,6 @@ AC_CHECK_LIB([m],[cos])
 AC_CHECK_LIB([xml2],[xmlStrPrintf])
 AC_CHECK_LIB([pthread],[pthread_mutex_init])
 AC_CHECK_LIB([cprops],[cp_mempool_alloc])
-AC_CHECK_LIB([openmp],[omp_num_threads])
 AC_CHECK_LIB([argtable2],[arg_lit0])
 AC_CHECK_LIB([rt],[clock_gettime])
 #AC_CHECK_LIB([common],[init_log], , [AC_MSG_ERROR([Please, set a valid common-libs path in configure LDFLAGS parameters. Ex: ./configure LDFLAGS="-L/common-libs/"])])

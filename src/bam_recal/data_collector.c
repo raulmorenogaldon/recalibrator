@@ -225,6 +225,13 @@ recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, rec
 		}
 	}
 
+	omp_set_num_threads(4);
+
+	#pragma omp parallel private(collect_env, current_batch)
+	{
+		if(omp_get_thread_num() == 0)
+		printf("THREADS: %d\n", omp_get_num_threads());
+
 	//Initialize get data environment
 	collect_env = (recal_data_collect_env_t *) malloc(sizeof(recal_data_collect_env_t));
 	recal_get_data_init_env(output_data->num_cycles, collect_env);
@@ -252,12 +259,12 @@ recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, rec
 		//printf("BATCH %d: Chrom = %d, Aligs = %d, Startpos: %d\n", j, current_batch->alignments_p[0]->core.tid, current_batch->num_alignments, current_batch->alignments_p[0]->core.pos);
 #endif
 		//Process all alignments of the batch
+		#pragma omp for
 		for(i = 0; i < current_batch->num_alignments; i++)
 		{
 			#ifdef D_TIME_DEBUG
 				time_init_slot(D_SLOT_GET_DATA_ALIG, TIME_GLOBAL_STATS);
 			#endif
-				//printf("-%d \t\t%d\n", current_batch->alignments_p[i]->core.pos, current_batch->alignments_p[i]->core.tid);
 			//Recollection
 			recal_get_data_from_bam_alignment(current_batch->alignments_p[i], ref, output_data, collect_env);
 			#ifdef D_TIME_DEBUG
@@ -274,6 +281,8 @@ recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, rec
 
 	//Destroy environment
 	recal_get_data_destroy_env(collect_env);
+
+	}
 
 	//Destroy reference
 	//_mm_free(reference);
@@ -407,7 +416,6 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 
 	genome_read_sequence_by_chr_index(ref_seq, (flag & BAM_FREVERSE) ? 1 : 0, (unsigned int)alig->core.tid, &init_pos, &end_pos, ref);
 
-	time_init_slot(8, TIME_GLOBAL_STATS);
 	//Iterates nucleotides in this read
 	for(i = 0; i < bam_seq_l; i++)
 	{
@@ -444,7 +452,6 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 			}
 		}
 	}
-	time_set_slot(8, TIME_GLOBAL_STATS);
 
 	//Dinucs
 	for(i = 0; i < bam_seq_l; i++)
