@@ -1,7 +1,8 @@
 #ifndef BAM_RECAL_H_
 #define BAM_RECAL_H_
 
-#include <pthread.h>
+//#include <pthread.h>
+#include <omp.h>
 
 #include <bam_file.h>
 #include <recal_common.h>
@@ -16,8 +17,15 @@
  * BAM RECALIBRATION PHASE 2 - RECALIBRATION
  **********************************************/
 
+typedef struct batch_out{
+	bam_batch_t *batch;
+	recal_info_t *info;
+} batch_out_t;
+
 /**
  * Private functions
  */
+void * recal_batch_thread(void * args);
+
 
 #endif /* BAM_RECAL_H_ */

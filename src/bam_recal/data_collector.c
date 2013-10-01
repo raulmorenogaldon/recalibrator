@@ -61,10 +61,6 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 	//Number alignment readed
 	int count = 0;
 
-	#ifdef USE_BATCH_POOL
-	bam_pool_t* pool;
-	#endif
-
 	unmapped = 0;
 	duplicated = 0;
 	#ifdef NOT_PRIMARY_ALIGNMENT
@@ -98,11 +94,6 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 
 	printf("\nNum alignments in batchs: %d\n----------------\n", batch->num_alignments);
 
-	#ifdef USE_BATCH_POOL
-	printf("Using batch pool!\n");
-	pool = pool_new(3, MAX_BATCH_SIZE);
-	#endif
-
 	#ifdef CHECK_DUPLICATES
 		ult_seq = (char *)malloc(sizeof(char) * output_data->num_cycles);
 	#endif
@@ -113,24 +104,6 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 		#endif
 		)
 	{
-		#ifdef USE_BATCH_POOL
-		while(!pool_has_free_batchs(pool));
-		{
-			#ifdef D_TIME_DEBUG
-				time_init_slot(D_SLOT_MEMCOPY_BATCH, clock(), time_global_stats);
-			#endif
-			pool_add_batch(batch, pool);
-			bam_batch_free(batch, 1);
-
-			//Get batch in pool
-			pool_next_batch(pool);
-			batch = pool_get_batch(pool);
-			#ifdef D_TIME_DEBUG
-				time_set_slot(D_SLOT_MEMCOPY_BATCH, clock(), time_global_stats);
-			#endif
-		}
-		#endif
-
 		//Process batch
 		#ifdef D_TIME_DEBUG
 			time_init_slot(D_SLOT_GET_DATA_BATCH, TIME_GLOBAL_STATS);
@@ -158,9 +131,6 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 		pos_last_seq = last_alig->core.pos;
 
 		//Free memory and take a new batch
-		#ifndef USE_BATCH_POOL
-		bam_batch_free(batch, 1);
-		#endif
 		batch = bam_batch_new(MAX_BATCH_SIZE, SINGLE_CHROM_BATCH);
 
 		//Read batch
@@ -184,10 +154,6 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 	printf("\n%d alignments with map quality zero.", mapzero);
 	#endif
 	printf("\n%d alignments unmapped.", unmapped);
-
-	#ifdef USE_BATCH_POOL
-		pool_free(pool);
-	#endif
 
 	//Free batch
 	bam_batch_free(batch, 1);

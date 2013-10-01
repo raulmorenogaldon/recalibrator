@@ -184,14 +184,6 @@ int mymain(	int full,
 
 			time_get_min_slot(D_SLOT_CALC_DELTAS, TIME_GLOBAL_STATS, &min);
 			printf("Time used to process deltas -> %.2f ms\n", min*1000.0);
-
-			#ifdef USE_BATCH_POOL
-			time_get_mean_slot(D_SLOT_MEMCOPY_BATCH, TIME_GLOBAL_STATS, &mean);
-			time_get_min_slot(D_SLOT_MEMCOPY_BATCH, TIME_GLOBAL_STATS, &min);
-			time_get_max_slot(D_SLOT_MEMCOPY_BATCH, TIME_GLOBAL_STATS, &max);
-			printf("Time used in pool operations (Mean) -> %.2f ms - min/max = %.2f/%.2f\n", 
-					mean*1000.0, min*1000.0, max*1000.0);
-			#endif
 		}	
 		
 		if (p2)
