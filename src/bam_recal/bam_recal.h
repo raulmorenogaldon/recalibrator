@@ -1,6 +1,8 @@
 #ifndef BAM_RECAL_H_
 #define BAM_RECAL_H_
 
+#include <pthread.h>
+
 #include <bam_file.h>
 #include <recal_common.h>
 #include <recal_config.h>

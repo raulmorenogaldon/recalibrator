@@ -197,6 +197,12 @@ int mymain(	int full,
 		if (p2)
 		{
 			//Print recalibrate stats
+			time_get_mean_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS, &mean);
+			time_get_min_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS, &min);
+			time_get_max_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS, &max);
+			printf("Time used for batch write (Mean) -> %.2f ms - min/max = %.2f/%.2f\n",
+								mean*1000.0, min*1000.0, max*1000.0);
+
 			time_get_mean_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS, &mean);
 			time_get_min_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS, &min);
 			time_get_max_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS, &max);

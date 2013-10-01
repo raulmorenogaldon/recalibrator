@@ -302,25 +302,25 @@ START_TEST (check_timestats)
 	/* Check timing */
 
 	/* Fails */
-	if(!time_init_slot(-1, 20, TIME_GLOBAL_STATS))
+	if(!time_init_slot(-1, TIME_GLOBAL_STATS))
 	{
 		ck_abort_msg("Must return error when slot is major than 20");
 	}
-	if(!time_init_slot(20, 20, TIME_GLOBAL_STATS))
+	if(!time_init_slot(20, TIME_GLOBAL_STATS))
 	{
 		ck_abort_msg("Must return error when slot is major than 20");
 	}
-	if(!time_set_slot(-1, 20, TIME_GLOBAL_STATS))
+	if(!time_set_slot(-1, TIME_GLOBAL_STATS))
 	{
 		ck_abort_msg("Must return error when slot is major than 20");
 	}
-	if(!time_set_slot(20, 20, TIME_GLOBAL_STATS))
+	if(!time_set_slot(20, TIME_GLOBAL_STATS))
 	{
 		ck_abort_msg("Must return error when slot is major than 20");
 	}
 
-	ck_assert(time_init_slot(0, 0, TIME_GLOBAL_STATS) == NO_ERROR);
-	ck_assert(time_set_slot(0, 20, TIME_GLOBAL_STATS) == NO_ERROR);
+	ck_assert(time_init_slot(0, TIME_GLOBAL_STATS) == NO_ERROR);
+	ck_assert(time_set_slot(0, TIME_GLOBAL_STATS) == NO_ERROR);
 
 	ck_assert(time_get_mean_slot(0, TIME_GLOBAL_STATS, &mean) == NO_ERROR);
 	ck_assert(time_get_mean_slot(0, timestats, &mean2) == NO_ERROR);
