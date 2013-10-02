@@ -119,22 +119,25 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 			//Write batch task
 			#pragma omp task
 			{
-				if(rdy_batch && rdy_batch->num_alignments != 0)
+				if(rdy_batch)
 				{
-					//printf("WRITE SEC: %d - %d\n", omp_get_num_threads(), omp_get_thread_num());
-					#ifdef D_TIME_DEBUG
-						time_init_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS);
-					#endif
-					bam_fwrite_batch(rdy_batch, recal_bam_f);
-					#ifdef D_TIME_DEBUG
-						time_set_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS);
-					#endif
+					if(rdy_batch->num_alignments != 0)
+					{
+						//printf("WRITE SEC: %d - %d\n", omp_get_num_threads(), omp_get_thread_num());
+						#ifdef D_TIME_DEBUG
+							time_init_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS);
+						#endif
+						bam_fwrite_batch(rdy_batch, recal_bam_f);
+						#ifdef D_TIME_DEBUG
+							time_set_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS);
+						#endif
 
-					//Update read counter
-					count += rdy_batch->num_alignments;
+						//Update read counter
+						count += rdy_batch->num_alignments;
 
-					//Show total progress
-					printf("Total alignments recalibrated: %d\r", count);
+						//Show total progress
+						printf("Total alignments recalibrated: %d\r", count);
+					}
 
 					//Free batch
 					bam_batch_free(rdy_batch, 1);
@@ -160,8 +163,8 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 			);
 	}
 
-	//Free out thread attributes
-	//pthread_attr_destroy(&out_thread_attr);
+	bam_batch_free(batch, 1);
+	bam_batch_free(read_batch, 1);
 
 	printf("\n---------------------\n", count);
 
@@ -191,7 +194,7 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info)
 	}
 
 	num_thr = omp_get_num_procs();
-	#pragma omp parallel num_threads(num_thr) private(recalibration_env)
+	#pragma omp parallel num_threads(num_thr) private(recalibration_env, err)
 	{
 		//Initialize get data environment
 		recalibration_env = (recal_recalibration_env_t *) malloc(sizeof(recal_recalibration_env_t));
@@ -201,8 +204,11 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info)
 		#pragma omp for schedule(dynamic)
 		for(i = 0; i < batch->num_alignments; i++)
 		{
-			//if(omp_get_thread_num() == 2)
-			//printf("INSIDE ALIGMENTS SEC: %d - %d - %d\n", omp_get_num_threads(), omp_get_thread_num(), i);
+			/*#pragma omp critical
+			{
+				printf("INSIDE ALIGMENTS SEC: %d - %d - %d\n", omp_get_num_threads(), omp_get_thread_num(), i);
+				fflush(stdout);
+			}*/
 
 			#ifdef D_TIME_DEBUG
 			#pragma omp master
@@ -348,7 +354,7 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, re
 	free(bam_seq);
 	free(res_quals);
 	free(aux_alig1);
-	free(aux_alig);
+	alignment_free(aux_alig);
 
 	return NO_ERROR;
 }
