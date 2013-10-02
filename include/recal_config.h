@@ -64,4 +64,6 @@
 	#define D_SLOT_WRITE_BATCH 8
 #endif
 
+//#define D_TIME_OPENMP
+
 #endif /* RECAL_CONFIG_H_ */
