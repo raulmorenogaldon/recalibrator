@@ -66,6 +66,12 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 	//batch_out_t out_args;
 	//void *status;
 
+	#ifdef D_TIME_OPENMP
+		//OpenMP stats file
+		FILE *stats = NULL;
+		char name[64];
+	#endif
+
 	// Set thread attributes
 	//pthread_attr_init(&out_thread_attr);
 	//pthread_attr_setdetachstate(&out_thread_attr, PTHREAD_CREATE_JOINABLE);
@@ -79,11 +85,12 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 	printf("---------------------\n", count);
 
 	//Set thread num
-	//omp_set_num_threads(3);
+	omp_set_num_threads(8);
 	omp_set_nested(1);
 
 	//OMP PARALLEL
-	#pragma omp parallel num_threads(omp_get_num_procs())
+	//#pragma omp parallel num_threads(omp_get_num_procs())
+	#pragma omp parallel
 	{
 
 		#pragma omp single
@@ -188,6 +195,17 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 					printf("Write %.2f ms\n", (end_write - init_write) * 1000.0);
 					printf("NEW ITERATION\n");
 					fflush(stdout);
+
+					if(!stats)
+					{
+						sprintf(name, "stats/stats_%d_%d_static.omp", read_batch->num_alignments, omp_get_num_threads());
+						stats = fopen(name,"w");
+					}
+
+					fprintf(stats, "%.2f %.2f %.2f\n", (end_read - init_read) * 1000.0,
+													(end_recal - init_recal) * 1000.0,
+													(end_write - init_write) * 1000.0);
+					fflush(stats);
 				#endif
 				//Setup next iteration
 				rdy_batch = batch;
@@ -209,6 +227,10 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 	}
 
 	printf("\nBatchs writed: %d\n", countb);
+
+	#ifdef D_TIME_OPENMP
+		fclose(stats);
+	#endif
 
 	bam_batch_free(batch, 1);
 	bam_batch_free(read_batch, 1);
@@ -240,9 +262,10 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info)
 		}
 	}
 
-	num_thr = omp_get_num_procs();
-	#pragma omp parallel num_threads(num_thr) private(recalibration_env, err)
+	//num_thr = omp_get_num_procs();
+	#pragma omp parallel /*num_threads(num_thr)*/ private(recalibration_env, err)
 	{
+
 		//Initialize get data environment
 		recalibration_env = (recal_recalibration_env_t *) malloc(sizeof(recal_recalibration_env_t));
 		recal_recalibration_init_env(bam_info->num_cycles, recalibration_env);
