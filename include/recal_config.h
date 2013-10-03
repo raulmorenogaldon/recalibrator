@@ -68,5 +68,6 @@
  * OpenMP
  */
 #define D_TIME_OPENMP
+//#define D_TIME_OPENMP_VERBOSE
 
 #endif /* RECAL_CONFIG_H_ */

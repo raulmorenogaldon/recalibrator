@@ -188,6 +188,7 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 			#pragma omp single
 			{
 				#ifdef D_TIME_OPENMP
+				#ifdef D_TIME_OPENMP_VERBOSE
 					fflush(stdout);
 					printf("Times:\n");
 					printf("Read %.2f ms\n", (end_read - init_read) * 1000.0);
@@ -195,6 +196,7 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 					printf("Write %.2f ms\n", (end_write - init_write) * 1000.0);
 					printf("NEW ITERATION\n");
 					fflush(stdout);
+				#endif
 
 					if(!stats)
 					{
