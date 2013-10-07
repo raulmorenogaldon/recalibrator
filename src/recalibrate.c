@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include <argtable2.h>
 #include <string.h>
 #include <libgen.h>
@@ -64,11 +66,32 @@ int mymain(	int full,
 	
 	//Time measures
 	#ifdef D_TIME_DEBUG
+
+	char filename[100];
+	char intaux[20];
+
 		//Initialize stats
 		if(time_new_stats(20, &TIME_GLOBAL_STATS))
 		{
 			printf("ERROR: FAILED TO INITIALIZE TIME STATS\n");
 		}
+
+		strcpy(filename, "stats/static_");
+		sprintf(intaux, "%d", MAX_BATCH_SIZE);
+		strcat(filename, intaux);
+		strcat(filename, "_");
+		sprintf(intaux, "%d", threads);
+		strcat(filename, intaux);
+		strcat(filename, ".stats");
+
+		//Initialize stats file output
+		if(time_set_output_file(filename, TIME_GLOBAL_STATS))
+		{
+			printf("ERROR: FAILED TO INITIALIZE TIME STATS FILE OUTPUT\n");
+		}
+
+		printf("STATISTICS ACTIVATED, output file: %s\n\n", filename);
+
 	#endif
 	
 	//Printf proc caps
@@ -89,7 +112,6 @@ int mymain(	int full,
 	init_log();
 
 	//Set num of threads
-	//NUM_THREADS = threads;
 	omp_set_num_threads(threads);
 
 	//Execute phase 1
@@ -218,12 +240,12 @@ int mymain(	int full,
 			printf("Time used for batch write (Mean) -> %.2f ms - min/max = %.2f/%.2f\n",
 								mean*1000.0, min*1000.0, max*1000.0);
 
-			time_get_min_slot(D_SLOT_RECALIBRATE, TIME_GLOBAL_STATS, &min);
+			time_get_min_slot(D_SLOT_PH2_RECALIBRATE, TIME_GLOBAL_STATS, &min);
 			printf("Time used to recalibrate -> %.2f s\n", min);
 		}
 			
 		//Free memory from stats
-		time_destroy_stats(&TIME_GLOBAL_STATS);
+		//time_destroy_stats(&TIME_GLOBAL_STATS);
 	#endif
 	
 	//Compare

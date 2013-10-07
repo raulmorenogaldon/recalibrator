@@ -109,7 +109,7 @@ time_destroy_stats(p_timestats *stats)
  * Time statistics output to file
  */
 ERROR_CODE
-time_set_output_file(const char *name, p_timestats *stats)
+time_set_output_file(const char *name, p_timestats stats)
 {
 	if(!stats)
 	{
@@ -117,7 +117,7 @@ time_set_output_file(const char *name, p_timestats *stats)
 		return INVALID_INPUT_PARAMS_NULL;
 	}
 
-	time_stats_t *s = (time_stats_t *)(*stats);
+	time_stats_t *s = (time_stats_t *)stats;
 
 	if(!s)
 	{
@@ -166,6 +166,8 @@ time_init_slot(const unsigned int slot, p_timestats stats)
 	s->slots[slot]->sec = (uint64_t)ts.tv_sec;
 	s->slots[slot]->nsec = (uint64_t)ts.tv_nsec;
 	pthread_mutex_unlock(&time_mutex);
+
+	return NO_ERROR;
 }
 
 
@@ -209,7 +211,7 @@ time_set_slot(const unsigned int slot, p_timestats stats)
 	}
 	interval = (double)interval_sec + ((double)interval_nsec / 1000000000.0);
 
-	time_aux_add_time(slot, stats, interval);
+	return time_aux_add_time(slot, stats, interval);
 }
 
 ERROR_CODE
@@ -237,7 +239,7 @@ time_add_time_slot(const unsigned int slot, p_timestats stats, const double time
 		return INVALID_INPUT_PARAMS_NEGATIVE;
 	}
 
-	time_aux_add_time(slot, stats, time);
+	return time_aux_add_time(slot, stats, time);
 }
 
 ERROR_CODE
@@ -339,8 +341,10 @@ time_aux_add_time(const unsigned int slot, p_timestats stats, const double time)
 	if(s->f_output)
 	{
 		//< SLOT TIME(s) >
-		fprintf(s->f_output, "%d %lf\n", slot, time);
+		fprintf(s->f_output, "%d %.9f\n", slot, time);
 	}
 
 	pthread_mutex_unlock(&time_mutex);
+
+	return NO_ERROR;
 }

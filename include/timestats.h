@@ -31,7 +31,7 @@ EXTERNC ERROR_CODE time_destroy_stats(p_timestats *stats);
 /**
  * Time statistics output to file
  */
-EXTERNC ERROR_CODE time_set_output_file(const char *name, p_timestats *stats);
+EXTERNC ERROR_CODE time_set_output_file(const char *name, p_timestats stats);
 
 /**
  * TIME OPERATIONS
