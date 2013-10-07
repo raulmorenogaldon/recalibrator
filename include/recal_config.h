@@ -37,8 +37,10 @@
 /**
  * BAM management
  */
-//#define MAX_BATCH_SIZE 1000000000
-#define MAX_BATCH_SIZE 1000000
+//#define MAX_BATCH_SIZE 	1000000000
+//#define MAX_BATCH_SIZE 	100000000
+//#define MAX_BATCH_SIZE 	10000000
+#define MAX_BATCH_SIZE 	1000000
 
 /**
  * Probability math limits
@@ -60,8 +62,12 @@
 	#define D_SLOT_CALC_DELTAS 4
 	#define D_SLOT_RECALIBRATE 5
 	#define D_SLOT_MEMCOPY_BATCH 6
-	#define D_SLOT_RECAL_ALIG 7
-	#define D_SLOT_WRITE_BATCH 8
+
+	//PHASE 2
+	#define D_SLOT_PH2_READ_BATCH 9
+	#define D_SLOT_PH2_PROCCESS_BATCH 10
+	#define D_SLOT_PH2_WRITE_BATCH 11
+	#define D_SLOT_PH2_RECAL_ALIG 12
 #endif
 
 /**

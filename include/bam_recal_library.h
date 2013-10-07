@@ -14,7 +14,6 @@
 #include <genome.h>
 #include <recal_common.h>
 
-
 /**
  * \brief Recalibration data storage.
  *

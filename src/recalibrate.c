@@ -10,6 +10,7 @@ int mymain(	int full,
 			int p1,
 			int p2,
 			int cycles,
+			int threads,
 			const char *reference, 
 			int refcount, 
 			const char *input, 
@@ -53,7 +54,7 @@ int mymain(	int full,
 		printf("No recalibration phase specified or comparation, executing full recalibration.\n");
 		full = 1;
 	}
-	
+
 	//If full recalibration, execute two phases
 	if (full)
 	{
@@ -64,7 +65,7 @@ int mymain(	int full,
 	//Time measures
 	#ifdef D_TIME_DEBUG
 		//Initialize stats
-		if(time_new_stats(10, &TIME_GLOBAL_STATS))
+		if(time_new_stats(20, &TIME_GLOBAL_STATS))
 		{
 			printf("ERROR: FAILED TO INITIALIZE TIME STATS\n");
 		}
@@ -86,6 +87,10 @@ int mymain(	int full,
 	#endif
 
 	init_log();
+
+	//Set num of threads
+	//NUM_THREADS = threads;
+	omp_set_num_threads(threads);
 
 	//Execute phase 1
 	if (p1)
@@ -189,17 +194,29 @@ int mymain(	int full,
 		if (p2)
 		{
 			//Print recalibrate stats
-			time_get_mean_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS, &mean);
-			time_get_min_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS, &min);
-			time_get_max_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS, &max);
-			printf("Time used for batch write (Mean) -> %.2f ms - min/max = %.2f/%.2f\n",
-								mean*1000.0, min*1000.0, max*1000.0);
-
-			time_get_mean_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS, &mean);
-			time_get_min_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS, &min);
-			time_get_max_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS, &max);
+			time_get_mean_slot(D_SLOT_PH2_RECAL_ALIG, TIME_GLOBAL_STATS, &mean);
+			time_get_min_slot(D_SLOT_PH2_RECAL_ALIG, TIME_GLOBAL_STATS, &min);
+			time_get_max_slot(D_SLOT_PH2_RECAL_ALIG, TIME_GLOBAL_STATS, &max);
 			printf("Time used recalibrate one alignment (Mean) -> %.2f micros - min/max = %.2f/%.2f\n", 
 					mean*1000000.0, min*1000000.0, max*1000000.0);
+
+			time_get_mean_slot(D_SLOT_PH2_READ_BATCH, TIME_GLOBAL_STATS, &mean);
+			time_get_min_slot(D_SLOT_PH2_READ_BATCH, TIME_GLOBAL_STATS, &min);
+			time_get_max_slot(D_SLOT_PH2_READ_BATCH, TIME_GLOBAL_STATS, &max);
+			printf("Time used for batch read (Mean) -> %.2f ms - min/max = %.2f/%.2f\n",
+								mean*1000.0, min*1000.0, max*1000.0);
+
+			time_get_mean_slot(D_SLOT_PH2_PROCCESS_BATCH, TIME_GLOBAL_STATS, &mean);
+			time_get_min_slot(D_SLOT_PH2_PROCCESS_BATCH, TIME_GLOBAL_STATS, &min);
+			time_get_max_slot(D_SLOT_PH2_PROCCESS_BATCH, TIME_GLOBAL_STATS, &max);
+			printf("Time used for batch proccess (Mean) -> %.2f ms - min/max = %.2f/%.2f\n",
+								mean*1000.0, min*1000.0, max*1000.0);
+
+			time_get_mean_slot(D_SLOT_PH2_WRITE_BATCH, TIME_GLOBAL_STATS, &mean);
+			time_get_min_slot(D_SLOT_PH2_WRITE_BATCH, TIME_GLOBAL_STATS, &min);
+			time_get_max_slot(D_SLOT_PH2_WRITE_BATCH, TIME_GLOBAL_STATS, &max);
+			printf("Time used for batch write (Mean) -> %.2f ms - min/max = %.2f/%.2f\n",
+								mean*1000.0, min*1000.0, max*1000.0);
 
 			time_get_min_slot(D_SLOT_RECALIBRATE, TIME_GLOBAL_STATS, &min);
 			printf("Time used to recalibrate -> %.2f s\n", min);
@@ -233,6 +250,8 @@ int mymain(	int full,
 
 int main(int argc, char **argv)
 {
+	int thr;
+
     //struct arg_lit  *recurse = arg_lit0("R",NULL,                       "recurse through subdirectories");
     //struct arg_int  *repeat  = arg_int0("k","scalar",NULL,              "define scalar value k (default is 3)");
     //struct arg_str  *defines = arg_strn("D","define","MACRO",0,argc+2,  "macro definitions");
@@ -244,6 +263,7 @@ int main(int argc, char **argv)
     struct arg_lit  *phase1 = arg_lit0("1",NULL,                 		"execute only first part of recalibration");
     struct arg_lit  *phase2 = arg_lit0("2",NULL,                 		"execute only second part of recalibration, need data file");
     struct arg_int  *cycles  = arg_int0("C","scalar",NULL,              "define number of cycles of bams");
+    struct arg_int  *threads  = arg_int0("T","scalar",NULL,             "define number of threads to use");
     struct arg_file *refile = arg_file0("R",NULL,"<reference>",         "reference genome FASTA file");
     struct arg_file *infile = arg_file0("I",NULL,"<input>",           	"input BAM file");
     struct arg_file *outfile = arg_file0("o",NULL,"<output>",          	"output recalibrated BAM file, default:\"output.bam\"");
@@ -254,7 +274,7 @@ int main(int argc, char **argv)
     struct arg_lit  *version = arg_lit0(NULL,"version",                 "print version information and exit");
     struct arg_end  *end     = arg_end(20);
     
-    void* argtable[] = {full,phase1,phase2,cycles,refile,infile,outfile,datafile,infofile,compfile,help,version,end};
+    void* argtable[] = {full,phase1,phase2,cycles,threads,refile,infile,outfile,datafile,infofile,compfile,help,version,end};
     const char* progname = "Recalibrate";
     int nerrors;
     int exitcode=0;
@@ -328,11 +348,23 @@ int main(int argc, char **argv)
 		goto exit;
 	}
     
+    //Default case: 1 thread
+	if (threads->count == 0 || threads->ival[0] <= 0)
+	{
+		thr = 1;
+	}
+	else
+	{
+		thr = threads->ival[0];
+	}
+
+
     /* normal case: take the command line options at face value */
     exitcode = mymain(	full->count,
 						phase1->count,
 						phase2->count,
 						cycles->ival[0],
+						thr,
 						refile->filename[0], 
 						refile->count, 
 						infile->filename[0], 

@@ -85,7 +85,7 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 	printf("---------------------\n", count);
 
 	//Set thread num
-	omp_set_num_threads(8);
+	//omp_set_num_threads(NUM_THREADS);
 	omp_set_nested(1);
 
 	//OMP PARALLEL
@@ -124,42 +124,36 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 				//Recalibrate batch
 				#pragma omp section
 				{
-					#ifdef D_TIME_OPENMP
-					init_recal = omp_get_wtime();
-					#endif
-
 					//Recalibrate batch
 					if(batch->num_alignments != 0)
 					{
+						#ifdef D_TIME_OPENMP
+							init_recal = omp_get_wtime();
+						#endif
+
 						err = recal_recalibrate_batch(batch, bam_info);
 						if(err)
 							printf("ERROR (recal_recalibrate_batch): %d\n", err);
-					}
 
-					#ifdef D_TIME_OPENMP
-					end_recal = omp_get_wtime();
-					#endif
+						#ifdef D_TIME_OPENMP
+							end_recal = omp_get_wtime();
+						#endif
+					}
 				}
 
 
 				//Write batch task
 				#pragma omp section
 				{
-					#ifdef D_TIME_OPENMP
-					init_write = omp_get_wtime();
-					#endif
-
 					if(rdy_batch)
 					{
 						if(rdy_batch->num_alignments != 0)
 						{
-							#ifdef D_TIME_DEBUG
-								time_init_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS);
+							#ifdef D_TIME_OPENMP
+								init_write = omp_get_wtime();
 							#endif
+
 							bam_fwrite_batch(rdy_batch, recal_bam_f);
-							#ifdef D_TIME_DEBUG
-								time_set_slot(D_SLOT_WRITE_BATCH, TIME_GLOBAL_STATS);
-							#endif
 
 							//Update read counter
 							count += rdy_batch->num_alignments;
@@ -169,18 +163,18 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 
 							//Show total progress
 							printf("Total alignments recalibrated: %d\r", count);
+							fflush(stdout);
+
+							#ifdef D_TIME_OPENMP
+								end_write = omp_get_wtime();
+							#endif
 						}
 
 						//Free batch
 						bam_batch_free(rdy_batch, 1);
 						rdy_batch = NULL;
 					}
-
-					#ifdef D_TIME_OPENMP
-					end_write = omp_get_wtime();
-					#endif
 				}
-
 			}
 
 			#pragma omp barrier
@@ -188,15 +182,21 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 			#pragma omp single
 			{
 				#ifdef D_TIME_OPENMP
-				#ifdef D_TIME_OPENMP_VERBOSE
-					fflush(stdout);
-					printf("Times:\n");
-					printf("Read %.2f ms\n", (end_read - init_read) * 1000.0);
-					printf("Recal %.2f ms\n", (end_recal - init_recal) * 1000.0);
-					printf("Write %.2f ms\n", (end_write - init_write) * 1000.0);
-					printf("NEW ITERATION\n");
-					fflush(stdout);
-				#endif
+					#ifdef D_TIME_OPENMP_VERBOSE
+						fflush(stdout);
+						printf("Times:\n");
+						printf("Read %.2f ms\n", (end_read - init_read) * 1000.0);
+						printf("Recal %.2f ms\n", (end_recal - init_recal) * 1000.0);
+						printf("Write %.2f ms\n", (end_write - init_write) * 1000.0);
+						printf("NEW ITERATION\n");
+						fflush(stdout);
+					#endif
+
+					#ifdef D_TIME_DEBUG
+						if(end_read != 0.0) time_add_time_slot(D_SLOT_PH2_READ_BATCH, TIME_GLOBAL_STATS, end_read - init_read);
+						if(end_recal != 0.0) time_add_time_slot(D_SLOT_PH2_PROCCESS_BATCH, TIME_GLOBAL_STATS, end_recal - init_recal);
+						if(end_write != 0.0) time_add_time_slot(D_SLOT_PH2_WRITE_BATCH, TIME_GLOBAL_STATS, end_write - init_write);
+					#endif
 
 					if(!stats)
 					{
@@ -208,6 +208,14 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 													(end_recal - init_recal) * 1000.0,
 													(end_write - init_write) * 1000.0);
 					fflush(stats);
+
+					init_read = 0.0;
+					end_read = 0.0;
+					init_recal = 0.0;
+					end_recal = 0.0;
+					init_write = 0.0;
+					end_write = 0.0;
+
 				#endif
 				//Setup next iteration
 				rdy_batch = batch;
@@ -252,6 +260,9 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info)
 	ERROR_CODE err;
 	int num_thr;
 
+	//Measures
+	double init_time, end_time;
+
 	//Get data environment
 	recal_recalibration_env_t *recalibration_env;
 
@@ -265,7 +276,7 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info)
 	}
 
 	//num_thr = omp_get_num_procs();
-	#pragma omp parallel /*num_threads(num_thr)*/ private(recalibration_env, err)
+	#pragma omp parallel /*num_threads(num_thr)*/ private(recalibration_env, err, init_time, end_time)
 	{
 
 		//Initialize get data environment
@@ -283,16 +294,18 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info)
 			}*/
 
 			#ifdef D_TIME_DEBUG
-			#pragma omp master
-			time_init_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS);
+			init_time = omp_get_wtime();
 			#endif
+
 			//Process every alignment
 			err = recal_recalibrate_alignment(batch->alignments_p[i], bam_info, recalibration_env);
 			if(err)
 				printf("ERROR (recal_recalibrate_alignment): %d\n", err);
+
 			#ifdef D_TIME_DEBUG
-			#pragma omp master
-			time_set_slot(D_SLOT_RECAL_ALIG, TIME_GLOBAL_STATS);
+			end_time = omp_get_wtime();
+			#pragma omp critical
+				time_add_time_slot(D_SLOT_PH2_RECAL_ALIG, TIME_GLOBAL_STATS, end_time - init_time);
 			#endif
 		}
 
