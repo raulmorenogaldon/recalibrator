@@ -29,6 +29,11 @@ EXTERNC ERROR_CODE time_new_stats(const unsigned int num_slots, p_timestats *out
 EXTERNC ERROR_CODE time_destroy_stats(p_timestats *stats);
 
 /**
+ * Time statistics output to file
+ */
+EXTERNC ERROR_CODE time_set_output_file(const char *name, p_timestats *stats);
+
+/**
  * TIME OPERATIONS
  */
 EXTERNC ERROR_CODE time_init_slot(const unsigned int slot, p_timestats stats);

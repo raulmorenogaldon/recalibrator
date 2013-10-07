@@ -22,9 +22,15 @@ typedef struct time_slot {
 } time_slot_t;
 
 typedef struct time_stats {
+	FILE *f_output;
 	unsigned int num_slots;
 	time_slot_t **slots;
 } time_stats_t;
+
+/**
+ * PRIVATE FUNCTIONS
+ */
+ERROR_CODE time_aux_add_time(const unsigned int slot, p_timestats stats, const double time);
 
 ERROR_CODE time_new_stats(const unsigned int num_slots, p_timestats *out_timestats)
 {
@@ -34,6 +40,7 @@ ERROR_CODE time_new_stats(const unsigned int num_slots, p_timestats *out_timesta
 	
 	stats = (time_stats_t *) malloc(sizeof(time_stats_t));
 	
+	stats->f_output = NULL;
 	stats->num_slots = num_slots;
 	stats->slots = (time_slot_t **)malloc(num_slots * sizeof(time_slot_t *));
 	
@@ -87,8 +94,43 @@ time_destroy_stats(p_timestats *stats)
 	}
 
 	free(s->slots);
+
+	//If output file
+	if(s->f_output)
+		fclose(s->f_output);
+
 	free(s);
 	*stats = NULL;
+
+	return NO_ERROR;
+}
+
+/**
+ * Time statistics output to file
+ */
+ERROR_CODE
+time_set_output_file(const char *name, p_timestats *stats)
+{
+	if(!stats)
+	{
+		printf("Time - WARNING: Attempting to access NULL pointer time\n");
+		return INVALID_INPUT_PARAMS_NULL;
+	}
+
+	time_stats_t *s = (time_stats_t *)(*stats);
+
+	if(!s)
+	{
+		printf("Time - WARNING: Attempting to access NULL pointer time\n");
+		return INVALID_INPUT_PARAMS_NULL;
+	}
+
+	if(s->f_output)
+	{
+		fclose(s->f_output);
+	}
+
+	s->f_output = fopen(name, "w");
 
 	return NO_ERROR;
 }
@@ -167,22 +209,7 @@ time_set_slot(const unsigned int slot, p_timestats stats)
 	}
 	interval = (double)interval_sec + ((double)interval_nsec / 1000000000.0);
 
-	pthread_mutex_lock(&time_mutex);
-
-	if(s->slots[slot]->dmax_sec <= interval)
-	{
-		s->slots[slot]->dmax_sec = interval;
-	}
-
-	if(s->slots[slot]->dmin_sec >= interval)
-	{
-		s->slots[slot]->dmin_sec = interval;
-	}
-		
-	s->slots[slot]->number++;
-	s->slots[slot]->dsum_sec += interval;
-
-	pthread_mutex_unlock(&time_mutex);
+	time_aux_add_time(slot, stats, interval);
 }
 
 ERROR_CODE
@@ -210,22 +237,7 @@ time_add_time_slot(const unsigned int slot, p_timestats stats, const double time
 		return INVALID_INPUT_PARAMS_NEGATIVE;
 	}
 
-	pthread_mutex_lock(&time_mutex);
-
-	if(s->slots[slot]->dmax_sec <= time)
-	{
-		s->slots[slot]->dmax_sec = time;
-	}
-
-	if(s->slots[slot]->dmin_sec >= time)
-	{
-		s->slots[slot]->dmin_sec = time;
-	}
-
-	s->slots[slot]->number++;
-	s->slots[slot]->dsum_sec += time;
-
-	pthread_mutex_unlock(&time_mutex);
+	time_aux_add_time(slot, stats, time);
 }
 
 ERROR_CODE
@@ -298,4 +310,37 @@ time_get_max_slot(const unsigned int slot, const p_timestats stats, double *out_
 	*out_max = s->slots[slot]->dmax_sec;
 
 	return NO_ERROR;
+}
+
+/**
+ * PRIVATE FUNCTIONS
+ */
+ERROR_CODE
+time_aux_add_time(const unsigned int slot, p_timestats stats, const double time)
+{
+	time_stats_t *s = (time_stats_t *)stats;
+
+	pthread_mutex_lock(&time_mutex);
+
+	if(s->slots[slot]->dmax_sec <= time)
+	{
+		s->slots[slot]->dmax_sec = time;
+	}
+
+	if(s->slots[slot]->dmin_sec >= time)
+	{
+		s->slots[slot]->dmin_sec = time;
+	}
+
+	s->slots[slot]->number++;
+	s->slots[slot]->dsum_sec += time;
+
+	//File output
+	if(s->f_output)
+	{
+		//< SLOT TIME(s) >
+		fprintf(s->f_output, "%d %lf\n", slot, time);
+	}
+
+	pthread_mutex_unlock(&time_mutex);
 }
