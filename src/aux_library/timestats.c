@@ -212,6 +212,16 @@ time_add_time_slot(const unsigned int slot, p_timestats stats, const double time
 
 	pthread_mutex_lock(&time_mutex);
 
+	if(s->slots[slot]->dmax_sec <= time)
+	{
+		s->slots[slot]->dmax_sec = time;
+	}
+
+	if(s->slots[slot]->dmin_sec >= time)
+	{
+		s->slots[slot]->dmin_sec = time;
+	}
+
 	s->slots[slot]->number++;
 	s->slots[slot]->dsum_sec += time;
 
