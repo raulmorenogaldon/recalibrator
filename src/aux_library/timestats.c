@@ -130,7 +130,7 @@ time_set_output_file(const char *name, p_timestats stats)
 		fclose(s->f_output);
 	}
 
-	s->f_output = fopen(name, "w");
+	s->f_output = fopen(name, "a");
 
 	return NO_ERROR;
 }

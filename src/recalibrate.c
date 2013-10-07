@@ -82,7 +82,7 @@ int mymain(	int full,
 		strcat(filename, "_");
 		sprintf(intaux, "%d", threads);
 		strcat(filename, intaux);
-		strcat(filename, ".stats");
+		strcat(filename, "_.stats");
 
 		//Initialize stats file output
 		if(time_set_output_file(filename, TIME_GLOBAL_STATS))
@@ -188,60 +188,64 @@ int mymain(	int full,
 		//Times from phase 1
 		if (p1)
 		{	
-			time_get_min_slot(D_SLOT_GET_DATA_BAM, TIME_GLOBAL_STATS, &min);
-			printf("Time used to process BAM -> %.2f s\n", min);
+			printf("\nPHASE 1\n");
 
-			time_get_mean_slot(D_SLOT_GET_DATA_BATCH, TIME_GLOBAL_STATS, &mean);
-			time_get_min_slot(D_SLOT_GET_DATA_BATCH, TIME_GLOBAL_STATS, &min);
-			time_get_max_slot(D_SLOT_GET_DATA_BATCH, TIME_GLOBAL_STATS, &max);
-			printf("Time used to process one BATCH(mean) -> %.2f ms - min/max = %.2f/%.2f\n", 
+			time_get_mean_slot(D_SLOT_PH1_READ_BATCH, TIME_GLOBAL_STATS, &mean);
+			time_get_min_slot(D_SLOT_PH1_READ_BATCH, TIME_GLOBAL_STATS, &min);
+			time_get_max_slot(D_SLOT_PH1_READ_BATCH, TIME_GLOBAL_STATS, &max);
+			printf("Time used for batch read (mean) -> %.2f ms - min/max = %.2f/%.2f\n",
 					mean*1000.0, min*1000.0, max*1000.0);
 
-			time_get_mean_slot(D_SLOT_GET_DATA_ALIG, TIME_GLOBAL_STATS, &mean);
-			time_get_min_slot(D_SLOT_GET_DATA_ALIG, TIME_GLOBAL_STATS, &min);
-			time_get_max_slot(D_SLOT_GET_DATA_ALIG, TIME_GLOBAL_STATS, &max);
-			printf("Time used to process one ALIGNMENT(mean) -> %.2f micros - min/max = %.2f/%.2f\n", 
+			time_get_mean_slot(D_SLOT_PH1_COLLECT_BATCH, TIME_GLOBAL_STATS, &mean);
+			time_get_min_slot(D_SLOT_PH1_COLLECT_BATCH, TIME_GLOBAL_STATS, &min);
+			time_get_max_slot(D_SLOT_PH1_COLLECT_BATCH, TIME_GLOBAL_STATS, &max);
+			printf("Time used for batch collect (mean) -> %.2f ms - min/max = %.2f/%.2f\n",
+					mean*1000.0, min*1000.0, max*1000.0);
+
+			time_get_mean_slot(D_SLOT_PH1_COLLECT_ALIG, TIME_GLOBAL_STATS, &mean);
+			time_get_min_slot(D_SLOT_PH1_COLLECT_ALIG, TIME_GLOBAL_STATS, &min);
+			time_get_max_slot(D_SLOT_PH1_COLLECT_ALIG, TIME_GLOBAL_STATS, &max);
+			printf("Time used for alig collect (mean) -> %.2f micros - min/max = %.2f/%.2f\n",
 					mean*1000000.0, min*1000000.0, max*1000000.0);
 
-			time_get_mean_slot(D_SLOT_READ_BATCH, TIME_GLOBAL_STATS, &mean);
-			time_get_min_slot(D_SLOT_READ_BATCH, TIME_GLOBAL_STATS, &min);
-			time_get_max_slot(D_SLOT_READ_BATCH, TIME_GLOBAL_STATS, &max);
-			printf("Time used to read one BATCH(mean) -> %.2f ms - min/max = %.2f/%.2f\n", 
-					mean*1000.0, min*1000.0, max*1000.0);
+			time_get_min_slot(D_SLOT_PROCCESS_DELTAS, TIME_GLOBAL_STATS, &min);
+			printf("Time used for deltas proccess -> %.2f ms\n", min*1000.0);
 
-			time_get_min_slot(D_SLOT_CALC_DELTAS, TIME_GLOBAL_STATS, &min);
-			printf("Time used to process deltas -> %.2f ms\n", min*1000.0);
+			time_get_min_slot(D_SLOT_PH1_COLLECT_BAM, TIME_GLOBAL_STATS, &min);
+			printf("TIME USED FOR BAM COLLECTION -> %.2f s\n", min);
 		}	
 		
 		if (p2)
 		{
+			printf("\nPHASE 2\n");
+
 			//Print recalibrate stats
 			time_get_mean_slot(D_SLOT_PH2_RECAL_ALIG, TIME_GLOBAL_STATS, &mean);
 			time_get_min_slot(D_SLOT_PH2_RECAL_ALIG, TIME_GLOBAL_STATS, &min);
 			time_get_max_slot(D_SLOT_PH2_RECAL_ALIG, TIME_GLOBAL_STATS, &max);
-			printf("Time used recalibrate one alignment (Mean) -> %.2f micros - min/max = %.2f/%.2f\n", 
+			printf("Time used for alig recalibration (mean) -> %.2f micros - min/max = %.2f/%.2f\n",
 					mean*1000000.0, min*1000000.0, max*1000000.0);
 
 			time_get_mean_slot(D_SLOT_PH2_READ_BATCH, TIME_GLOBAL_STATS, &mean);
 			time_get_min_slot(D_SLOT_PH2_READ_BATCH, TIME_GLOBAL_STATS, &min);
 			time_get_max_slot(D_SLOT_PH2_READ_BATCH, TIME_GLOBAL_STATS, &max);
-			printf("Time used for batch read (Mean) -> %.2f ms - min/max = %.2f/%.2f\n",
+			printf("Time used for batch read (mean) -> %.2f ms - min/max = %.2f/%.2f\n",
 								mean*1000.0, min*1000.0, max*1000.0);
 
 			time_get_mean_slot(D_SLOT_PH2_PROCCESS_BATCH, TIME_GLOBAL_STATS, &mean);
 			time_get_min_slot(D_SLOT_PH2_PROCCESS_BATCH, TIME_GLOBAL_STATS, &min);
 			time_get_max_slot(D_SLOT_PH2_PROCCESS_BATCH, TIME_GLOBAL_STATS, &max);
-			printf("Time used for batch proccess (Mean) -> %.2f ms - min/max = %.2f/%.2f\n",
+			printf("Time used for batch proccess (mean) -> %.2f ms - min/max = %.2f/%.2f\n",
 								mean*1000.0, min*1000.0, max*1000.0);
 
 			time_get_mean_slot(D_SLOT_PH2_WRITE_BATCH, TIME_GLOBAL_STATS, &mean);
 			time_get_min_slot(D_SLOT_PH2_WRITE_BATCH, TIME_GLOBAL_STATS, &min);
 			time_get_max_slot(D_SLOT_PH2_WRITE_BATCH, TIME_GLOBAL_STATS, &max);
-			printf("Time used for batch write (Mean) -> %.2f ms - min/max = %.2f/%.2f\n",
+			printf("Time used for batch write (mean) -> %.2f ms - min/max = %.2f/%.2f\n",
 								mean*1000.0, min*1000.0, max*1000.0);
 
 			time_get_min_slot(D_SLOT_PH2_RECALIBRATE, TIME_GLOBAL_STATS, &min);
-			printf("Time used to recalibrate -> %.2f s\n", min);
+			printf("TIME USED FOR BAM RECALIBRATION -> %.2f s\n", min);
 		}
 			
 		//Free memory from stats
