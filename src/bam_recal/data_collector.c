@@ -49,7 +49,8 @@ recal_get_data_from_file(const char *bam_path, const char *ref_name, const char 
 ERROR_CODE
 recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t* output_data)
 {
-	bam_batch_t* batch;
+	bam_batch_t *read_batch;
+	bam_batch_t *collect_batch;
 	ERROR_CODE err;
 
 	//Duplicate check
@@ -57,6 +58,10 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 	uint32_t l_last_seq;
 	uint32_t pos_last_seq;
 	bam1_t *last_alig;
+
+	//Time measure
+	double init_read = 0.0, init_collect = 0.0;
+	double end_read = 0.0, end_collect = 0.0;
 
 	//Number alignment readed
 	int count = 0;
@@ -80,70 +85,122 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 
 	printf("\n----------------\nProcessing \"%s\" file...\n----------------", bam->filename);
 
-	//Allocate memory for batchs
-	batch = bam_batch_new(MAX_BATCH_SIZE, MULTIPLE_CHROM_BATCH);
+	//Allocate first iteration empty batch
+	collect_batch = bam_batch_new(1, MULTIPLE_CHROM_BATCH);
+	collect_batch->num_alignments = 0;
 
-	//Read batch
-	#ifdef D_TIME_DEBUG
-		time_init_slot(D_SLOT_PH1_READ_BATCH, TIME_GLOBAL_STATS);
-	#endif
-	bam_fread_max_size(batch, MAX_BATCH_SIZE, 0, bam);
-	#ifdef D_TIME_DEBUG
-		time_set_slot(D_SLOT_PH1_READ_BATCH, TIME_GLOBAL_STATS);
-	#endif
-
-	printf("\nNum alignments in batchs: %d\n----------------\n", batch->num_alignments);
-
-	#ifdef CHECK_DUPLICATES
-		ult_seq = (char *)malloc(sizeof(char) * output_data->num_cycles);
-	#endif
-	last_seq = (char *)malloc(sizeof(char));	// Avoid comprobation in bucle and always use free
-	while(batch->num_alignments != 0
-		#ifdef D_MAX_READS
-			&& count < D_MAX_READS
-		#endif
-		)
+	//Duplicate checking
 	{
-		//Process batch
-		#ifdef D_TIME_DEBUG
-			time_init_slot(D_SLOT_PH1_COLLECT_BATCH, TIME_GLOBAL_STATS);
+		#ifdef CHECK_DUPLICATES
+			ult_seq = (char *)malloc(sizeof(char) * output_data->num_cycles);
 		#endif
-		err = recal_get_data_from_bam_batch(batch, ref, output_data);
-		#ifdef D_TIME_DEBUG
-			time_set_slot(D_SLOT_PH1_COLLECT_BATCH, TIME_GLOBAL_STATS);
-		#endif
-
-		if(err)
-			printf("ERROR (recal_get_data_from_bam_batch): %d\n", err);
-
-		//Update read counter
-		count += batch->num_alignments;
-
-		//Show total progress
-		printf("Total alignments readed: %d\r", count);
-		fflush(stdout);
-
-		//Get last alignment
-		free(last_seq);
-		last_alig = batch->alignments_p[batch->num_alignments-1];
-		last_seq = new_sequence_from_bam(last_alig);
-		l_last_seq = last_alig->core.l_qseq;
-		pos_last_seq = last_alig->core.pos;
-
-		//Free memory and take a new batch
-		bam_batch_free(batch, 1);
-		batch = bam_batch_new(MAX_BATCH_SIZE, SINGLE_CHROM_BATCH);
-
-		//Read batch
-		#ifdef D_TIME_DEBUG
-			time_init_slot(D_SLOT_PH1_READ_BATCH, TIME_GLOBAL_STATS);
-		#endif
-		//bam_fread_max_size(batch, MAX_BATCH_SIZE, 1, bam);
-		bam_fread_max_size_no_duplicates(batch, MAX_BATCH_SIZE, 0, bam, last_seq, &l_last_seq, &pos_last_seq);
-		#ifdef D_TIME_DEBUG
-			time_set_slot(D_SLOT_PH1_READ_BATCH, TIME_GLOBAL_STATS);
-		#endif
+		last_seq = (char *)malloc(sizeof(char));	// Avoid comprobation in bucle and always use free
 	}
+
+	//OpenMP parallel, principal proccess
+	#pragma omp parallel
+	{
+
+		#pragma omp single
+		printf("\nUsing %d threads\n", omp_get_num_threads());
+
+		do
+		{
+			#pragma omp sections
+			{
+				//Read next batch
+				#pragma omp section
+				{
+					read_batch = bam_batch_new(MAX_BATCH_SIZE, SINGLE_CHROM_BATCH);
+
+					//Read batch
+					#ifdef D_TIME_DEBUG
+						init_read = omp_get_wtime();
+					#endif
+					//bam_fread_max_size(batch, MAX_BATCH_SIZE, 1, bam);
+					bam_fread_max_size_no_duplicates(read_batch, MAX_BATCH_SIZE, 0, bam, last_seq, &l_last_seq, &pos_last_seq);
+					#ifdef D_TIME_DEBUG
+						end_read = omp_get_wtime();
+					#endif
+				}
+
+				//Collect batch
+				#pragma omp section
+				{
+					if(collect_batch->num_alignments != 0)
+					{
+						//Process batch
+						#ifdef D_TIME_DEBUG
+							init_collect = omp_get_wtime();
+						#endif
+						err = recal_get_data_from_bam_batch(collect_batch, ref, output_data);
+						#ifdef D_TIME_DEBUG
+							end_collect = omp_get_wtime();
+						#endif
+
+						if(err)
+							printf("ERROR (recal_get_data_from_bam_batch): %d\n", err);
+
+						//Update read counter
+						count += collect_batch->num_alignments;
+
+						//Show total progress
+						printf("Total alignments readed: %d\r", count);
+						fflush(stdout);
+
+						//Get last alignment
+						free(last_seq);
+						last_alig = collect_batch->alignments_p[collect_batch->num_alignments-1];
+						last_seq = new_sequence_from_bam(last_alig);
+						l_last_seq = last_alig->core.l_qseq;
+						pos_last_seq = last_alig->core.pos;
+
+						//Free memory and take a new batch
+						bam_batch_free(collect_batch, 1);
+					}
+				}
+
+			}	/* END SECTIONS */
+
+			#pragma omp barrier
+
+			#pragma omp single
+			{
+				#ifdef D_TIME_DEBUG
+					#ifdef D_TIME_OPENMP_VERBOSE
+						fflush(stdout);
+						printf("Times:\n");
+						printf("Read %.2f ms\n", (end_read - init_read) * 1000.0);
+						printf("Collect %.2f ms\n", (end_collect - init_collect) * 1000.0);
+						printf("NEW ITERATION\n");
+						fflush(stdout);
+					#endif
+
+					//Add times
+					if(end_read != 0.0) time_add_time_slot(D_SLOT_PH1_READ_BATCH, TIME_GLOBAL_STATS, end_read - init_read);
+					if(end_collect != 0.0) time_add_time_slot(D_SLOT_PH1_COLLECT_BATCH, TIME_GLOBAL_STATS, end_collect - init_collect);
+
+					//Reset counters to avoid resample
+					init_read = 0.0;
+					end_read = 0.0;
+					init_collect = 0.0;
+					end_collect = 0.0;
+				#endif
+
+				//Setup next iteration
+				collect_batch = read_batch;
+				read_batch = NULL;
+			}
+
+			#pragma omp barrier
+
+		} while( collect_batch->num_alignments != 0
+			#ifdef D_MAX_READS
+				&& count < D_MAX_READS
+			#endif
+			);
+
+	}	/* END PARALLEL */
 
 	printf("\n----------------\n%d alignments readed.", count);
 	printf("\n%d alignments processed.", count - unmapped - mapzero - duplicated - notprimary);
@@ -156,8 +213,7 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 	#endif
 	printf("\n%d alignments unmapped.", unmapped);
 
-	//Free batch
-	bam_batch_free(batch, 1);
+	//Last free
 	free(last_seq);
 	#ifdef CHECK_DUPLICATES
 		free(ult_seq);

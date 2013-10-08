@@ -57,8 +57,8 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 	ERROR_CODE err;
 
 	//Measures
-	double init_read, init_recal, init_write;
-	double end_read, end_recal, end_write;
+	double init_read = 0.0, init_recal = 0.0, init_write = 0.0;
+	double end_read = 0.0, end_recal = 0.0, end_write = 0.0;
 
 	//Thread output
 	//pthread_t out_thread;
