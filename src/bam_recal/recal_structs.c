@@ -84,6 +84,64 @@ recal_destroy_info(recal_info_t **data)
 }
 
 /**
+ * Reduce data.
+ */
+ERROR_CODE
+recal_reduce_info(recal_info_t *dst_data, recal_info_t *src_data)
+{
+	int i;
+
+	//CHECK PARAMS
+	{
+		if(!dst_data || !src_data)
+			return INVALID_INPUT_PARAMS_NULL;
+
+		if(dst_data->num_cycles != src_data->num_cycles)
+			return INVALID_INPUT_PARAMS;
+
+		if(dst_data->min_qual != src_data->min_qual)
+			return INVALID_INPUT_PARAMS;
+
+		if(dst_data->num_quals != src_data->num_quals)
+			return INVALID_INPUT_PARAMS;
+
+		if(dst_data->num_dinuc != src_data->num_dinuc)
+			return INVALID_INPUT_PARAMS;
+	}
+
+	//MERGE
+	//TODO : Potential SSE implementation
+	{
+		//Total counters
+		dst_data->total_miss += src_data->total_miss;
+		dst_data->total_bases += src_data->total_bases;
+
+		//Quality vectors
+		for(i = 0; i < dst_data->num_quals; i++)
+		{
+			dst_data->qual_miss[i] += src_data->qual_miss[i];
+			dst_data->qual_bases[i] += src_data->qual_bases[i];
+		}
+
+		//Qual-Cycle matrix
+		for(i = 0; i < dst_data->num_quals * dst_data->num_cycles; i++)
+		{
+			dst_data->qual_cycle_miss[i] += src_data->qual_cycle_miss[i];
+			dst_data->qual_cycle_bases[i] += src_data->qual_cycle_bases[i];
+		}
+
+		//Qual-Dinuc matrix
+		for(i = 0; i < dst_data->num_quals * dst_data->num_dinuc; i++)
+		{
+			dst_data->qual_dinuc_miss[i] += src_data->qual_dinuc_miss[i];
+			dst_data->qual_dinuc_bases[i] += src_data->qual_dinuc_bases[i];
+		}
+	}
+
+	return NO_ERROR;
+}
+
+/**
  * Initialize empty data collection environment struct.
  */
 ERROR_CODE

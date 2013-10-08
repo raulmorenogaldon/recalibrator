@@ -87,6 +87,16 @@ EXTERNC ERROR_CODE recal_init_info(const uint32_t cycles, recal_info_t **out_dat
 EXTERNC ERROR_CODE recal_destroy_info(recal_info_t **data);
 
 /**
+ * \brief Reduce data.
+ *
+ * Reduce all data into one struct.
+ *
+ * \param dst_data Data struct to contain reduction
+ * \param src_data Data struct to reduce with dst_data
+ */
+EXTERNC ERROR_CODE recal_reduce_info(recal_info_t *dst_data, recal_info_t *src_data);
+
+/**
  * \brief Initialize empty data collection environment struct.
  *
  * \param cycles Number of maximum cycles to handle.
