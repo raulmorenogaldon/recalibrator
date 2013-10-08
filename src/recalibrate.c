@@ -208,6 +208,12 @@ int mymain(	int full,
 			printf("Time used for alig collect (mean) -> %.2f micros - min/max = %.2f/%.2f\n",
 					mean*1000000.0, min*1000000.0, max*1000000.0);
 
+			time_get_mean_slot(D_SLOT_PH1_COLLECT_REDUCE_DATA, TIME_GLOBAL_STATS, &mean);
+			time_get_min_slot(D_SLOT_PH1_COLLECT_REDUCE_DATA, TIME_GLOBAL_STATS, &min);
+			time_get_max_slot(D_SLOT_PH1_COLLECT_REDUCE_DATA, TIME_GLOBAL_STATS, &max);
+			printf("Time used for reduce data (mean) -> %.2f micros - min/max = %.2f/%.2f\n",
+					mean*1000000.0, min*1000000.0, max*1000000.0);
+
 			time_get_min_slot(D_SLOT_PROCCESS_DELTAS, TIME_GLOBAL_STATS, &min);
 			printf("Time used for deltas proccess -> %.2f ms\n", min*1000.0);
 

@@ -97,6 +97,8 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 		last_seq = (char *)malloc(sizeof(char));	// Avoid comprobation in bucle and always use free
 	}
 
+	omp_set_nested(1);
+
 	//OpenMP parallel, principal proccess
 	#pragma omp parallel
 	{
@@ -229,6 +231,7 @@ ERROR_CODE
 recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, recal_info_t* output_data)
 {
 	int i, j;
+	ERROR_CODE err;
 
 	//Batch splitting
 	bam_batch_t *current_batch;
@@ -236,8 +239,12 @@ recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, rec
 	size_t batchs_l;
 	size_t num_chroms;
 
+	//Time measures
+	double init_time, end_time;
+
 	//Get data environment
 	recal_data_collect_env_t *collect_env;
+	recal_info_t *data;
 
 	//CHECK ARGUMENTS
 	{
@@ -248,58 +255,88 @@ recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, rec
 		}
 	}
 
-	//Initialize get data environment
-	collect_env = (recal_data_collect_env_t *) malloc(sizeof(recal_data_collect_env_t));
-	recal_get_data_init_env(output_data->num_cycles, collect_env);
-
-	//Current is general batch
-	current_batch = batch;
-
-#ifdef SPLIT_BATCHS_BY_CHROM
-	//printf("Number alignments in original batch: %d\n", batch->num_alignments);
-
-	//Get number of chroms in this batch
-	batch_count_chroms(batch, &num_chroms);
-
-	//Split batchs
-	v_batchs = (bam_batch_t *) malloc(sizeof(bam_batch_t) * num_chroms);
-	batch_split_by_chrom(batch, v_batchs, &batchs_l, num_chroms);
-
-	//printf("Number of splitted batchs: %d\n", batchs_l);
-
-	//Process every batch
-	for(j = 0; j < batchs_l; j++)
+	//Parallel zone
+	#pragma omp parallel private(collect_env, data, init_time, end_time, err)
 	{
-		//Get next branch
-		current_batch = &v_batchs[j];
-		//printf("BATCH %d: Chrom = %d, Aligs = %d, Startpos: %d\n", j, current_batch->alignments_p[0]->core.tid, current_batch->num_alignments, current_batch->alignments_p[0]->core.pos);
-#endif
 
-		//Process all alignments of the batch
-		for(i = 0; i < current_batch->num_alignments; i++)
+		//Initialize get data environment
+		collect_env = (recal_data_collect_env_t *) malloc(sizeof(recal_data_collect_env_t));
+		recal_get_data_init_env(output_data->num_cycles, collect_env);
+
+		//Initialize output data
+		recal_init_info(output_data->num_cycles, &data);
+
+		//Current is general batch
+		current_batch = batch;
+
+		#ifdef SPLIT_BATCHS_BY_CHROM
+			//printf("Number alignments in original batch: %d\n", batch->num_alignments);
+
+			//Get number of chroms in this batch
+			batch_count_chroms(batch, &num_chroms);
+
+			//Split batchs
+			v_batchs = (bam_batch_t *) malloc(sizeof(bam_batch_t) * num_chroms);
+			batch_split_by_chrom(batch, v_batchs, &batchs_l, num_chroms);
+
+			//printf("Number of splitted batchs: %d\n", batchs_l);
+
+			//Process every batch
+			for(j = 0; j < batchs_l; j++)
+			{
+				//Get next branch
+				current_batch = &v_batchs[j];
+				//printf("BATCH %d: Chrom = %d, Aligs = %d, Startpos: %d\n", j, current_batch->alignments_p[0]->core.tid, current_batch->num_alignments, current_batch->alignments_p[0]->core.pos);
+		#endif
+
+				//Process all alignments of the batch
+				#pragma omp for
+				for(i = 0; i < current_batch->num_alignments; i++)
+				{
+					#ifdef D_TIME_DEBUG
+					init_time = omp_get_wtime();
+					#endif
+					//Recollection
+					recal_get_data_from_bam_alignment(current_batch->alignments_p[i], ref, data, collect_env);
+					#ifdef D_TIME_DEBUG
+						end_time = omp_get_wtime();
+						#pragma omp critical
+							time_add_time_slot(D_SLOT_PH1_COLLECT_ALIG, TIME_GLOBAL_STATS, end_time - init_time);
+					#endif
+				}
+
+		#ifdef SPLIT_BATCHS_BY_CHROM
+				free(current_batch->alignments_p);
+			}
+
+			free(v_batchs);
+		#endif
+
+		//Reduce data
+		#pragma omp critical
 		{
 			#ifdef D_TIME_DEBUG
-				time_init_slot(D_SLOT_PH1_COLLECT_ALIG, TIME_GLOBAL_STATS);
+				init_time = omp_get_wtime();
 			#endif
-			//Recollection
-			recal_get_data_from_bam_alignment(current_batch->alignments_p[i], ref, output_data, collect_env);
+
+			err = recal_reduce_info(output_data, data);
+
+			if(err)
+				printf("ERROR: Failed to reduce collection data!\n");
+
 			#ifdef D_TIME_DEBUG
-				time_set_slot(D_SLOT_PH1_COLLECT_ALIG, TIME_GLOBAL_STATS);
+				end_time = omp_get_wtime();
+				time_add_time_slot(D_SLOT_PH1_COLLECT_REDUCE_DATA, TIME_GLOBAL_STATS, end_time - init_time);
 			#endif
 		}
 
-#ifdef SPLIT_BATCHS_BY_CHROM
-		free(current_batch->alignments_p);
-	}
+		//Free data memory
+		recal_destroy_info(&data);
 
-	free(v_batchs);
-#endif
+		//Destroy environment
+		recal_get_data_destroy_env(collect_env);
 
-	//Destroy environment
-	recal_get_data_destroy_env(collect_env);
-
-	//Destroy reference
-	//_mm_free(reference);
+	} /* END PARALLEL */
 
 	return NO_ERROR;
 }
