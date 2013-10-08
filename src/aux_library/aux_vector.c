@@ -39,7 +39,7 @@ new_vector_uint32(const size_t size, const uint32_t value, uint32_t **out_vector
 	for(i = 0; i < size; i++)
 		vector[i] = value;
 
-	printf("Created new vector uint32 with %d positions, total size %lu bytes\n", (int)size, size * sizeof(uint32_t));
+	//printf("Created new vector uint32 with %d positions, total size %lu bytes\n", (int)size, size * sizeof(uint32_t));
 
 	*out_vector = vector;
 
@@ -66,7 +66,7 @@ new_vector_double(const size_t size, const double value, double **out_vector)
 	for(i = 0; i < size; i++)
 		vector[i] = value;
 
-	printf("Created new vector double with %d positions, total size %lu bytes\n", (int)size, size * sizeof(double));
+	//printf("Created new vector double with %d positions, total size %lu bytes\n", (int)size, size * sizeof(double));
 
 	*out_vector = vector;
 
