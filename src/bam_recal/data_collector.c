@@ -131,6 +131,7 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 		pos_last_seq = last_alig->core.pos;
 
 		//Free memory and take a new batch
+		bam_batch_free(batch, 1);
 		batch = bam_batch_new(MAX_BATCH_SIZE, SINGLE_CHROM_BATCH);
 
 		//Read batch
