@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = src tests
+SUBDIRS = src tests stats
 EXTRA_DIST = AUTHORS ChangeLog NEWS README THANKS
 
 #DISTCHECK_CONFIGURE_FLAGS	= 	--with-samtools=/home/rmoreno/ext/samtools-0.1.18/ 	\

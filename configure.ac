@@ -64,5 +64,6 @@ AC_CONFIG_FILES([\
 				tests/Makefile	\
 				tests/aux_library/Makefile	\
 				tests/recal/Makefile	\
+				stats/Makefile	\
 				])
 AC_OUTPUT

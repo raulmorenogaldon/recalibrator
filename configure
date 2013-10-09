@@ -12639,7 +12639,7 @@ done
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/common/Makefile src/aux_library/Makefile src/bam_recal/Makefile tests/Makefile tests/aux_library/Makefile tests/recal/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/common/Makefile src/aux_library/Makefile src/bam_recal/Makefile tests/Makefile tests/aux_library/Makefile tests/recal/Makefile stats/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13658,6 +13658,7 @@ do
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
     "tests/aux_library/Makefile") CONFIG_FILES="$CONFIG_FILES tests/aux_library/Makefile" ;;
     "tests/recal/Makefile") CONFIG_FILES="$CONFIG_FILES tests/recal/Makefile" ;;
+    "stats/Makefile") CONFIG_FILES="$CONFIG_FILES stats/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
