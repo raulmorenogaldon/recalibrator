@@ -59,6 +59,7 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 	//Measures
 	double init_read = 0.0, init_recal = 0.0, init_write = 0.0;
 	double end_read = 0.0, end_recal = 0.0, end_write = 0.0;
+	double init_it = 0.0, end_it = 0.0;
 
 	//Thread output
 	//pthread_t out_thread;
@@ -92,6 +93,11 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 
 		do
 		{
+
+			#ifdef D_TIME_DEBUG
+				#pragma omp single
+				init_it = omp_get_wtime();
+			#endif
 
 			#pragma omp sections
 			{
@@ -186,10 +192,14 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 						fflush(stdout);
 					#endif
 
+					end_it = omp_get_wtime();
+
 					//Add times
 					if(end_read != 0.0) time_add_time_slot(D_SLOT_PH2_READ_BATCH, TIME_GLOBAL_STATS, end_read - init_read);
 					if(end_recal != 0.0) time_add_time_slot(D_SLOT_PH2_PROCCESS_BATCH, TIME_GLOBAL_STATS, end_recal - init_recal);
 					if(end_write != 0.0) time_add_time_slot(D_SLOT_PH2_WRITE_BATCH, TIME_GLOBAL_STATS, end_write - init_write);
+
+					time_add_time_slot(D_SLOT_PH2_ITERATION, TIME_GLOBAL_STATS, end_it - init_it);
 
 					//Reset counters to avoid resample
 					init_read = 0.0;

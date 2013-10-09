@@ -62,6 +62,7 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 	//Time measure
 	double init_read = 0.0, init_collect = 0.0;
 	double end_read = 0.0, end_collect = 0.0;
+	double init_it = 0.0, end_it = 0.0;
 
 	//Number alignment readed
 	int count = 0;
@@ -108,6 +109,11 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 
 		do
 		{
+			#ifdef D_TIME_DEBUG
+				#pragma omp single
+				init_it = omp_get_wtime();
+			#endif
+
 			#pragma omp sections
 			{
 				//Read next batch
@@ -178,9 +184,12 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 						fflush(stdout);
 					#endif
 
+					end_it = omp_get_wtime();
+
 					//Add times
 					if(end_read != 0.0) time_add_time_slot(D_SLOT_PH1_READ_BATCH, TIME_GLOBAL_STATS, end_read - init_read);
 					if(end_collect != 0.0) time_add_time_slot(D_SLOT_PH1_COLLECT_BATCH, TIME_GLOBAL_STATS, end_collect - init_collect);
+					time_add_time_slot(D_SLOT_PH1_ITERATION, TIME_GLOBAL_STATS, end_it - init_it);
 
 					//Reset counters to avoid resample
 					init_read = 0.0;
