@@ -12639,7 +12639,7 @@ done
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/common/Makefile src/aux_library/Makefile src/bam_recal/Makefile tests/Makefile tests/aux_library/Makefile tests/recal/Makefile stats/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/common/Makefile src/timestats/Makefile src/aux_library/Makefile src/bam_recal/Makefile tests/Makefile tests/aux_library/Makefile tests/recal/Makefile stats/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13653,6 +13653,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/common/Makefile") CONFIG_FILES="$CONFIG_FILES src/common/Makefile" ;;
+    "src/timestats/Makefile") CONFIG_FILES="$CONFIG_FILES src/timestats/Makefile" ;;
     "src/aux_library/Makefile") CONFIG_FILES="$CONFIG_FILES src/aux_library/Makefile" ;;
     "src/bam_recal/Makefile") CONFIG_FILES="$CONFIG_FILES src/bam_recal/Makefile" ;;
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;

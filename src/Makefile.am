@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = common aux_library bam_recal
+SUBDIRS = common timestats aux_library bam_recal
 
 INCLUDES = 		-I$(top_builddir)/include
 
@@ -13,6 +13,6 @@ librecal_la_LIBADD = 	$(top_builddir)/src/common/libcommon.la	\
 
 bin_PROGRAMS = recal
 recal_SOURCES = recalibrate.c
-recal_LDADD = librecal.la
+recal_LDADD = $(top_builddir)/src/timestats/libtimestats.la librecal.la
 
 CLEANFILES = *~

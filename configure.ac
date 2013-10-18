@@ -59,6 +59,7 @@ AC_CONFIG_FILES([\
 				Makefile	\
 				src/Makefile	\
 				src/common/Makefile	\
+				src/timestats/Makefile	\
 				src/aux_library/Makefile	\
 				src/bam_recal/Makefile	\
 				tests/Makefile	\

@@ -52,8 +52,11 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 librecal_aux_la_LIBADD =
 am_librecal_aux_la_OBJECTS = aux_misc.lo aux_bam.lo aux_math.lo \
-	aux_quality.lo aux_vector.lo timestats.lo
+	aux_quality.lo aux_vector.lo
 librecal_aux_la_OBJECTS = $(am_librecal_aux_la_OBJECTS)
+librecal_aux_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(librecal_aux_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -222,8 +225,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = librecal_aux.la
-librecal_aux_la_SOURCES = aux_misc.c aux_bam.c aux_math.c aux_quality.c aux_vector.c timestats.c aux_bam.h aux_math.h aux_quality.h aux_misc.h aux_vector.h
-include_HEADERS = $(top_builddir)/include/aux_library.h $(top_builddir)/include/timestats.h
+librecal_aux_la_SOURCES = aux_misc.c aux_bam.c aux_math.c aux_quality.c aux_vector.c aux_bam.h aux_math.h aux_quality.h aux_misc.h aux_vector.h
+include_HEADERS = $(top_builddir)/include/aux_library.h 
+librecal_aux_la_LDFLAGS = -version-info 0:0:0
 
 #EXTRA_DIST = 
 INCLUDES = -I$(top_builddir)/include
@@ -271,7 +275,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 librecal_aux.la: $(librecal_aux_la_OBJECTS) $(librecal_aux_la_DEPENDENCIES) $(EXTRA_librecal_aux_la_DEPENDENCIES) 
-	$(LINK)  $(librecal_aux_la_OBJECTS) $(librecal_aux_la_LIBADD) $(LIBS)
+	$(librecal_aux_la_LINK)  $(librecal_aux_la_OBJECTS) $(librecal_aux_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -284,7 +288,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aux_misc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aux_quality.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aux_vector.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timestats.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

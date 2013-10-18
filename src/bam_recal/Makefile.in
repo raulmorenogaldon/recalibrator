@@ -54,6 +54,9 @@ librecal_bam_la_LIBADD =
 am_librecal_bam_la_OBJECTS = recal_structs.lo bam_recal.lo \
 	data_collector.lo
 librecal_bam_la_OBJECTS = $(am_librecal_bam_la_OBJECTS)
+librecal_bam_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(librecal_bam_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -224,6 +227,7 @@ top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = librecal_bam.la
 librecal_bam_la_SOURCES = recal_structs.c bam_recal.c data_collector.c bam_recal.h data_collector.h recal_structs.h
 include_HEADERS = $(top_builddir)/include/bam_recal_library.h 
+librecal_bam_la_LDFLAGS = -version-info 0:0:0
 
 #EXTRA_DIST =
 INCLUDES = -I$(top_builddir)/include
@@ -271,7 +275,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 librecal_bam.la: $(librecal_bam_la_OBJECTS) $(librecal_bam_la_DEPENDENCIES) $(EXTRA_librecal_bam_la_DEPENDENCIES) 
-	$(LINK)  $(librecal_bam_la_OBJECTS) $(librecal_bam_la_LIBADD) $(LIBS)
+	$(librecal_bam_la_LINK)  $(librecal_bam_la_OBJECTS) $(librecal_bam_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
