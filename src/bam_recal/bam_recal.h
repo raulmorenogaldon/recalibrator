@@ -25,7 +25,6 @@ typedef struct batch_out{
 /**
  * Private functions
  */
-void * recal_batch_thread(void * args);
 
 
 #endif /* BAM_RECAL_H_ */

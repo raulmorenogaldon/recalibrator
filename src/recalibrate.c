@@ -28,6 +28,7 @@ int mymain(	int full,
 {	
 	recal_info_t *data;
 	char *dir, *base, *inputc, *outputc, *infofilec, *datafilec;
+	char *sched;
 	
 	//Incorrect case: No input files
     if (incount == 0)
@@ -64,6 +65,10 @@ int mymain(	int full,
 		p2 = 1;
 	}
 	
+	//Set schedule if not defined
+	setenv("OMP_SCHEDULE", "static", 0);
+	sched = getenv("OMP_SCHEDULE");
+
 	//Time measures
 	#ifdef D_TIME_DEBUG
 
@@ -76,7 +81,15 @@ int mymain(	int full,
 			printf("ERROR: FAILED TO INITIALIZE TIME STATS\n");
 		}
 
-		strcpy(filename, "stats/static_");
+		strcpy(filename, "stats/");
+		if(sched)
+			strcat(filename,sched);
+		else
+		{
+			printf("ERROR: Obtainig OMP_SCHEDULE environment value\n");
+		}
+
+		strcat(filename,"_");
 		sprintf(intaux, "%d", MAX_BATCH_SIZE);
 		strcat(filename, intaux);
 		strcat(filename, "_");
@@ -113,6 +126,7 @@ int mymain(	int full,
 
 	//Set num of threads
 	omp_set_num_threads(threads);
+	printf("Threading with %d threads and %s schedule\n", threads, sched);
 
 	//Execute phase 1
 	if (p1)

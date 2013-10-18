@@ -38,9 +38,9 @@
  * BAM management
  */
 //#define MAX_BATCH_SIZE 	1000000000
-//#define MAX_BATCH_SIZE 	100000000
+#define MAX_BATCH_SIZE 	100000000
 //#define MAX_BATCH_SIZE 	10000000
-#define MAX_BATCH_SIZE 	1000000
+//#define MAX_BATCH_SIZE 	1000000
 
 /**
  * Probability math limits
@@ -79,5 +79,6 @@
  * OpenMP
  */
 //#define D_TIME_OPENMP_VERBOSE
+//#define OMP_SCHEDULE "dynamic"
 
 #endif /* RECAL_CONFIG_H_ */

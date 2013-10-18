@@ -170,7 +170,7 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 
 			}	/* END SECTIONS */
 
-			#pragma omp barrier
+			//#pragma omp barrier
 
 			#pragma omp single
 			{
@@ -203,7 +203,7 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 				read_batch = NULL;
 			}
 
-			#pragma omp barrier
+			//#pragma omp barrier
 
 		} while( collect_batch->num_alignments != 0
 			#ifdef D_MAX_READS
@@ -299,7 +299,7 @@ recal_get_data_from_bam_batch(const bam_batch_t* batch, const genome_t* ref, rec
 		#endif
 
 				//Process all alignments of the batch
-				#pragma omp for
+				#pragma omp for schedule(runtime)
 				for(i = 0; i < current_batch->num_alignments; i++)
 				{
 					#ifdef D_TIME_DEBUG

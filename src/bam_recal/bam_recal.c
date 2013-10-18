@@ -177,7 +177,7 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 				}
 			}
 
-			#pragma omp barrier
+			//#pragma omp barrier
 
 			#pragma omp single
 			{
@@ -217,7 +217,7 @@ recal_recalibrate_bam(const bam_file_t *orig_bam_f, const recal_info_t *bam_info
 				read_batch = NULL;
 			}
 
-			#pragma omp barrier
+			//#pragma omp barrier
 
 			//printf("READY BATCH %d\n", rdy_batch->num_alignments);
 			//printf("BATCH %d\n", batch->num_alignments);
@@ -274,7 +274,7 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info)
 		recal_recalibration_init_env(bam_info->num_cycles, recalibration_env);
 
 		//Process all alignments of the batchs
-		#pragma omp for
+		#pragma omp for schedule(runtime)
 		for(i = 0; i < batch->num_alignments; i++)
 		{
 			/*#pragma omp critical
@@ -438,13 +438,3 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, re
 /**
  * Private functions
  */
-
-void *
-recal_batch_thread(void * args)
-{
-	batch_out_t *arg = (batch_out_t *)args;
-	int bytes;
-
-
-	pthread_exit(NULL);
-}
