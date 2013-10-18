@@ -52,6 +52,7 @@ am_check_recal_OBJECTS = check_recal-check_recal.$(OBJEXT)
 check_recal_OBJECTS = $(am_check_recal_OBJECTS)
 am__DEPENDENCIES_1 =
 check_recal_DEPENDENCIES = $(top_builddir)/src/librecal.la \
+	$(top_builddir)/src/timestats/libtimestats.la \
 	$(am__DEPENDENCIES_1)
 check_recal_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(check_recal_CFLAGS) \
@@ -200,7 +201,7 @@ ACLOCAL_AMFLAGS = -I m4
 check_recal_SOURCES = check_recal.c
 check_recal_CFLAGS = $(CHECK_CFLAGS)
 check_recal_CPPFLAGS = -I$(top_builddir)/include
-check_recal_LDADD = $(top_builddir)/src/librecal.la $(CHECK_LIBS)
+check_recal_LDADD = $(top_builddir)/src/librecal.la $(top_builddir)/src/timestats/libtimestats.la $(CHECK_LIBS)
 CLEANFILES = *~
 all: all-am
 

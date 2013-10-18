@@ -53,6 +53,7 @@ am_check_aux_library_OBJECTS =  \
 check_aux_library_OBJECTS = $(am_check_aux_library_OBJECTS)
 am__DEPENDENCIES_1 =
 check_aux_library_DEPENDENCIES = $(top_builddir)/src/librecal.la \
+	$(top_builddir)/src/timestats/libtimestats.la \
 	$(am__DEPENDENCIES_1)
 check_aux_library_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
@@ -202,7 +203,7 @@ ACLOCAL_AMFLAGS = -I m4
 check_aux_library_SOURCES = check_aux_library.c
 check_aux_library_CFLAGS = $(CHECK_CFLAGS)
 check_aux_library_CPPFLAGS = -I$(top_builddir)/include
-check_aux_library_LDADD = $(top_builddir)/src/librecal.la $(CHECK_LIBS)
+check_aux_library_LDADD = $(top_builddir)/src/librecal.la $(top_builddir)/src/timestats/libtimestats.la $(CHECK_LIBS)
 CLEANFILES = *~
 all: all-am
 
