@@ -47,9 +47,10 @@ typedef struct time_stats {
 /**
  * PRIVATE FUNCTIONS
  */
-ERROR_CODE time_aux_add_time(const unsigned int slot, p_timestats stats, const double time);
+int time_aux_add_time(const unsigned int slot, p_timestats stats, const double time);
 
-ERROR_CODE time_new_stats(const unsigned int num_slots, p_timestats *out_timestats)
+int
+time_new_stats(const unsigned int num_slots, p_timestats *out_timestats)
 {
 	time_stats_t *stats;
 	time_slot_t *slot;
@@ -79,13 +80,13 @@ ERROR_CODE time_new_stats(const unsigned int num_slots, p_timestats *out_timesta
 	TIME_GLOBAL_STATS = stats;
 	*out_timestats = stats;
 
-	return NO_ERROR;
+	return 0;
 }
 
 /**
  * Time statistics structure delete
  */
-ERROR_CODE
+int
 time_destroy_stats(p_timestats *stats)
 {
 	int i;
@@ -93,7 +94,7 @@ time_destroy_stats(p_timestats *stats)
 	if(!stats)
 	{
 		printf("Time - WARNING: Attempting to destroy NULL pointer time\n");
-		return INVALID_INPUT_PARAMS_NULL;
+		return 1;
 	}
 
 	time_stats_t *s = (time_stats_t *)(*stats);
@@ -101,7 +102,7 @@ time_destroy_stats(p_timestats *stats)
 	if(!s)
 	{
 		printf("Time - WARNING: Attempting to destroy NULL pointer time\n");
-		return INVALID_INPUT_PARAMS_NULL;
+		return 1;
 	}
 
 	//Destroy slots
@@ -119,19 +120,19 @@ time_destroy_stats(p_timestats *stats)
 	free(s);
 	*stats = NULL;
 
-	return NO_ERROR;
+	return 0;
 }
 
 /**
  * Time statistics output to file
  */
-ERROR_CODE
+int
 time_set_output_file(const char *name, p_timestats stats)
 {
 	if(!stats)
 	{
 		printf("Time - WARNING: Attempting to access NULL pointer time\n");
-		return INVALID_INPUT_PARAMS_NULL;
+		return 1;
 	}
 
 	time_stats_t *s = (time_stats_t *)stats;
@@ -139,7 +140,7 @@ time_set_output_file(const char *name, p_timestats stats)
 	if(!s)
 	{
 		printf("Time - WARNING: Attempting to access NULL pointer time\n");
-		return INVALID_INPUT_PARAMS_NULL;
+		return 1;
 	}
 
 	if(s->f_output)
@@ -149,13 +150,13 @@ time_set_output_file(const char *name, p_timestats stats)
 
 	s->f_output = fopen(name, "a");
 
-	return NO_ERROR;
+	return 0;
 }
 
 /**
  * TIME OPERATIONS
  */
-ERROR_CODE
+int
 time_init_slot(const unsigned int slot, p_timestats stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
@@ -167,7 +168,7 @@ time_init_slot(const unsigned int slot, p_timestats stats)
 	if(!s)
 	{
 		printf("Time - WARNING: Attempting to initialize slot from NULL pointer time\n");
-		return INVALID_INPUT_PARAMS_NULL;
+		return 1;
 	}
 
 	pthread_mutex_lock(&time_mutex);
@@ -177,18 +178,18 @@ time_init_slot(const unsigned int slot, p_timestats stats)
 		pthread_mutex_unlock(&time_mutex);
 
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
-		return INVALID_INPUT_SLOT;
+		return 1;
 	}
 
 	s->slots[slot]->sec = (uint64_t)ts.tv_sec;
 	s->slots[slot]->nsec = (uint64_t)ts.tv_nsec;
 	pthread_mutex_unlock(&time_mutex);
 
-	return NO_ERROR;
+	return 0;
 }
 
 
-ERROR_CODE
+int
 time_set_slot(const unsigned int slot, p_timestats stats)
 {
 	time_stats_t *s = (time_stats_t *)stats;
@@ -201,7 +202,7 @@ time_set_slot(const unsigned int slot, p_timestats stats)
 	if(!s)
 	{
 		printf("Time - WARNING: Attempting to set slot from NULL pointer time\n");
-		return INVALID_INPUT_PARAMS_NULL;
+		return 1;
 	}
 
 	pthread_mutex_lock(&time_mutex);
@@ -210,7 +211,7 @@ time_set_slot(const unsigned int slot, p_timestats stats)
 		pthread_mutex_unlock(&time_mutex);
 
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
-		return INVALID_INPUT_SLOT;
+		return 1;
 	}
 	pthread_mutex_unlock(&time_mutex);
 
@@ -231,7 +232,7 @@ time_set_slot(const unsigned int slot, p_timestats stats)
 	return time_aux_add_time(slot, stats, interval);
 }
 
-ERROR_CODE
+int
 time_add_time_slot(const unsigned int slot, p_timestats stats, const double time)
 {
 	time_stats_t *s = (time_stats_t *)stats;
@@ -239,27 +240,27 @@ time_add_time_slot(const unsigned int slot, p_timestats stats, const double time
 	if(!s)
 	{
 		printf("Time - WARNING: Attempting to add time to NULL pointer time\n");
-		return INVALID_INPUT_PARAMS_NULL;
+		return 1;
 	}
 
 	pthread_mutex_lock(&time_mutex);
 	if(slot >= s->num_slots)
 	{
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
-		return INVALID_INPUT_SLOT;
+		return 1;
 	}
 	pthread_mutex_unlock(&time_mutex);
 
 	if(time < 0)
 	{
 		printf("Time: Trying to add negative time = %lf\n", time);
-		return INVALID_INPUT_PARAMS_NEGATIVE;
+		return 1;
 	}
 
 	return time_aux_add_time(slot, stats, time);
 }
 
-ERROR_CODE
+int
 time_get_mean_slot(const unsigned int slot, const p_timestats stats, double *out_mean)
 {
 	time_stats_t *s = (time_stats_t *)stats;
@@ -267,23 +268,23 @@ time_get_mean_slot(const unsigned int slot, const p_timestats stats, double *out
 	if(!s)
 	{
 		printf("Time - WARNING: Attempting to get slot mean from NULL pointer time\n");
-		return INVALID_INPUT_PARAMS_NULL;
+		return 1;
 	}
 
 	pthread_mutex_lock(&time_mutex);
 	if(slot >= s->num_slots)
 	{
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
-		return INVALID_INPUT_SLOT;
+		return 1;
 	}
 	pthread_mutex_unlock(&time_mutex);
 
 	*out_mean = s->slots[slot]->dsum_sec / (double)s->slots[slot]->number;
 
-	return NO_ERROR;
+	return 0;
 }
 
-ERROR_CODE
+int
 time_get_min_slot(const unsigned int slot, const p_timestats stats, double *out_min)
 {
 	time_stats_t *s = (time_stats_t *)stats;
@@ -291,23 +292,23 @@ time_get_min_slot(const unsigned int slot, const p_timestats stats, double *out_
 	if(!s)
 	{
 		printf("Time - WARNING: Attempting to get slot min from NULL pointer time\n");
-		return INVALID_INPUT_PARAMS_NULL;
+		return 1;
 	}
 
 	pthread_mutex_lock(&time_mutex);
 	if(slot >= s->num_slots)
 	{
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
-		return INVALID_INPUT_SLOT;
+		return 1;
 	}
 	pthread_mutex_unlock(&time_mutex);
 
 	*out_min = s->slots[slot]->dmin_sec;
 
-	return NO_ERROR;
+	return 0;
 }
 
-ERROR_CODE
+int
 time_get_max_slot(const unsigned int slot, const p_timestats stats, double *out_max)
 {
 	time_stats_t *s = (time_stats_t *)stats;
@@ -315,26 +316,26 @@ time_get_max_slot(const unsigned int slot, const p_timestats stats, double *out_
 	if(!s)
 	{
 		printf("Time - WARNING: Attempting to get slot max from NULL pointer time\n");
-		return INVALID_INPUT_PARAMS_NULL;
+		return 1;
 	}
 
 	pthread_mutex_lock(&time_mutex);
 	if(slot >= s->num_slots)
 	{
 		printf("Time: illegal slot, maximum = %d\n", s->num_slots);
-		return INVALID_INPUT_SLOT;
+		return 1;
 	}
 	pthread_mutex_unlock(&time_mutex);
 
 	*out_max = s->slots[slot]->dmax_sec;
 
-	return NO_ERROR;
+	return 0;
 }
 
 /**
  * PRIVATE FUNCTIONS
  */
-ERROR_CODE
+int
 time_aux_add_time(const unsigned int slot, p_timestats stats, const double time)
 {
 	time_stats_t *s = (time_stats_t *)stats;
@@ -363,5 +364,5 @@ time_aux_add_time(const unsigned int slot, p_timestats stats, const double time)
 
 	pthread_mutex_unlock(&time_mutex);
 
-	return NO_ERROR;
+	return 0;
 }

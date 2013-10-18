@@ -22,7 +22,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <pthread.h>
-#include <recal_common.h>
+
+#ifdef __cplusplus
+	#define EXTERNC extern "C"
+#else
+	#define EXTERNC extern
+#endif
 
 
 /**
@@ -38,26 +43,26 @@ EXTERNC p_timestats TIME_GLOBAL_STATS;
 /**
  * Time statistics structure creation
  */
-EXTERNC ERROR_CODE time_new_stats(const unsigned int num_slots, p_timestats *out_timestats);
+EXTERNC int time_new_stats(const unsigned int num_slots, p_timestats *out_timestats);
 
 /**
  * Time statistics structure delete
  */
-EXTERNC ERROR_CODE time_destroy_stats(p_timestats *stats);
+EXTERNC int time_destroy_stats(p_timestats *stats);
 
 /**
  * Time statistics output to file
  */
-EXTERNC ERROR_CODE time_set_output_file(const char *name, p_timestats stats);
+EXTERNC int time_set_output_file(const char *name, p_timestats stats);
 
 /**
  * TIME OPERATIONS
  */
-EXTERNC ERROR_CODE time_init_slot(const unsigned int slot, p_timestats stats);
-EXTERNC ERROR_CODE time_set_slot(const unsigned int slot, p_timestats stats);
-EXTERNC ERROR_CODE time_add_time_slot(const unsigned int slot, p_timestats stats, const double time);
-EXTERNC ERROR_CODE time_get_mean_slot(const unsigned int slot, const p_timestats stats, double *out_mean);
-EXTERNC ERROR_CODE time_get_min_slot(const unsigned int slot, const p_timestats stats, double *out_min);
-EXTERNC ERROR_CODE time_get_max_slot(const unsigned int slot, const p_timestats stats, double *out_max);
+EXTERNC int time_init_slot(const unsigned int slot, p_timestats stats);
+EXTERNC int time_set_slot(const unsigned int slot, p_timestats stats);
+EXTERNC int time_add_time_slot(const unsigned int slot, p_timestats stats, const double time);
+EXTERNC int time_get_mean_slot(const unsigned int slot, const p_timestats stats, double *out_mean);
+EXTERNC int time_get_min_slot(const unsigned int slot, const p_timestats stats, double *out_min);
+EXTERNC int time_get_max_slot(const unsigned int slot, const p_timestats stats, double *out_max);
 
 #endif
