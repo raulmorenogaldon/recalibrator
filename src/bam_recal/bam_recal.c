@@ -265,7 +265,7 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info)
 {
 	int i;
 	ERROR_CODE err;
-	int num_thr;
+	//int num_thr;
 
 	//Measures
 	double init_time, end_time;
@@ -329,6 +329,39 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info)
 ERROR_CODE
 recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, recal_recalibration_env_t *recalibration_env)
 {
+	//Lengths
+	uint32_t bam_seq_l;
+	uint32_t bam_seq_max_l;
+
+	//CHECK ARGUMENTS (Assuming this function is called always from recal_recalibrate_batch)
+	{
+		//Check nulls
+		if(!alig || !bam_info || !recalibration_env)
+			return INVALID_INPUT_PARAMS_NULL;
+	}
+
+	//SET VARS
+	{
+		bam_seq_max_l = recalibration_env->bam_seq_max_l;
+	}
+
+	//Sequence length
+	bam_seq_l = alig->core.l_qseq;
+	if(bam_seq_l > bam_seq_max_l || bam_seq_l == 0)
+	{
+		return INVALID_SEQ_LENGTH;
+	}
+
+	//Process
+	recal_recalibrate_alignment_priv(alig, bam_info, recalibration_env);
+
+	return NO_ERROR;
+}
+
+//Function for library internal use
+static INLINE void
+recal_recalibrate_alignment_priv(const bam1_t* alig, const recal_info_t *bam_info, recal_recalibration_env_t *recalibration_env)
+{
 	unsigned int qual_index;
 	unsigned int matrix_index;
 	unsigned int i;
@@ -342,7 +375,6 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, re
 	uint32_t bam_seq_max_l;
 
 	//Recalibration
-	double estimated_Q;
 	double delta_r, delta_rc, delta_rd;
 
 	alignment_t* aux_alig;
@@ -351,8 +383,9 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, re
 	//CHECK ARGUMENTS (Assuming this function is called always from recal_recalibrate_batch)
 	{
 		//Check nulls
-		if(!alig)
-			return INVALID_INPUT_PARAMS_NULL;
+		ASSERT(alig);
+		ASSERT(bam_info);
+		ASSERT(recalibration_env);
 	}
 
 	//FILTERS
@@ -367,12 +400,12 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, re
 		bam_seq_max_l = recalibration_env->bam_seq_max_l;
 	}
 
-	//Sequence length
+	//Get sequence length
 	bam_seq_l = alig->core.l_qseq;
-	if(bam_seq_l > bam_seq_max_l || bam_seq_l == 0)
-	{
-		return INVALID_SEQ_LENGTH;
-	}
+
+	//Sequence length check
+	ASSERT(alig->core.l_qseq <= bam_seq_max_l);
+	ASSERT(bam_seq_l != 0);
 
 	//Get sequence
 	bam_seq = new_sequence_from_bam(alig);
@@ -447,11 +480,5 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, re
 	free(res_quals);
 	free(aux_alig1);
 	alignment_free(aux_alig);
-
-	return NO_ERROR;
 }
 
-
-/**
- * Private functions
- */

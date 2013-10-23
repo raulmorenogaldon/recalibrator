@@ -81,6 +81,12 @@
 #define __ATTR_HOT __attribute__((hot))
 
 /**
+ * ASSERTIONS
+ */
+#include <assert.h>
+#define ASSERT(expr) assert(expr)
+
+/**
  * ERROR CODES
  */
 
