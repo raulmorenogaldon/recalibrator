@@ -305,9 +305,9 @@ recal_recalibrate_batch(const bam_batch_t* batch, const recal_info_t *bam_info)
 			#endif
 
 			//Process every alignment
-			err = recal_recalibrate_alignment(batch->alignments_p[i], bam_info, recalibration_env);
-			if(err)
-				printf("ERROR (recal_recalibrate_alignment): %d\n", err);
+			/*err = */recal_recalibrate_alignment_priv(batch->alignments_p[i], bam_info, recalibration_env);
+			//if(err)
+			//	printf("ERROR (recal_recalibrate_alignment): %d\n", err);
 
 			#ifdef D_TIME_DEBUG
 			end_time = omp_get_wtime();
