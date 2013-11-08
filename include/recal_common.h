@@ -30,6 +30,10 @@
 #include <emmintrin.h>
 #endif
 
+/**
+ * NULL DEFINITION
+ */
+
 #ifndef NULL
 	#ifdef __cplusplus
 		#define NULL 0
@@ -38,19 +42,53 @@
 	#endif
 #endif
 
+/**
+ * EXTERN DEFINE
+ */
+
 #ifdef __cplusplus
 	#define EXTERNC extern "C"
 #else
 	#define EXTERNC extern
 #endif
 
+/**
+ * BOOLS
+ */
+
 #define BOOL unsigned char
 #define TRUE 1
 #define FALSE 0
 
+/**
+ * INLINING
+ */
+
+#ifndef __GNUC__
+	#define __asm__ asm
+	#define __inline__ inline
+#endif
+#define INLINE __inline__
+
+/**
+ * MEMORY ALIGNMENT
+ */
 #define MEM_ALIG_SIZE 16
 
+/**
+ * HOT AND COLD ATTRIBUTES
+ */
 #define __ATTR_HOT __attribute__((hot))
+
+/**
+ * ASSERTIONS
+ */
+#include <assert.h>
+#define ASSERT(expr) assert(expr)
+
+/**
+ * ERROR CODES
+ */
 
 //#define ERROR_CODE unsigned char;
 enum ERROR_C {
