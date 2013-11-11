@@ -19,15 +19,15 @@
 //TEST DATA
 const size_t DATA_SIZE = D_SIZE;
 const double ESTIMATED_Q = 25.7403;
-const uint8_t MINIMUM_QUALITY = 6;
+const U_QUALS MINIMUM_QUALITY = 6;
 
 //Global
 const double GLOBAL_MISS = 7147.44;
-const uint32_t GLOBAL_OBS = 700787;
-const uint32_t GLOBAL_EMPIRICAL = 20;
+const U_BASES GLOBAL_OBS = 700787;
+const U_BASES GLOBAL_EMPIRICAL = 20;
 const double GLOBAL_DELTA = -5.740300000000001;
 
-const uint8_t quality[D_SIZE] = {
+const U_QUALS quality[D_SIZE] = {
 		6, 		7, 		8, 		9, 		10,
 		11, 	12, 	13, 	14, 	15, 	16, 	17, 	18, 	19, 	20,
 		21, 	22, 	23, 	24, 	25, 	26, 	27, 	28, 	29, 	30,
@@ -41,7 +41,7 @@ const double qual_errors[D_SIZE] = {
 		176.62, 390.35, 319.97, 309.83, 625.71,	717.60, 632.62, 1361.47
 };
 
-const uint32_t qual_obs[D_SIZE] = {
+const U_BASES qual_obs[D_SIZE] = {
 		360, 	569, 	743, 	1385, 	1049, 											//6
 		1646, 	5471, 	1870, 	597, 	1165, 	1149, 	1588, 	1719, 	2438, 	11675,	//11
 		4196, 	3429, 	2553, 	3259, 	18129, 	7152, 	3951, 	22848, 	11205, 	30077, 	//21

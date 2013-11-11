@@ -85,7 +85,7 @@ typedef enum DINUC
  * \param cycles Number of maximum cycles to stat.
  * \param out_info Previously allocated info struct to initialize.
  */
-EXTERNC ERROR_CODE recal_init_info(const uint32_t cycles, recal_info_t **out_data);
+EXTERNC ERROR_CODE recal_init_info(const U_CYCLES cycles, recal_info_t **out_data);
 
 /**
  * \brief Free all resources of recalibration.
@@ -112,7 +112,7 @@ EXTERNC ERROR_CODE recal_reduce_info(recal_info_t *dst_data, recal_info_t *src_d
  * \param cycles Number of maximum cycles to handle.
  * \param collect_env Previously allocated info struct to initialize.
  */
-EXTERNC ERROR_CODE recal_get_data_init_env(const uint32_t cycles, recal_data_collect_env_t *collect_env);
+EXTERNC ERROR_CODE recal_get_data_init_env(const U_CYCLES cycles, recal_data_collect_env_t *collect_env);
 
 /**
  * \brief Free all resources of data collect environment.
@@ -129,7 +129,7 @@ EXTERNC ERROR_CODE recal_get_data_destroy_env(recal_data_collect_env_t *collect_
  * \param cycles Number of maximum cycles to handle.
  * \param recalibration_env Previously allocated info struct to initialize.
  */
-EXTERNC ERROR_CODE recal_recalibration_init_env(const uint32_t cycles, recal_recalibration_env_t *recalibration_env);
+EXTERNC ERROR_CODE recal_recalibration_init_env(const U_CYCLES cycles, recal_recalibration_env_t *recalibration_env);
 
 /**
  * \brief Free all resources of recalibration environment.
@@ -149,7 +149,7 @@ EXTERNC ERROR_CODE recal_recalibration_destroy_env(recal_recalibration_env_t *re
  * \param dinuc Dinucleotide to add.
  * \param match Indicate if match(!=0) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const char qual, const uint32_t cycle, const char dinuc, const double match) __ATTR_HOT;
+EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const char qual, const U_CYCLES cycle, const char dinuc, const double match) __ATTR_HOT;
 
 /**
  * \brief Add recalibration data from vector of bases.
@@ -164,7 +164,7 @@ EXTERNC ERROR_CODE recal_add_base(recal_info_t *data, const char qual, const uin
  * \param dinuc Vector of dinucleotides to add.
  * \param matches Vector of match(!=0) or not (0)
  */
-EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const uint16_t init_cycle, const uint32_t num_cycles, const char *dinuc, const char *matches) __ATTR_HOT;
+EXTERNC ERROR_CODE recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const U_CYCLES init_cycle, const U_CYCLES num_cycles, const char *dinuc, const char *matches) __ATTR_HOT;
 
 /**
  * \brief Compute deltas from bases and misses.
@@ -185,7 +185,7 @@ EXTERNC ERROR_CODE recal_calc_deltas(recal_info_t* data);
  * \param B Second base.
  * \param out_dinuc Pointer to output dinucleotide.
  */
-EXTERNC ERROR_CODE recal_get_dinuc(const char A, const char B, uint8_t *out_dinuc) __ATTR_HOT;
+EXTERNC ERROR_CODE recal_get_dinuc(const char A, const char B, U_DINUC *out_dinuc) __ATTR_HOT;
 
 
 /***********************************************

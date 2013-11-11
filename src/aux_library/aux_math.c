@@ -120,7 +120,7 @@ gaussian_function(double value, double a, double b, double c, double d)
  * Return approximation for log10(n!)
  */
 double
-log10_gamma(uint32_t n)
+log10_gamma(uint64_t n)
 {
 	double ln = lgamma(n+1);
 

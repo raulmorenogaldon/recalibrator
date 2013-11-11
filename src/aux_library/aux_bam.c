@@ -122,7 +122,7 @@ init_empty_bam_header(const unsigned int num_chroms, bam_header_t *header)
 char *
 new_sequence_from_bam(bam1_t *bam1)
 {
-	char *bam_seq = bam1_seq(bam1);
+	char *bam_seq = (char *)bam1_seq(bam1);
 	int seq_len = bam1->core.l_qseq;
 
 	char *seq = (char *) _mm_malloc(seq_len * sizeof(char), MEM_ALIG_SIZE);
@@ -162,7 +162,7 @@ new_sequence_from_bam(bam1_t *bam1)
 ERROR_CODE
 new_sequence_from_bam_ref(bam1_t *bam1, char *seq, uint32_t max_l)
 {
-	char *bam_seq = bam1_seq(bam1);
+	char *bam_seq = (char *)bam1_seq(bam1);
 	int seq_len = bam1->core.l_qseq;
 
 	if(seq_len > max_l)
@@ -203,7 +203,7 @@ new_sequence_from_bam_ref(bam1_t *bam1, char *seq, uint32_t max_l)
 char *
 new_quality_from_bam(bam1_t *bam1, int base_quality)
 {
-	char *bam_qual = bam1_qual(bam1);
+	char *bam_qual = (char *)bam1_qual(bam1);
 	int qual_len = bam1->core.l_qseq;
 
 	char *qual = (char *) malloc(qual_len * sizeof(char));
@@ -218,7 +218,7 @@ new_quality_from_bam(bam1_t *bam1, int base_quality)
  * Get string containing bam1 quality for every nucleotide.
  */
 ERROR_CODE
-new_quality_from_bam_ref(bam1_t *bam1, int base_quality, char *qual, uint32_t max_l)
+new_quality_from_bam_ref(bam1_t *bam1, U_QUALS base_quality, char *qual, U_CYCLES max_l)
 {
 	char *bam_qual = bam1_qual(bam1);
 	int qual_len = bam1->core.l_qseq;
@@ -239,8 +239,8 @@ new_quality_from_bam_ref(bam1_t *bam1, int base_quality, char *qual, uint32_t ma
 ERROR_CODE
 decompose_cigar(char *cigar, uint8_t cigar_l, char *n_elem, char *type, uint8_t *types_l, uint8_t max_types_length)
 {
-	uint8_t u_elems;
-	char c_type;
+	//uint8_t u_elems;
+	//char c_type;
 	char cigar_elem;
 	int pos;
 	int i;
@@ -302,7 +302,7 @@ decompose_cigar(char *cigar, uint8_t cigar_l, char *n_elem, char *type, uint8_t 
 }
 
 ERROR_CODE
-supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uint8_t cigar_type_l, char *seq_res, uint8_t *seq_res_l)
+supress_indels(char *seq, U_CYCLES seq_l, char *cigar_elem, char *cigar_type, uint8_t cigar_type_l, char *seq_res, U_CYCLES *seq_res_l)
 {
 	int i, j, seq_i, res_i;
 	char count;

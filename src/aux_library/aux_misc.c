@@ -25,7 +25,7 @@ printf_proc_features()
 	int SSE     = 0;
 	int SSE2    = 0;
 	int SSE3    = 0;
-	int SSSE3   = 0;
+	/*int SSSE3   = 0;
 	int SSE41   = 0;
 	int SSE42   = 0;
 	int SSE4a   = 0;
@@ -33,7 +33,7 @@ printf_proc_features()
 	int XOP     = 0;
 	int FMA3    = 0;
 	int FMA4    = 0;
-	int a,b,c,d;
+	int a,b,c,d;*/
 
 	/*cpuid(0,a,b,c,d);
 	int nIds = a;

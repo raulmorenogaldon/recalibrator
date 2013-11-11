@@ -77,7 +77,7 @@ EXTERNC double gaussian_function(double value, double a, double b, double c, dou
  * Return approximation for log10(n!)
  * \param n Number to apply factorial and logarithm.
  */
-EXTERNC double log10_gamma(uint32_t n);
+EXTERNC double log10_gamma(uint64_t n);
 
 /***************************
  * QUALITY OPERATIONS
@@ -93,7 +93,7 @@ EXTERNC double log10_gamma(uint32_t n);
  * \param start_quality Indicates Quality value for first component of v_bases.
  * \param estimated_Q Pointer to store result of estimated global quality.
  */
-EXTERNC ERROR_CODE recal_get_estimated_Q(uint32_t *v_bases, uint32_t count, uint8_t start_quality, double *estimated_Q);
+EXTERNC ERROR_CODE recal_get_estimated_Q(U_BASES *v_bases, size_t count, U_QUALS start_quality, double *estimated_Q);
 
 /**
  * Obtains empirical quality from a count of bases and misses and a theorical quality.
@@ -102,7 +102,7 @@ EXTERNC ERROR_CODE recal_get_estimated_Q(uint32_t *v_bases, uint32_t count, uint
  * \param initial_quality Theorical quality.
  * \param emp_qual Pointer to store result of empirical quality.
  */
-EXTERNC ERROR_CODE recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, double *emp_qual);
+EXTERNC ERROR_CODE recal_get_empirical_Q(double miss, U_BASES bases, double initial_quality, double *emp_qual);
 
 /**
  * Obtains how much one empirical quality approximates one theorical quality, expressed by logarithm.
@@ -120,7 +120,7 @@ EXTERNC ERROR_CODE log10_Qemp_Reported(double Qemp, double Qreported, double *lo
  * \param err Count of errors in this observations.
  * \param log Pointer to store logarithm of comparation result.
  */
-EXTERNC ERROR_CODE log10_Qemp_likelihood(double Qemp, uint32_t obs, uint32_t err, double *log);
+EXTERNC ERROR_CODE log10_Qemp_likelihood(double Qemp, U_BASES obs, U_BASES err, double *log);
 
 /***************************
  * BAM OPERATIONS
@@ -148,7 +148,7 @@ EXTERNC char * new_sequence_from_bam(bam1_t *bam1);
  * \param seq Pointer to allocated character vector for sequence storage.
  * \param max_l Maximum length can handle seq vector.
  */
-EXTERNC ERROR_CODE new_sequence_from_bam_ref(bam1_t *bam1, char *seq, uint32_t max_l);
+EXTERNC ERROR_CODE new_sequence_from_bam_ref(bam1_t *bam1, char *seq, U_CYCLES max_l);
 
 /**
  * Get string containing bam1 quality for every nucleotide.
@@ -165,7 +165,7 @@ EXTERNC char * new_quality_from_bam(bam1_t *bam1, int base_quality);
  * \param qual Pointer to allocated character vector for quality storage.
  * \param max_l Maximum length can handle qual vector.
  */
-EXTERNC ERROR_CODE new_quality_from_bam_ref(bam1_t *bam1, int base_quality, char *qual, uint32_t max_l);
+EXTERNC ERROR_CODE new_quality_from_bam_ref(bam1_t *bam1, U_QUALS base_quality, char *qual, U_CYCLES max_l);
 
 /**
  * Decomponse a string cigar in two vectors, containing number of ocurrences for every cigar operation (I, D, =, M, etc..)
@@ -178,7 +178,7 @@ EXTERNC ERROR_CODE new_quality_from_bam_ref(bam1_t *bam1, int base_quality, char
  */
 EXTERNC ERROR_CODE decompose_cigar(char *cigar, uint8_t cigar_l, char *n_elem, char *type, uint8_t *types_l, uint8_t max_types_length);
 
-EXTERNC ERROR_CODE supress_indels(char *seq, uint8_t seq_l, char *cigar_elem, char *cigar_type, uint8_t cigar_type_l, char *seq_res, uint8_t *seq_res_l) __attribute__((deprecated));
+EXTERNC ERROR_CODE supress_indels(char *seq, U_CYCLES seq_l, char *cigar_elem, char *cigar_type, uint8_t cigar_type_l, char *seq_res, U_CYCLES *seq_res_l) __attribute__((deprecated));
 
 /**
  * Get sequence and quality vector supressing insertions and adding deletions.

@@ -72,8 +72,8 @@ recal_get_data_from_bam(const bam_file_t *bam, const genome_t* ref, recal_info_t
 
 	//Duplicate check
 	char *last_seq;
-	uint32_t l_last_seq;
-	uint32_t pos_last_seq;
+	U_CYCLES l_last_seq;
+	U_CYCLES pos_last_seq;
 	bam1_t *last_alig;
 
 	//Time measure
@@ -383,11 +383,11 @@ recal_get_data_from_bam_alignment(const bam1_t* alig, const genome_t* ref, recal
 	//Enviroment
 	char *bam_seq;
 	char *bam_quals;
-	uint32_t bam_seq_l;
+	U_CYCLES bam_seq_l;
 	char *aux_res_seq;
 	char *aux_res_qual;
-	uint32_t aux_res_seq_l;
-	uint32_t bam_seq_max_l;
+	U_CYCLES aux_res_seq_l;
+	U_CYCLES bam_seq_max_l;
 
 	//SSE
 	#ifdef __SSE2__

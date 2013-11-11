@@ -18,6 +18,8 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
+#include <stdint.h>
+
 #ifdef __MMX__
 #include <mmintrin.h>
 #endif
@@ -51,6 +53,14 @@
 #else
 	#define EXTERNC extern
 #endif
+
+/**
+ * DATA LENGTHS
+ */
+typedef uint8_t U_QUALS;
+typedef uint64_t U_BASES;
+typedef uint32_t U_CYCLES;
+typedef uint8_t U_DINUC;
 
 /**
  * BOOLS

@@ -12,26 +12,26 @@
  * This struct hold all data necessary to perform recalibrations
  */
 struct recal_info {
-	uint8_t min_qual;	//Set minor stored quality
-	uint32_t num_quals;	//Set range of stored qualities
-	uint32_t num_cycles;	//Set maximum number of cycles stored
-	uint32_t num_dinuc;	//Set number of maximum dinucleotides
+	U_QUALS min_qual;	//Set minor stored quality
+	U_QUALS num_quals;	//Set range of stored qualities
+	U_CYCLES num_cycles;	//Set maximum number of cycles stored
+	U_DINUC num_dinuc;	//Set number of maximum dinucleotides
 
 	double total_miss;				//Total misses
-	uint32_t total_bases;				//Total bases
+	U_BASES total_bases;				//Total bases
 	double total_delta;			//Global delta
 	double total_estimated_Q;	//Global estimated Quality
 
 	double* qual_miss;				//Misses per quality
-    uint32_t* qual_bases;				//Bases per quality
+	U_BASES* qual_bases;				//Bases per quality
     double* qual_delta;			//Delta per quality
 
     double* qual_cycle_miss;		//Misses per quality-cycle pair
-    uint32_t* qual_cycle_bases;		//Bases per quality-cycle pair
+    U_BASES* qual_cycle_bases;		//Bases per quality-cycle pair
     double* qual_cycle_delta;		//Deltas per quality-cycle pair
 
     double* qual_dinuc_miss;		//Misses per quality-dinuc pair
-    uint32_t* qual_dinuc_bases;		//Bases per quality-dinuc pair
+    U_BASES* qual_dinuc_bases;		//Bases per quality-dinuc pair
     double* qual_dinuc_delta;		//Deltas per quality-dinuc pair
 };
 
@@ -47,7 +47,7 @@ typedef struct data_collect_env {
 	char *aux_res_qual;
 
 	//Maximum length
-	uint32_t bam_seq_max_l;
+	U_CYCLES bam_seq_max_l;
 
 };
 
@@ -57,7 +57,7 @@ typedef struct recalibration_env {
 	char *bam_quals;
 
 	//Maximum length
-	uint32_t bam_seq_max_l;
+	U_CYCLES bam_seq_max_l;
 
 };
 

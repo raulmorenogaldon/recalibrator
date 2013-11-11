@@ -25,13 +25,13 @@
  * Obtains estimated global quality from a vector of bases.
  */
 ERROR_CODE
-recal_get_estimated_Q(uint32_t *v_bases, uint32_t count, uint8_t start_quality, double *estimated_Q)
+recal_get_estimated_Q(U_BASES *v_bases, size_t count, U_QUALS start_quality, double *estimated_Q)
 {
 	double err0;
 	double total_sum;
-	uint32_t total_bases;
+	U_BASES total_bases;
 	double aux;
-	uint8_t quality;
+	U_QUALS quality;
 	int i;
 
 	total_sum = 0.0;
@@ -40,7 +40,7 @@ recal_get_estimated_Q(uint32_t *v_bases, uint32_t count, uint8_t start_quality, 
 	//Obtains global base count and error count
 	for(i = count-1; i >= 0; i--)
 	{
-		quality = (uint8_t)i + start_quality;	/* Get quality for this component*/
+		quality = (U_QUALS)i + start_quality;	/* Get quality for this component*/
 		err0 = (double)v_bases[i] * pow(10.0, (-((double)quality)*0.1));	/* Calculate error based in count of bases and what quality have */
 		//Increment global counters
 		total_sum += err0;
@@ -61,10 +61,10 @@ recal_get_estimated_Q(uint32_t *v_bases, uint32_t count, uint8_t start_quality, 
  * Obtains empirical quality from a count of bases and misses and a theorical quality.
  */
 ERROR_CODE
-recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, double *emp_qual)
+recal_get_empirical_Q(double miss, U_BASES bases, double initial_quality, double *emp_qual)
 {
-	uint32_t mismatches;
-	uint32_t observations;
+	U_BASES mismatches;
+	U_BASES observations;
 	double log10[91];
 	double norm[91];
 	double sum_norm;
@@ -74,7 +74,7 @@ recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, doubl
 	double max;
 	int i;
 
-	mismatches = (uint32_t)(miss + 0.5) + SMOOTH_CONSTANT;
+	mismatches = (U_BASES)(miss + 0.5) + SMOOTH_CONSTANT;
 	observations = bases + (SMOOTH_CONSTANT*2);
 
 	//Get logarithms
@@ -112,7 +112,7 @@ recal_get_empirical_Q(double miss, uint32_t bases, double initial_quality, doubl
 ERROR_CODE
 log10_Qemp_Reported(double Qemp, double Qreported, double *log)
 {
-	uint8_t difference;
+	U_QUALS difference;
 	double gaussian;
 	double local_log;
 
@@ -138,7 +138,7 @@ log10_Qemp_Reported(double Qemp, double Qreported, double *log)
  * Result is expressed by a logarithm.
  */
 ERROR_CODE
-log10_Qemp_likelihood(double Qemp, uint32_t obs, uint32_t err, double *log)
+log10_Qemp_likelihood(double Qemp, U_BASES obs, U_BASES err, double *log)
 {
 	double log10p;
 	double log10OneMinusP;

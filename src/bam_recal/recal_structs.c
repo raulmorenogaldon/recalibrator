@@ -31,7 +31,7 @@
  * Initialize empty recalibration data struct.
  */
 ERROR_CODE
-recal_init_info(const uint32_t cycles, recal_info_t **out_data)
+recal_init_info(const U_CYCLES cycles, recal_info_t **out_data)
 {
 	recal_info_t *data;
 	int vector_size = MAX_QUALITY - MIN_QUALITY;
@@ -52,18 +52,23 @@ recal_init_info(const uint32_t cycles, recal_info_t **out_data)
 
 	//Quality vectors
 	new_vector_double(vector_size, 0.0, &(data->qual_miss));
-	new_vector_uint32(vector_size, 0.0, &(data->qual_bases));
+	data->qual_bases = (U_BASES *)malloc(vector_size * sizeof(U_BASES));
 	new_vector_double(vector_size, 0.0, &(data->qual_delta));
 
 	//Qual-Cycle matrix
 	new_vector_double(vector_size * cycles, 0.0, &(data->qual_cycle_miss));
-	new_vector_uint32(vector_size * cycles, 0.0, &(data->qual_cycle_bases));
+	data->qual_cycle_bases = (U_BASES *)malloc(vector_size * cycles * sizeof(U_BASES));
 	new_vector_double(vector_size * cycles, 0.0, &(data->qual_cycle_delta));
 
 	//Qual-Dinuc matrix
-	new_vector_double(vector_size * cycles, 0.0, &(data->qual_dinuc_miss));
-	new_vector_uint32(vector_size * cycles, 0.0, &(data->qual_dinuc_bases));
-	new_vector_double(vector_size * cycles, 0.0, &(data->qual_dinuc_delta));
+	new_vector_double(vector_size * NUM_DINUC, 0.0, &(data->qual_dinuc_miss));
+	data->qual_dinuc_bases = (U_BASES *)malloc(vector_size * NUM_DINUC * sizeof(U_BASES));
+	new_vector_double(vector_size * NUM_DINUC, 0.0, &(data->qual_dinuc_delta));
+
+	//Initialize vector values
+	memset(data->qual_bases, 0, vector_size * sizeof(U_BASES));
+	memset(data->qual_cycle_bases, 0, vector_size * cycles * sizeof(U_BASES));
+	memset(data->qual_dinuc_bases, 0, vector_size * NUM_DINUC * sizeof(U_BASES));
 
 	*out_data = data;
 
@@ -162,7 +167,7 @@ recal_reduce_info(recal_info_t *dst_data, recal_info_t *src_data)
  * Initialize empty data collection environment struct.
  */
 ERROR_CODE
-recal_get_data_init_env(const uint32_t cycles, recal_data_collect_env_t *collect_env)
+recal_get_data_init_env(const U_CYCLES cycles, recal_data_collect_env_t *collect_env)
 {
 	if(!collect_env)
 		return INVALID_INPUT_PARAMS_NULL;
@@ -205,7 +210,7 @@ recal_get_data_destroy_env(recal_data_collect_env_t *collect_env)
  * Initialize empty recalibration environment struct.
  */
 ERROR_CODE
-recal_recalibration_init_env(const uint32_t cycles, recal_recalibration_env_t *recalibration_env)
+recal_recalibration_init_env(const U_CYCLES cycles, recal_recalibration_env_t *recalibration_env)
 {
 	if(!recalibration_env)
 		return INVALID_INPUT_PARAMS_NULL;
@@ -240,7 +245,7 @@ recal_recalibration_destroy_env(recal_recalibration_env_t *recalibration_env)
  * Add recalibration data from one base.
  */
 ERROR_CODE
-recal_add_base(recal_info_t *data, const char qual, const uint32_t cycle, const char dinuc, const double match)
+recal_add_base(recal_info_t *data, const char qual, const U_CYCLES cycle, const char dinuc, const double match)
 {
 	int qual_index = qual - data->min_qual;
 	int qual_cycle_index = qual_index * data->num_cycles + cycle;
@@ -301,10 +306,10 @@ recal_add_base(recal_info_t *data, const char qual, const uint32_t cycle, const 
  * Add recalibration data from vector of bases
  */
 ERROR_CODE
-recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const uint16_t init_cycle, const uint32_t num_cycles, const char *dinuc, const char *matches)
+recal_add_base_v(recal_info_t *data, const char *seq, const char *quals, const U_CYCLES init_cycle, const U_CYCLES num_cycles, const char *dinuc, const char *matches)
 {
-	int i;
-	uint32_t cycles;
+	U_CYCLES i;
+	U_CYCLES cycles;
 	ERROR_CODE err;
 
 	cycles = num_cycles;
@@ -373,7 +378,7 @@ recal_calc_deltas(recal_info_t* data)
 	printf("Processing deltas...\n");
 
 	//Estimated Q
-	recal_get_estimated_Q(data->qual_bases, data->num_quals, (uint8_t)0, &estimated_Q);
+	recal_get_estimated_Q(data->qual_bases, data->num_quals, (U_QUALS)0, &estimated_Q);
 
 	//Get empirical global qual
 	recal_get_empirical_Q(data->total_miss, data->total_bases, estimated_Q, &emp_Q);
@@ -470,7 +475,7 @@ recal_calc_deltas(recal_info_t* data)
  * Return dinucleotide enumeration from two bases.
  */
 ERROR_CODE
-recal_get_dinuc(const char A, const char B, uint8_t *out_dinuc)
+recal_get_dinuc(const char A, const char B, U_DINUC *out_dinuc)
 {
 	*out_dinuc = d_X;
 
@@ -577,8 +582,8 @@ recal_fprint_info(const recal_info_t *data, const char *path)
 	printf("\n----------------\nPrinting data on \"%s\" file...\n----------------\n", path);
 
 	//Print general info
-	fprintf(fp, "==============================\nGENERAL: \nTotal miss: %lu\nTotal bases: %lu\nTotal delta: %.2f\nEstimated Q: %.2f\n",
-			(long unsigned int)data->total_miss, (long unsigned int)data->total_bases, (float)data->total_delta, (float)data->total_estimated_Q);
+	fprintf(fp, "==============================\nGENERAL: \nTotal miss: %.2lf\nTotal bases: %lu\nTotal delta: %.2lf\nEstimated Q: %.2lf\n",
+			(double)data->total_miss, (U_BASES)data->total_bases, (double)data->total_delta, (double)data->total_estimated_Q);
 
 	//Print quality infos
 	fprintf(fp, "==============================\nQUAL VECTOR:\n");
@@ -672,28 +677,30 @@ recal_save_recal_info(const recal_info_t *data, const char *path)
 
 	fp = fopen(path, "w+");
 
-	fwrite(data, sizeof(uint8_t), 1, fp);
-	fwrite(data, sizeof(uint32_t), 3, fp);
+	fwrite(data, sizeof(U_QUALS), 1, fp);	//min_qual
+	fwrite(data, sizeof(U_QUALS), 1, fp);	//num_quals
+	fwrite(data, sizeof(U_CYCLES), 1, fp);	//num_cycles
+	fwrite(data, sizeof(U_DINUC), 1, fp);	//num_dinuc
 
 	//Save total counters
 	fwrite(&data->total_miss, sizeof(double), 1, fp);
-	fwrite(&data->total_bases, sizeof(uint32_t), 1, fp);
+	fwrite(&data->total_bases, sizeof(U_BASES), 1, fp);
 	fwrite(&data->total_delta, sizeof(double), 1, fp);
 	fwrite(&data->total_estimated_Q, sizeof(double), 1, fp);
 
 	//Save qual counters
 	fwrite(data->qual_miss, sizeof(double), data->num_quals, fp);
-	fwrite(data->qual_bases, sizeof(uint32_t), data->num_quals, fp);
+	fwrite(data->qual_bases, sizeof(U_BASES), data->num_quals, fp);
 	fwrite(data->qual_delta, sizeof(double), data->num_quals, fp);
 
 	//Save cycle counters
 	fwrite(data->qual_cycle_miss, sizeof(double), data->num_quals * data->num_cycles, fp);
-	fwrite(data->qual_cycle_bases, sizeof(uint32_t), data->num_quals * data->num_cycles, fp);
+	fwrite(data->qual_cycle_bases, sizeof(U_BASES), data->num_quals * data->num_cycles, fp);
 	fwrite(data->qual_cycle_delta, sizeof(double), data->num_quals * data->num_cycles, fp);
 
 	//Save dinuc counters
 	fwrite(data->qual_dinuc_miss, sizeof(double), data->num_quals * data->num_dinuc, fp);
-	fwrite(data->qual_dinuc_bases, sizeof(uint32_t), data->num_quals * data->num_dinuc, fp);
+	fwrite(data->qual_dinuc_bases, sizeof(U_BASES), data->num_quals * data->num_dinuc, fp);
 	fwrite(data->qual_dinuc_delta, sizeof(double), data->num_quals * data->num_dinuc, fp);
 
 	fclose(fp);
@@ -713,28 +720,30 @@ recal_load_recal_info(const char *path, recal_info_t *data)
 
 	fp = fopen(path, "r");
 
-	fread(data, sizeof(uint8_t), 1, fp);
-	fread(data, sizeof(uint32_t), 3, fp);
+	fwrite(data, sizeof(U_QUALS), 1, fp);	//min_qual
+	fwrite(data, sizeof(U_QUALS), 1, fp);	//num_quals
+	fwrite(data, sizeof(U_CYCLES), 1, fp);	//num_cycles
+	fwrite(data, sizeof(U_DINUC), 1, fp);	//num_dinuc
 
 	//Read total counters
 	fread(&data->total_miss, sizeof(double), 1, fp);
-	fread(&data->total_bases, sizeof(uint32_t), 1, fp);
+	fread(&data->total_bases, sizeof(U_BASES), 1, fp);
 	fread(&data->total_delta, sizeof(double), 1, fp);
 	fread(&data->total_estimated_Q, sizeof(double), 1, fp);
 
 	//Read qual counters
 	fread(data->qual_miss, sizeof(double), data->num_quals, fp);
-	fread(data->qual_bases, sizeof(uint32_t), data->num_quals, fp);
+	fread(data->qual_bases, sizeof(U_BASES), data->num_quals, fp);
 	fread(data->qual_delta, sizeof(double), data->num_quals, fp);
 
 	//Read cycle counters
 	fread(data->qual_cycle_miss, sizeof(double), data->num_quals * data->num_cycles, fp);
-	fread(data->qual_cycle_bases, sizeof(uint32_t), data->num_quals * data->num_cycles, fp);
+	fread(data->qual_cycle_bases, sizeof(U_BASES), data->num_quals * data->num_cycles, fp);
 	fread(data->qual_cycle_delta, sizeof(double), data->num_quals * data->num_cycles, fp);
 
 	//Read dinuc counters
 	fread(data->qual_dinuc_miss, sizeof(double), data->num_quals * data->num_dinuc, fp);
-	fread(data->qual_dinuc_bases, sizeof(uint32_t), data->num_quals * data->num_dinuc, fp);
+	fread(data->qual_dinuc_bases, sizeof(U_BASES), data->num_quals * data->num_dinuc, fp);
 	fread(data->qual_dinuc_delta, sizeof(double), data->num_quals * data->num_dinuc, fp);
 
 	fclose(fp);

@@ -362,17 +362,17 @@ recal_recalibrate_alignment(const bam1_t* alig, const recal_info_t *bam_info, re
 static INLINE void
 recal_recalibrate_alignment_priv(const bam1_t* alig, const recal_info_t *bam_info, recal_recalibration_env_t *recalibration_env)
 {
-	unsigned int qual_index;
+	U_QUALS qual_index;
 	unsigned int matrix_index;
 	unsigned int i;
-	uint8_t dinuc;
+	U_DINUC dinuc;
 
 	//Sequence
 	char *bam_seq;
 	char *bam_quals;
 	char *res_quals;
-	uint32_t bam_seq_l;
-	uint32_t bam_seq_max_l;
+	U_CYCLES bam_seq_l;
+	U_CYCLES bam_seq_max_l;
 
 	//Recalibration
 	double delta_r, delta_rc, delta_rd;
