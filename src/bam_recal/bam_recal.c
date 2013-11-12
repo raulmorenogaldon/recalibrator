@@ -32,13 +32,14 @@ recal_recalibrate_bam_file(const char *orig_bam_path, const recal_info_t *bam_in
 	printf("BAM opened!...\n");
 
 	//Allocate
-	recal_bam_header = (bam_header_t *) calloc(1, sizeof(bam_header_t));
+	//recal_bam_header = (bam_header_t *) calloc(1, sizeof(bam_header_t));
 
 	//Create new bam
 	printf("Creating new bam file in \"%s\"...\n", recal_bam_path);
-	init_empty_bam_header(orig_bam_f->bam_header_p->n_targets, recal_bam_header);
-	recal_bam_f = bam_fopen_mode(recal_bam_path, recal_bam_header, "w");
-	bam_fwrite_header(recal_bam_header, recal_bam_f);
+	//init_empty_bam_header(orig_bam_f->bam_header_p->n_targets, recal_bam_header);
+	recal_bam_f = bam_fopen_mode(recal_bam_path, orig_bam_f->bam_header_p, "w");
+	bam_fwrite_header(recal_bam_f->bam_header_p, recal_bam_f);
+	recal_bam_f->bam_header_p = NULL;
 	printf("New BAM initialized!...\n");
 
 	//Recalibrate bams
@@ -51,10 +52,11 @@ recal_recalibrate_bam_file(const char *orig_bam_path, const recal_info_t *bam_in
 	#endif
 
 	//Memory free
-	printf("Closing \"%s\" BAM file...\n", orig_bam_path);
-	bam_fclose(orig_bam_f);
 	printf("Closing \"%s\" BAM file...\n", recal_bam_path);
 	bam_fclose(recal_bam_f);
+	printf("Closing \"%s\" BAM file...\n", orig_bam_path);
+	bam_fclose(orig_bam_f);
+
 	printf("BAMs closed.\n");
 	printf("Recalibration DONE.\n");
 
