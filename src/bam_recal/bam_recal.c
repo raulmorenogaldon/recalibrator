@@ -456,31 +456,33 @@ recal_recalibrate_alignment_priv(const bam1_t* alig, const recal_info_t *bam_inf
 			}
 			else
 			{
-				res_quals[i] = calidad;
+				res_quals[i] = (char)calidad;
 			}
 		}
 	}
 
 	//Convert bam1_t to alignment_t
-	aux_alig = alignment_new_by_bam(alig, 0);
+	//aux_alig = alignment_new_by_bam(alig, 0);
 
 	//Set qualities in alignment
-	memcpy(aux_alig->quality, res_quals, bam_seq_l);
+	//memcpy(aux_alig->quality, res_quals, bam_seq_l);
 
 	//Fix reads in alignment (sequence conversion to string is bug)
-	memcpy(aux_alig->sequence, bam_seq, bam_seq_l);
+	//memcpy(aux_alig->sequence, bam_seq, bam_seq_l);
 
 	//Convert alig to bam1 format
-	aux_alig1 = convert_to_bam(aux_alig, 0);
+	//aux_alig1 = convert_to_bam(aux_alig, 0);
 
 	//Overwrite batch readings
-	free(alig->data);
-	memcpy(alig, aux_alig1, sizeof(bam1_t));
+	//free(alig->data);
+	//memcpy(alig, aux_alig1, sizeof(bam1_t));
+
+	memcpy(bam1_qual(alig), res_quals, bam_seq_l);
 
 	//Memory free
 	free(bam_seq);
 	free(res_quals);
-	free(aux_alig1);
-	alignment_free(aux_alig);
+	//free(aux_alig1);
+	//alignment_free(aux_alig);
 }
 
