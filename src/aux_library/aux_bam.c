@@ -402,7 +402,9 @@ supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cig
 			break;
 		case BAM_CMATCH:
 		case BAM_CPAD:
-		default:
+		case BAM_CEQUAL:
+		case BAM_CSOFT_CLIP:
+		case BAM_CHARD_CLIP:
 			if(count + seq_i > seq_l)
 				count = seq_l - seq_i;
 
@@ -417,6 +419,11 @@ supress_indels_from_32_cigar(char *seq, char *qual, int32_t seq_l, uint32_t *cig
 			res_i += count;
 			seq_i += count;
 			break;
+
+		default:
+			fprintf(stderr, "WARNING: Unrecognised cigar N:%d T:%d\n", count, type);
+			fflush(stderr);
+			abort();
 		}
 	}
 
