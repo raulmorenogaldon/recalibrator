@@ -20,6 +20,7 @@
 #include <argtable2.h>
 #include <string.h>
 #include <libgen.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include "recal_config.h"
 #include "bam_recal_library.h"
@@ -47,6 +48,7 @@ int mymain(	int full,
 	recal_info_t *data;
 	char *dir, *base, *inputc, *outputc, *infofilec, *datafilec;
 	char *sched;
+	char cwd[1024];
 	
 	//Incorrect case: No input files
     if (incount == 0)
@@ -138,13 +140,27 @@ int mymain(	int full,
 			printf("ERROR: FAILED TO INITIALIZE TIME STATS\n");
 		}
 
-		strcpy(filename, "stats/");
+
+		if (getcwd(cwd, sizeof(cwd)) != NULL)
+		{
+			printf("Current working dir: %s\n", cwd);
+		}
+		else
+		{
+			perror("WARNING: getcwd() dont work\n");
+		}
+
+		strcpy(filename, cwd);
+		strcat(filename,"/stats/");
 		if(sched)
 			strcat(filename,sched);
 		else
 		{
 			printf("ERROR: Obtainig OMP_SCHEDULE environment value\n");
 		}
+
+		//Create stats directory
+		mkdir(filename, S_IRWXU);
 
 		strcat(filename,"_");
 		sprintf(intaux, "%d", MAX_BATCH_SIZE);
