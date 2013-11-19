@@ -20,6 +20,7 @@
 #include <argtable2.h>
 #include <string.h>
 #include <libgen.h>
+#include <sys/stat.h>
 #include "recal_config.h"
 #include "bam_recal_library.h"
 #include "aux_library.h"
@@ -53,6 +54,22 @@ int mymain(	int full,
 		printf("Please, specify one input files.\n");
 		return 1;
 	}
+
+    //Incorrect case: Input file dont exists
+    if (incount == 1)
+    {
+    	FILE *f = NULL;
+    	f = fopen(input, "r");
+    	if(f)
+    	{
+    		fclose(f);
+    	}
+    	else
+    	{
+    		printf("Inexistent input file \"%s\".\n", input);
+    		return 1;
+    	}
+    }
 	
 	//Incorrect case: More than one output files
     if (outcount > 1)
@@ -82,6 +99,29 @@ int mymain(	int full,
 		p2 = 1;
 	}
 	
+	//Incorrect case: No reference in phase 1
+	if (p1 && refcount == 0)
+	{
+		printf("Please, specify reference file with phase 1.\n");
+		return 1;
+	}
+
+	//Incorrect case: Reference file dont exists
+	if (p1 && refcount > 0)
+	{
+		FILE *f = NULL;
+		f = fopen(reference, "r");
+		if(f)
+		{
+			fclose(f);
+		}
+		else
+		{
+			printf("Inexistent reference file \"%s\".\n", reference);
+			return 1;
+		}
+	}
+
 	//Set schedule if not defined
 	setenv("OMP_SCHEDULE", "static", 0);
 	sched = getenv("OMP_SCHEDULE");
@@ -200,9 +240,11 @@ int mymain(	int full,
 			recal_load_recal_info(datafile, data);
 		}
 		
-		//Recalibrate bam
+
 		inputc = strdup(input);
 		outputc = strdup(output);
+
+		//Recalibrate bam
 		recal_recalibrate_bam_file(inputc, data, outputc);
 		free(inputc);
 		free(outputc);
